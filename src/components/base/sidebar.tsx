@@ -1,40 +1,36 @@
-import { MenuProps } from "antd";
 import React from "react";
-import { ISiderProps, Sidebar } from "ui";
+import { useNavigate } from "react-router-dom";
+import { Sidebar, getSidebarItem as getItem, MoneyCollectOutlined } from "ui";
 import {
   HomeOutlined,
   UserOutlined,
   UserAddOutlined,
   BookOutlined,
   SettingOutlined,
-  LogoutOutlined,
   UsergroupAddOutlined,
-} from "@ant-design/icons";
+  ILayoutSidebarProps,
+} from "ui";
 import { routeNames } from "app/utils";
 
-export type MenuItem = Required<MenuProps>["items"][number];
-function getItem(
-  label: React.ReactNode,
-  key: React.Key,
-  icon?: React.ReactNode,
-  children?: MenuItem[]
-): MenuItem {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  } as MenuItem;
-}
 export const items = [
   getItem("Dashboard", routeNames.dashboard, <HomeOutlined />),
   getItem("Patients", routeNames.patients, <UserOutlined />),
   getItem("Families", routeNames.families, <UsergroupAddOutlined />),
+  getItem("Payments", routeNames.payments, <MoneyCollectOutlined />),
   getItem("Appointments", routeNames.appointments, <BookOutlined />),
   getItem("Users", routeNames.users, <UserAddOutlined />),
   getItem("Settings", routeNames.settings, <SettingOutlined />),
-  getItem("Logout", routeNames.logout, <LogoutOutlined />),
 ];
-export const AppSidebar = (props: Omit<ISiderProps, "items">) => {
-  return <Sidebar items={items} {...props} />;
+
+export const AppSidebar = (props: ILayoutSidebarProps) => {
+  const navigate = useNavigate();
+  return (
+    <Sidebar
+      items={items}
+      onSelect={(key) => {
+        navigate(key);
+      }}
+      {...props}
+    />
+  );
 };

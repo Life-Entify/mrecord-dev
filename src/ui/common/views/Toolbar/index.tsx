@@ -1,4 +1,4 @@
-import { Button, ButtonProps, DatePicker, Input } from "antd";
+import { Button, ButtonProps, DatePicker, Input, theme } from "antd";
 import { SearchProps } from "antd/es/input";
 import React from "react";
 import styled from "styled-components";
@@ -7,7 +7,7 @@ import type { RangePickerProps, DatePickerProps } from "antd/es/date-picker";
 const Root = styled.div`
   display: flex;
   align-items: center;
-  box-shadow: 0px 0px 3px;
+  box-shadow: 0px 0px 1px;
   border-radius: 3px;
   padding: 10px;
 `;
@@ -24,6 +24,7 @@ export interface IToolbarProps {
   newBtnProps?: ButtonProps;
   datePickerProps?: DatePickerProps;
   dateRangePickerProps?: RangePickerProps;
+  extra?: React.ReactNode;
 }
 
 export const Toolbar: React.FC<IToolbarProps> = ({
@@ -31,9 +32,14 @@ export const Toolbar: React.FC<IToolbarProps> = ({
   newBtnProps,
   datePickerProps,
   dateRangePickerProps,
+  extra,
 }) => {
+  const myTheme = theme.useToken();
+  const {
+    token: { colorBgLayout },
+  } = myTheme;
   return (
-    <Root>
+    <Root style={{ background: colorBgLayout }}>
       <Space style={{ display: "flex" }}>
         {searchProps && <Input.Search {...searchProps} />}
         {datePickerProps && <DatePicker {...datePickerProps} />}
@@ -41,6 +47,7 @@ export const Toolbar: React.FC<IToolbarProps> = ({
           <DatePicker.RangePicker {...dateRangePickerProps} />
         )}
         <Gap />
+        {extra}
         {newBtnProps && (
           <Button type="primary" {...newBtnProps}>
             {newBtnProps.title}

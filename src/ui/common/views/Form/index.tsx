@@ -34,7 +34,7 @@ type IFieldsProps = {
   fieldType: FORM_FIELD_TYPES;
 };
 export interface IFormItems {
-  itemProps?: FormItemProps;
+  itemProps: FormItemProps;
   fieldProps?: IFieldProps | IFieldsProps[];
   fieldType: FORM_FIELD_TYPES;
 }
@@ -102,6 +102,7 @@ export interface IFormProps {
   formProps?: FormProps;
   items?: IFormItems[];
 }
+
 export const Form: React.FC<IFormProps> = ({ formProps, formRef, items }) => {
   const [form] = AntForm.useForm();
   return (

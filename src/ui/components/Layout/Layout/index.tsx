@@ -1,21 +1,22 @@
-import { Layout as AntLayout, theme } from 'antd';
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { ISiderProps } from '../Sidebar';
+import { Layout as AntLayout, theme } from "antd";
+import React, { useState } from "react";
+import styled from "styled-components";
+import { ISiderProps } from "../Sidebar";
 
 const ComponentContainer = styled.div`
   padding: 24px;
   minheight: 340px;
-  background: ${props => props.theme.colorBgContainer};
+  background: ${(props) => props.theme.colorBgContainer};
 `;
 const { Content } = AntLayout;
+export type ILayoutSidebarProps = Omit<ISiderProps, "items" | "onSelect">
 export interface ILayoutProps {
-  Sidebar?: React.FC<Omit<ISiderProps, 'items'>>;
+  Sidebar?: React.FC<ILayoutSidebarProps>;
   children: React.ReactNode;
   Header?: React.FC;
   Breadcrumb?: React.FC;
 }
-export const Layout = function({
+export const Layout = function ({
   children,
   Sidebar,
   Header,
@@ -28,9 +29,9 @@ export const Layout = function({
   return (
     <AntLayout hasSider>
       {Sidebar && <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />}
-      <AntLayout className="site-layout" style={{ height: '100vh' }}>
+      <AntLayout className="site-layout" style={{ height: "100vh" }}>
         {Header && <Header />}
-        <Content style={{ margin: '0 16px' }}>
+        <Content style={{ margin: "0 16px" }}>
           {Breadcrumb && <Breadcrumb />}
           <ComponentContainer style={{ background: colorBgContainer }}>
             {children}

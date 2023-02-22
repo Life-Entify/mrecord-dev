@@ -3,6 +3,7 @@ export const routeNames: IRouteNames = {
   patients: "/patients",
   families: "/families",
   appointments: "/appointments",
+  payments: "/payments",
   users: "/users",
   settings: "/settings",
   logout: "/logout",
@@ -13,6 +14,7 @@ interface IRouteNames {
   patients: string;
   families: string;
   appointments: string;
+  payments: string;
   settings: string;
   users: string;
   logout: string;

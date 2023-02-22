@@ -2,10 +2,11 @@ import { ConfigProvider } from "antd";
 import { AliasToken } from "antd/es/theme/internal";
 import React from "react";
 import { ThemeProvider } from "styled-components";
+import { IThemeComponents } from "./types";
 
 export interface IProviderProps {
   children: React.ReactNode;
-  appTheme: Partial<AliasToken> | undefined;
+  appTheme: Partial<AliasToken & IThemeComponents> | undefined;
 }
 export const Provider: React.FC<IProviderProps> = function ({
   children,

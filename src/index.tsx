@@ -9,23 +9,31 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { Provider } from "ui";
 import { AppInitAdapter } from "./app/init";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
+
+const client = new ApolloClient({
+  uri: "http://localhost:8080/graphql",
+  cache: new InMemoryCache(),
+});
+
 root.render(
   <React.StrictMode>
-    <AppInitAdapter>
-      <Provider
-        appTheme={
-          {
+    <ApolloProvider client={client}>
+      <AppInitAdapter>
+        <Provider
+          appTheme={{
             // colorPrimary: "red",
-          }
-        }
-      >
-        <App />
-      </Provider>
-    </AppInitAdapter>
+            infoBoardBg: "#f6f6f6",
+          }}
+        >
+          <App />
+        </Provider>
+      </AppInitAdapter>
+    </ApolloProvider>
   </React.StrictMode>
 );
 
