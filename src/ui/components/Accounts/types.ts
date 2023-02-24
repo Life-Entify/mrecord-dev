@@ -1,3 +1,17 @@
+import React from "react";
+import { IPerson } from "../Person";
+import { IStaff } from "../Staff";
+
+export interface ITxCategory {
+  _id: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
+}
+
+export enum LIST_ACTIONS {
+  EDIT = "edit",
+  DELETE = "delete",
+}
 export interface IBank {
   _id: string;
   bank: string;
@@ -7,11 +21,7 @@ export interface IBank {
   branch: string;
   description: string;
 }
-export interface IBankFundChangeForm {
-  amount: number;
-  description: number;
-  action_at: number;
-}
+
 export enum TxType {
   INCOME = "income",
   EXPENDITURE = "expenditure",
@@ -25,9 +35,10 @@ export interface ITx {
   category_id: string;
   remark: string;
 }
-export enum PayType {
+export enum PaymentType {
   CASH = "cash",
-  TRANSFER = "cash",
+  TRANSFER = "transfer",
+  CHEQUE = "cheque",
 }
 export enum AccountAction {
   RECEIVE_PAY = "receive_pay",
@@ -39,22 +50,31 @@ export enum AccountAction {
 }
 export interface IPayment {
   _id: string;
-  pay_type: PayType;
+  pay_type: PaymentType;
   tx_type: TxType;
   action: AccountAction;
   person_id: string;
+  person?: IPerson;
+  staff_id: string;
   txIds: string[];
   total_amount: number;
+  created_at: string;
 }
 export enum BankTxType {
   DEPOSIT = "deposit",
-  WITHDRAWAL = "withdrawal"
+  WITHDRAWAL = "withdrawal",
 }
 export interface IBankTx {
   _id: string;
-  tx_type: BankTxType;
+  tx_type: string; // BankTxType;
   staff_id: string;
+  staff?: Partial<IStaff>;
   bank_id: string;
+  bank?: Partial<IBank>;
   amount: number;
-  ref_id: number;
+  description: string;
+  ref_id: string;
+  payment_id: string;
+  payment?: Partial<IPayment>;
+  created_at: string;
 }

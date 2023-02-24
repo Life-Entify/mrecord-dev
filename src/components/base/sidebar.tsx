@@ -19,6 +19,7 @@ export const items = [
   getItem("Accounts", "", <MoneyCollectOutlined />, [
     getItem("Payments", routeNames.payments),
     getItem("Banks", routeNames.banks),
+    getItem("Cash", routeNames.cash),
   ]),
   getItem("Appointments", routeNames.appointments, <BookOutlined />),
   getItem("Users", routeNames.users, <UserAddOutlined />),

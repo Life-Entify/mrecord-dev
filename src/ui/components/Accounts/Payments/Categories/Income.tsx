@@ -4,25 +4,25 @@ import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { categoryFormInputs } from "./data";
-import { ICategoryListItem, LIST_ACTIONS } from "./types";
+import { ITxCategory, LIST_ACTIONS } from "../../types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-export interface IIncomeCategoryProps<List = ICategoryListItem> {
+export interface IIncomeCategoryProps<List = ITxCategory> {
   listProps?: ListProps<List> & {
     onActionClick?: (type: LIST_ACTIONS, item: List) => void;
     onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
   };
 }
 export interface IIncomeCategoryState {
-  editCat: ICategoryListItem;
+  editCat: ITxCategory;
 }
 export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
   const { onActionClick, onCreateItem, ...deepListProps } = listProps || {};
   const formRef = React.useRef<FormInstance>(null);
-  let incomeCatForm: FormInstance<ICategoryListItem>;
+  let incomeCatForm: FormInstance<ITxCategory>;
   return (
     <Root>
       <List

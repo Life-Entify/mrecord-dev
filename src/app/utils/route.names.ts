@@ -5,6 +5,7 @@ export const routeNames: IRouteNames = {
   appointments: "/appointments",
   payments: "/accounts/payments",
   banks: "/accounts/banks",
+  cash: "/accounts/cash",
   users: "/users",
   settings: "/settings",
   logout: "/logout",
@@ -17,6 +18,7 @@ interface IRouteNames {
   appointments: string;
   payments: string;
   banks: string;
+  cash: string;
   settings: string;
   users: string;
   logout: string;

@@ -1,6 +1,6 @@
 import { RenderedCell } from "rc-table/lib/interface";
 import { FORM_FIELD_TYPES, IFormItems, TableColumnType } from "ui/common";
-import { IBank } from "../types";
+import { BankTxType, IBank, IBankTx, PaymentType } from "../types";
 
 export const bankFundEditForm: IFormItems[] = [
   {
@@ -25,7 +25,7 @@ export const bankFundEditForm: IFormItems[] = [
   {
     fieldType: FORM_FIELD_TYPES.DATE,
     itemProps: {
-      name: "action_at",
+      name: "created_at",
       label: "Date",
       rules: [{ required: true }],
     },
@@ -72,6 +72,71 @@ export const bankInputForm: IFormItems[] = [
     itemProps: {
       name: "description",
       label: "Other description of account",
+    },
+  },
+];
+export const bankTxInputForm: IFormItems[] = [
+  {
+    fieldType: FORM_FIELD_TYPES.SELECT,
+    itemProps: {
+      name: "payment_type",
+      label: "Payment Method",
+      rules: [{ required: true }],
+    },
+    fieldProps: {
+      options: [
+        {
+          value: PaymentType.CASH,
+          label: "Cash",
+        },
+        {
+          value: PaymentType.CHEQUE,
+          label: "Cheque",
+        },
+        {
+          value: PaymentType.TRANSFER,
+          label: "Transfer",
+        },
+      ],
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.TEXT,
+    itemProps: {
+      name: "amount",
+      label: "Amount",
+      rules: [{ required: true }],
+    },
+    fieldProps: {
+      type: "number",
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.TEXT,
+    itemProps: {
+      name: "ref_id",
+      label: "Ref ID",
+      rules: [{ required: true }],
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.TEXT_AREA,
+    itemProps: {
+      name: "description",
+      label: "Description",
+      rules: [{ required: true }],
+    },
+    fieldProps: {
+      showCount: true,
+      maxLength: 250,
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.DATE,
+    itemProps: {
+      name: "created_at",
+      label: "Date",
+      rules: [{ required: true }],
     },
   },
 ];
@@ -137,4 +202,73 @@ export const bankLabelMap: Record<keyof IBank, string> = {
   branch: "Bank Branch",
   bank: "Bank Name",
   _id: "ID",
+};
+export const getBankTxTableColumns = (
+  render?: (
+    keyIndex: string
+  ) => (
+    value: any,
+    record: IBankTx,
+    index: number
+  ) => React.ReactNode | RenderedCell<IBankTx>
+): TableColumnType<IBankTx>[] => [
+  {
+    key: "created_at",
+    dataIndex: "created_at",
+    fixed: "left",
+    title(props) {
+      return "Date";
+    },
+    render: render?.("created_at"),
+  },
+  {
+    key: "tx_type",
+    dataIndex: "tx_type",
+    fixed: "left",
+    title(props) {
+      return "Tx Type";
+    },
+    render: render?.("tx_type"),
+  },
+  {
+    key: "staff_id",
+    dataIndex: "staff_id",
+    fixed: "left",
+    title(_) {
+      return "Staff ID";
+    },
+    render: render?.("staff_id"),
+  },
+  {
+    key: "ref_id",
+    dataIndex: "ref_id",
+    title: "Tx Ref",
+    render: render?.("ref_id"),
+  },
+  {
+    key: "amount",
+    dataIndex: "amount",
+    title: "Amount",
+    render: render?.("amount"),
+  },
+  {
+    key: "action",
+    dataIndex: "action",
+    title: "Action",
+    render: render?.("action"),
+  },
+];
+export const bankTxLabelMap: Record<keyof IBankTx, string> = {
+  _id: "Tx ID",
+  ref_id: "Tx Ref",
+  description: "Account Description",
+  bank_id: "Bank ID",
+  staff_id: "Staff ID",
+  tx_type: "Tx Type",
+  amount: "Amount",
+  created_at: "Date",
+  payment_id: "Payment ID",
+  bank: "",
+  staff: "",
+  payment: ""
 };

@@ -4,13 +4,13 @@ import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { categoryFormInputs } from "./data";
-import { ICategoryListItem, LIST_ACTIONS } from "./types";
+import { ITxCategory, LIST_ACTIONS } from "../../types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-export interface IExpenditureCategoryProps<List = ICategoryListItem> {
+export interface IExpenditureCategoryProps<List = ITxCategory> {
   listProps?: ListProps<List> & {
     onActionClick?: (type: LIST_ACTIONS, item: List) => void;
     onCreateItem?: React.MouseEventHandler<HTMLDivElement>;

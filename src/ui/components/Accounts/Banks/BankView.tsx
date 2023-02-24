@@ -1,9 +1,16 @@
-import { Button, Divider, Table, TableProps } from "antd";
+import { Button, Divider, Space, Table, TableProps, Tooltip } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { IInfoBoardProps, InfoBoard, IToolbarProps, Toolbar } from "ui/common";
-import { IBank, IBankTx } from "../types";
-import { bankLabelMap } from "./data";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  IInfoBoardProps,
+  InfoBoard,
+  IToolbarProps,
+  Toolbar,
+} from "ui/common";
+import { BankTxType, IBank, IBankTx } from "../types";
+import { bankLabelMap, getBankTxTableColumns } from "./data";
 
 const Root = styled.div``;
 
@@ -13,8 +20,10 @@ export interface IBankViewProps {
     IInfoBoardProps<keyof IBank>,
     "data" | "dataMap" | "skipMap"
   >;
-  toolbarProps?: IToolbarProps;
-  tableProps?: TableProps<IBankTx>;
+  toolbarProps?: Omit<IToolbarProps, "dropdownProps"> & {
+    onNewTransaction?: (key: BankTxType) => void;
+  };
+  tableProps?: Omit<TableProps<IBankTx>, "columns">;
 }
 interface IBankViewState {
   showDetail: boolean;
@@ -28,6 +37,7 @@ export function BankView({
   const [state, _setState] = useState<Partial<IBankViewState>>({});
   const setState = (_state: Partial<IBankViewState>) =>
     _setState((state) => ({ ...state, ..._state }));
+  const { onNewTransaction, ...deepToolbarProps } = toolbarProps || {};
   return (
     <Root>
       <Button
@@ -49,8 +59,61 @@ export function BankView({
           <Divider style={{ marginTop: 50, marginBottom: 20 }} />
         </>
       )}
-      <Toolbar {...toolbarProps} />
-      <Table {...tableProps} />
+      <Toolbar
+        {...deepToolbarProps}
+        dropdownProps={{
+          menu: {
+            items: [
+              {
+                key: BankTxType.DEPOSIT,
+                label: "Deposit",
+              },
+              {
+                key: BankTxType.WITHDRAWAL,
+                label: "Withdrawal",
+              },
+            ],
+            onClick(event) {
+              onNewTransaction?.(event.key as BankTxType);
+            },
+          },
+          btnProps: {
+            children: "New Transaction",
+          },
+        }}
+      />
+      <div style={{ marginTop: 50 }} />
+      <Table
+        {...tableProps}
+        columns={getBankTxTableColumns((dataIndex) => (value, record) => {
+          if (dataIndex === "action") {
+            return (
+              <Space>
+                <Tooltip title="Edit transaction">
+                  <EditOutlined
+                    style={{ marginRight: 10 }}
+                    size={12}
+                    onClick={
+                      () => {}
+                      // onFundEdit?.(record, BANK_EDIT_ACTIONS.ADD)
+                    }
+                  />
+                </Tooltip>
+                <Tooltip title="Delete transaction">
+                  <DeleteOutlined
+                    size={12}
+                    onClick={
+                      () => {}
+                      // onFundEdit?.(record, BANK_EDIT_ACTIONS.DEDUCT)
+                    }
+                  />
+                </Tooltip>
+              </Space>
+            );
+          }
+          return value;
+        })}
+      />
     </Root>
   );
 }

@@ -5,6 +5,7 @@ import {
   Payments,
   PAYMENT_DIALOG_TYPE,
 } from "ui";
+import { dummy } from "../dummy";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -59,18 +60,7 @@ export default function PaymentComponent() {
             onActionClick(type, item) {
               console.log(type, item);
             },
-            dataSource: [
-              {
-                _id: "1",
-                title: "New Folders",
-                description: "This is the new folders",
-              },
-              {
-                _id: "2",
-                title: "New Folders",
-                description: "This is the new folders",
-              },
-            ],
+            dataSource: dummy.category,
           },
         },
       }}
