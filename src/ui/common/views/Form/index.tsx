@@ -11,6 +11,7 @@ import {
   SelectProps,
 } from "antd";
 import type { FormInstance, FormItemProps, FormProps } from "antd/es/form";
+import { TextAreaProps } from "antd/es/input";
 
 const { Option } = Select;
 
@@ -25,10 +26,16 @@ export enum FORM_FIELD_TYPES {
   SELECT = 4,
   FIELDS = 5,
   BUTTON = 6,
-  DATE = 7
+  DATE = 7,
+  TEXT_AREA = 8,
 }
 type BtnProps = ButtonProps;
-type IFieldProps = InputProps | DatePickerProps | SelectField | BtnProps;
+type IFieldProps =
+  | InputProps
+  | TextAreaProps
+  | DatePickerProps
+  | SelectField
+  | BtnProps;
 type IFieldsProps = {
   fieldProps: IFieldProps;
   fieldType: FORM_FIELD_TYPES;
@@ -44,6 +51,12 @@ export const FormFields: React.FC<IFormItems> = ({
   itemProps,
 }) => {
   switch (fieldType) {
+    case FORM_FIELD_TYPES.TEXT_AREA:
+      return (
+        <AntForm.Item {...itemProps}>
+          <Input.TextArea {...(fieldProps as TextAreaProps)} />
+        </AntForm.Item>
+      );
     case FORM_FIELD_TYPES.TEXT:
       return (
         <AntForm.Item {...itemProps}>
@@ -101,10 +114,20 @@ export interface IFormProps {
   formRef: React.Ref<FormInstance<any>>;
   formProps?: FormProps;
   items?: IFormItems[];
+  getForm?: (form: FormInstance) => void;
 }
 
-export const Form: React.FC<IFormProps> = ({ formProps, formRef, items }) => {
+export const Form: React.FC<IFormProps> = ({
+  formProps,
+  formRef,
+  items,
+  getForm,
+}) => {
   const [form] = AntForm.useForm();
+  if (getForm) {
+    getForm(form);
+  }
+
   return (
     <AntForm ref={formRef} style={{ maxWidth: 600 }} {...formProps} form={form}>
       {items?.map((item, index) => {

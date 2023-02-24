@@ -10,13 +10,13 @@ const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-export interface IIncomeCategoryProps<List = ICategoryListItem> {
+export interface IExpenditureCategoryProps<List = ICategoryListItem> {
   listProps?: ListProps<List> & {
     onActionClick?: (type: LIST_ACTIONS, item: List) => void;
     onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
   };
 }
-export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
+export function ExpenditureCategory({ listProps }: IExpenditureCategoryProps) {
   const { onActionClick, onCreateItem, ...deepListProps } = listProps || {};
   const formRef = React.useRef<FormInstance>(null);
   return (
@@ -45,13 +45,14 @@ export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
         header={
           <List.Item>
             <div style={{ width: "100%" }}>
-              <FormTitle>New Income Category</FormTitle>
+              <FormTitle>New Expenditure Category</FormTitle>
               <Form
                 formRef={formRef}
                 formProps={{
                   style: { width: "100%" },
                   name: "income-new-form",
                   layout: "vertical",
+                  initialValues: deepListProps?.dataSource?.[0],
                 }}
                 items={[
                   ...categoryFormInputs,

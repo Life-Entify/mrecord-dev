@@ -20,6 +20,16 @@ export default function PaymentComponent() {
   return (
     <Payments
       toolbarProps={{
+        newBtnProps: {
+          style: { marginLeft: 10 },
+          onClick: () =>
+            setState({
+              openDrawer: true,
+              dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT,
+              drawerTitle: "New Payment",
+            }),
+          title: "New Payment",
+        },
         extra: {
           categoryBtnProps: {
             onClick: () =>

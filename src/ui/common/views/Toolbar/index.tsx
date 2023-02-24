@@ -41,10 +41,20 @@ export const Toolbar: React.FC<IToolbarProps> = ({
   return (
     <Root style={{ background: colorBgLayout }}>
       <Space style={{ display: "flex" }}>
-        {searchProps && <Input.Search {...searchProps} />}
-        {datePickerProps && <DatePicker {...datePickerProps} />}
+        {searchProps && (
+          <div>
+            <Input.Search {...searchProps} />
+          </div>
+        )}
+        {datePickerProps && (
+          <div>
+            <DatePicker {...datePickerProps} />
+          </div>
+        )}
         {dateRangePickerProps && (
-          <DatePicker.RangePicker {...dateRangePickerProps} />
+          <div>
+            <DatePicker.RangePicker {...dateRangePickerProps} />
+          </div>
         )}
         <Gap />
         {extra}

@@ -16,7 +16,10 @@ export const items = [
   getItem("Dashboard", routeNames.dashboard, <HomeOutlined />),
   getItem("Patients", routeNames.patients, <UserOutlined />),
   getItem("Families", routeNames.families, <UsergroupAddOutlined />),
-  getItem("Payments", routeNames.payments, <MoneyCollectOutlined />),
+  getItem("Accounts", "", <MoneyCollectOutlined />, [
+    getItem("Payments", routeNames.payments),
+    getItem("Banks", routeNames.banks),
+  ]),
   getItem("Appointments", routeNames.appointments, <BookOutlined />),
   getItem("Users", routeNames.users, <UserAddOutlined />),
   getItem("Settings", routeNames.settings, <SettingOutlined />),
