@@ -87,9 +87,7 @@ export function Banks({
                   <Tooltip title={`Add fund to bank ${record.bank}`}>
                     <Button
                       size="small"
-                      onClick={() =>
-                        onFundEdit?.(record, BankTxType.DEPOSIT)
-                      }
+                      onClick={() => onFundEdit?.(record, BankTxType.DEPOSIT)}
                     >
                       <PlusOutlined size={10} />
                     </Button>

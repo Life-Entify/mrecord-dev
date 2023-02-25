@@ -23,8 +23,8 @@ export interface IBank {
 }
 
 export enum TxType {
-  INCOME = "income",
-  EXPENDITURE = "expenditure",
+  income,
+  expenditure,
 }
 export interface ITx {
   _id: string;
@@ -33,30 +33,32 @@ export interface ITx {
   payment_id: string;
   created_at: string;
   category_id: string;
+  category?: ITxCategory;
   remark: string;
 }
 export enum PaymentType {
-  CASH = "cash",
-  TRANSFER = "transfer",
-  CHEQUE = "cheque",
+  cash = "cash",
+  transfer = "transfer",
+  cheque = "cheque",
 }
 export enum AccountAction {
-  RECEIVE_PAY = "receive_pay",
-  PAY = "pay",
-  RECEIVE_DEPOSIT = "receive_deposit",
-  DEPOSIT_WITHDRAWAL = "deposit_withdrawal",
-  REGISTER_CREDIT = "register_credit",
-  REDEEM_CREDIT = "redeem_credit",
+  receive_pay = "receive_pay",
+  pay = "pay",
+  receive_deposit = "receive_deposit",
+  deposit_withdrawal = "deposit_withdrawal",
+  register_credit = "register_credit",
+  redeem_credit = "redeem_credit",
 }
 export interface IPayment {
   _id: string;
-  pay_type: PaymentType;
-  tx_type: TxType;
-  action: AccountAction;
+  pay_type: keyof typeof PaymentType;
+  tx_type: keyof typeof TxType;
+  action: keyof typeof AccountAction;
   person_id: string;
   person?: IPerson;
   staff_id: string;
   txIds: string[];
+  txs?: ITx[];
   total_amount: number;
   created_at: string;
 }
@@ -77,4 +79,11 @@ export interface IBankTx {
   payment_id: string;
   payment?: Partial<IPayment>;
   created_at: string;
+}
+export interface ICashBundle {
+  _id: string;
+  title: string;
+  payment_ids: string[];
+  payments?: IPayment[];
+  total_amount: number;
 }

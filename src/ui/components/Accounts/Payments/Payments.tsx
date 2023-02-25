@@ -1,4 +1,4 @@
-import { Button, ButtonProps, Drawer, DrawerProps, Space } from "antd";
+import { Button, ButtonProps, Drawer, DrawerProps, Space, Tabs } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
@@ -8,7 +8,8 @@ import {
 } from "./Categories/Categories";
 import { INewPaymentProps, NewPayment } from "./NewPayment";
 
-const TableContainer = styled.div`
+const Root = styled.div``;
+const Container = styled.div`
   margin-top: 50px;
 `;
 
@@ -31,12 +32,12 @@ export function Payments({
   drawerProps,
   toolbarProps,
   paymentCategoryProps,
-  newPaymentProps
+  newPaymentProps,
 }: IPaymentsProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { extra, ...deepToolbarProps } = toolbarProps || {};
   return (
-    <div>
+    <Root>
       {toolbarProps && (
         <Toolbar
           {...deepToolbarProps}
@@ -49,17 +50,25 @@ export function Payments({
           }
         />
       )}
-      <TableContainer>
+      <Container>
+        <Tabs>
+          <Tabs.TabPane key={1} tab="Payments">
+            This is payment
+          </Tabs.TabPane>
+          <Tabs.TabPane key={2} tab="Receivers">
+            This is the receivers
+          </Tabs.TabPane>
+        </Tabs>
         {/* <Table<IPatient> {...tableProps} /> */}
-      </TableContainer>
-      <Drawer {...deepDrawerProps}>
-        {drawerType === PAYMENT_DIALOG_TYPE.CATEGORIES && (
-          <PaymentCategories {...paymentCategoryProps} />
-        )}
-        {drawerType === PAYMENT_DIALOG_TYPE.NEW_PAYMENT && (
-          <NewPayment {...newPaymentProps} />
-        )}
-      </Drawer>
-    </div>
+        <Drawer {...deepDrawerProps}>
+          {drawerType === PAYMENT_DIALOG_TYPE.CATEGORIES && (
+            <PaymentCategories {...paymentCategoryProps} />
+          )}
+          {drawerType === PAYMENT_DIALOG_TYPE.NEW_PAYMENT && (
+            <NewPayment {...newPaymentProps} />
+          )}
+        </Drawer>
+      </Container>
+    </Root>
   );
 }

@@ -1,6 +1,6 @@
 import { RenderedCell } from "rc-table/lib/interface";
 import { FORM_FIELD_TYPES, IFormItems, TableColumnType } from "ui/common";
-import { BankTxType, IBank, IBankTx, PaymentType } from "../types";
+import { IBank, IBankTx, PaymentType } from "../types";
 
 export const bankFundEditForm: IFormItems[] = [
   {
@@ -86,15 +86,15 @@ export const bankTxInputForm: IFormItems[] = [
     fieldProps: {
       options: [
         {
-          value: PaymentType.CASH,
+          value: PaymentType.cash,
           label: "Cash",
         },
         {
-          value: PaymentType.CHEQUE,
+          value: PaymentType.cheque,
           label: "Cheque",
         },
         {
-          value: PaymentType.TRANSFER,
+          value: PaymentType.transfer,
           label: "Transfer",
         },
       ],
@@ -270,5 +270,5 @@ export const bankTxLabelMap: Record<keyof IBankTx, string> = {
   payment_id: "Payment ID",
   bank: "",
   staff: "",
-  payment: ""
+  payment: "",
 };
