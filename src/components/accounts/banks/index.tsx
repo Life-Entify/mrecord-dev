@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { Banks, BANK_DIALOG_TYPE, IBank, BankTxType } from "ui";
-import { dummy } from "../dummy";
+import { Banks, BANK_DIALOG_TYPE, IOrgBank, BankTxType } from "ui";
+import { dummy } from "../../dummy";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
   dialogType: BANK_DIALOG_TYPE;
 }
 interface IBankState {
-  bank: IBank;
+  bank: IOrgBank;
   bankAction: BankTxType;
 }
 export default function PaymentComponent() {
@@ -75,17 +75,7 @@ export default function PaymentComponent() {
           });
           setBankState({ bank: record, bankAction: action });
         },
-        dataSource: [
-          {
-            _id: "1",
-            name: "St. Mary",
-            bank: "First Bank",
-            description: "Our main bank",
-            balance: 0,
-            number: 8989900000,
-            branch: "Owerri",
-          },
-        ],
+        dataSource: dummy.orgBanks
       }}
       fundChangeProps={{
         bank: bankState.bank,
@@ -122,19 +112,7 @@ export default function PaymentComponent() {
           dateRangePickerProps: {},
         },
         tableProps: {
-          dataSource: [
-            {
-              _id: "129484",
-              ref_id: "ref from bank",
-              staff_id: "3455sd",
-              bank_id: "dfsfds",
-              amount: 30000,
-              description: "staff salary",
-              created_at: "2023-02-25",
-              tx_type: "expenditure",
-              payment_id: "",
-            },
-          ],
+          dataSource: dummy.bankTx,
         },
       }}
       newBankTxProps={{

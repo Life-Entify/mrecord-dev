@@ -4,25 +4,25 @@ import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { categoryFormInputs } from "./data";
-import { ITxCategory, LIST_ACTIONS } from "../../types";
+import { IPaymentCategory, LIST_ACTIONS } from "../../types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-export interface IIncomeCategoryProps<List = ITxCategory> {
+export interface IIncomeCategoryProps<List = IPaymentCategory> {
   listProps?: ListProps<List> & {
     onActionClick?: (type: LIST_ACTIONS, item: List) => void;
     onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
   };
 }
 export interface IIncomeCategoryState {
-  editCat: ITxCategory;
+  editCat: IPaymentCategory;
 }
 export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
   const { onActionClick, onCreateItem, ...deepListProps } = listProps || {};
   const formRef = React.useRef<FormInstance>(null);
-  let incomeCatForm: FormInstance<ITxCategory>;
+  let incomeCatForm: FormInstance<IPaymentCategory>;
   return (
     <Root>
       <List
@@ -56,6 +56,7 @@ export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
                   style: { width: "100%" },
                   name: "income-new-form",
                   layout: "vertical",
+                  onFinish: onCreateItem,
                 }}
                 getForm={(form) => (incomeCatForm = form)}
                 items={[
@@ -69,7 +70,6 @@ export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
                       type: "primary",
                       htmlType: "submit",
                       children: "Create Category",
-                      onClick: onCreateItem,
                     },
                   },
                 ]}

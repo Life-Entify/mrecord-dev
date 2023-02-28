@@ -1,9 +1,9 @@
 import { Spin, Table, TableProps } from "antd";
 import React from "react";
-import { IPayment } from "../types";
-import { getPaymentTableColumns } from "./data";
+import { IPayment } from "../../types";
+import { getPaymentTableColumns } from "../PaymentTable";
 import { RenderedCell } from "rc-table/lib/interface";
-import { ITxTableProps, TxTable } from "./TxTable";
+import { ITxTableProps, TxTable } from "../TxTable";
 
 export interface IPaymentTableProps {
   payments?: IPayment[];
@@ -18,20 +18,23 @@ export interface IPaymentTableProps {
       index: number
     ) => React.ReactNode | RenderedCell<IPayment>;
   };
+  removeColumns?: (keyof IPayment)[];
 }
 
 export function PaymentTable({
   tableProps,
   payments,
   showTx = true,
+  removeColumns,
 }: IPaymentTableProps) {
   const { expandable, render, txSubTableProps, ...deepTableProps } =
     tableProps || {};
   return (
     <Table
+      scroll={{ x: true }}
       size="small"
       {...deepTableProps}
-      columns={getPaymentTableColumns(render)}
+      columns={getPaymentTableColumns(removeColumns, render)}
       dataSource={payments}
       expandable={{
         expandedRowRender: showTx

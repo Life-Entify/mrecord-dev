@@ -7,6 +7,7 @@ const Payments = React.lazy(
 );
 const Cash = React.lazy(() => import("../../components/accounts/cash/index"));
 const Banks = React.lazy(() => import("../../components/accounts/banks/index"));
+const Staff = React.lazy(() => import("../../components/staff/index"));
 export const routes: {
   path: string;
   Component: React.LazyExoticComponent<React.ComponentType<any>>;
@@ -30,5 +31,9 @@ export const routes: {
   {
     path: routeNames.cash,
     Component: Cash,
+  },
+  {
+    path: routeNames.staff,
+    Component: Staff,
   },
 ];

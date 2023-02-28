@@ -1,6 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Sidebar, getSidebarItem as getItem, MoneyCollectOutlined } from "ui";
+import {
+  Sidebar,
+  getSidebarItem as getItem,
+  MoneyCollectOutlined,
+  GroupOutlined,
+} from "ui";
 import {
   HomeOutlined,
   UserOutlined,
@@ -20,6 +25,9 @@ export const items = [
     getItem("Payments", routeNames.payments),
     getItem("Banks", routeNames.banks),
     getItem("Cash", routeNames.cash),
+  ]),
+  getItem("Human Resource", routeNames.appointments, <UserOutlined />, [
+    getItem("Staff", routeNames.staff),
   ]),
   getItem("Appointments", routeNames.appointments, <BookOutlined />),
   getItem("Users", routeNames.users, <UserAddOutlined />),

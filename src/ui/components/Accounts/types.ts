@@ -2,7 +2,7 @@ import React from "react";
 import { IPerson } from "../Person";
 import { IStaff } from "../Staff";
 
-export interface ITxCategory {
+export interface IPaymentCategory {
   _id: string;
   title: React.ReactNode;
   description?: React.ReactNode;
@@ -12,12 +12,14 @@ export enum LIST_ACTIONS {
   EDIT = "edit",
   DELETE = "delete",
 }
+export interface IOrgBank extends IBank {
+  balance: number;
+}
 export interface IBank {
   _id: string;
   bank: string;
   name: string;
   number: number;
-  balance: number;
   branch: string;
   description: string;
 }
@@ -28,12 +30,12 @@ export enum TxType {
 }
 export interface ITx {
   _id: string;
-  tx_type: TxType;
+  tx_type: keyof typeof TxType;
   amount: number;
   payment_id: string;
   created_at: string;
   category_id: string;
-  category?: ITxCategory;
+  category?: IPaymentCategory;
   remark: string;
 }
 export enum PaymentType {
@@ -72,7 +74,7 @@ export interface IBankTx {
   staff_id: string;
   staff?: Partial<IStaff>;
   bank_id: string;
-  bank?: Partial<IBank>;
+  bank?: Partial<IOrgBank>;
   amount: number;
   description: string;
   ref_id: string;
@@ -86,4 +88,9 @@ export interface ICashBundle {
   payment_ids: string[];
   payments?: IPayment[];
   total_amount: number;
+  bankmove_id?: string;
+  bank?: IBank;
+  cashout_amount?: number;
+  cashout_payment_ids?: string[];
+  cashout_payments?: IPayment[];
 }

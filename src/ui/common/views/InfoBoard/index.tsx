@@ -17,7 +17,8 @@ export interface IInfoBoardProps<T extends string | number | symbol> {
   dataMap?: Record<T, ReactNode>;
   descriptionProps?: DescriptionsProps;
   descriptionItemProps?: DescriptionsItemProps;
-  skipMap?: string[];
+  skipMap?: T[];
+  includeMap?: T[];
   replaceMap?: (
     value: React.ReactNode,
     key: T,
@@ -29,16 +30,19 @@ export function InfoBoard<T extends string | number | symbol>({
   data,
   dataMap,
   skipMap,
+  includeMap,
   replaceMap,
   descriptionProps,
   descriptionItemProps,
 }: IInfoBoardProps<T>) {
   return (
     <Root>
-      <Descriptions title={title} layout="vertical" {...descriptionProps} extra>
+      <Descriptions title={title} layout="vertical" {...descriptionProps}>
         {data &&
           Object.entries(data).map(([key, value], index) => {
-            if (skipMap && skipMap.indexOf(key) !== -1) return null;
+            if (includeMap && !includeMap.includes(key as T)) {
+              return null;
+            } else if (skipMap && skipMap.indexOf(key as T) !== -1) return null;
             if (key === "__typename") return null;
             return (
               <Descriptions.Item
@@ -49,7 +53,9 @@ export function InfoBoard<T extends string | number | symbol>({
                 {
                   (replaceMap
                     ? replaceMap(value as React.ReactNode, key as T, data)
-                    : value) as React.ReactNode
+                    : typeof value === "string" || typeof value === "number"
+                    ? value
+                    : null) as React.ReactNode
                 }
               </Descriptions.Item>
             );

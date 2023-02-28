@@ -325,7 +325,6 @@ export default WithPatient(function PatientComponent({
           }
         }
       }
-      console.log(changedFields);
       if (Object.keys(changedFields).length === 0) {
         return openNotification({
           message: "No changes made",
@@ -349,7 +348,6 @@ export default WithPatient(function PatientComponent({
         changeData.person_id = patient?.person._id;
         changeData.profile = changedFields;
       }
-      console.log(changeData, changedFields);
       updatePatient({
         variables: changeData,
       })

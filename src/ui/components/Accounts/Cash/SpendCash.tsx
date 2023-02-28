@@ -1,28 +1,22 @@
-import { FormInstance } from "antd";
+import { Button, FormInstance, Tooltip } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IPaymentCategory } from "../../types";
-import { bankTxInputForm } from "../data";
+import { ICashBundle, IPaymentCategory } from "../types";
+import { getSpendCashForm } from "./data";
 
 const Root = styled.div``;
-const FormTitle = styled.h3``;
 
-export interface INewBankWithdrawalTxProps {
-  title?: React.ReactNode;
-  category?: IPaymentCategory[];
+export interface ISpendCashProps {
+  bundle?: ICashBundle;
+  categories?: IPaymentCategory[];
   onCreateItem?: React.MouseEventHandler;
 }
 
-export function NewBankWithdrawalTx({
-  title,
-  category = [],
-  onCreateItem,
-}: INewBankWithdrawalTxProps) {
+function SpendCashFn({ bundle, categories, onCreateItem }: ISpendCashProps) {
   const formRef = React.useRef<FormInstance>(null);
   return (
     <Root>
-      <FormTitle>{title}</FormTitle>
       <Form
         formRef={formRef}
         formProps={{
@@ -30,24 +24,28 @@ export function NewBankWithdrawalTx({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
+          initialValues: {
+            amount: bundle?.total_amount,
+          },
           onFinish: onCreateItem,
         }}
         items={[
-          ...bankTxInputForm,
-          {
-            fieldType: FORM_FIELD_TYPES.SELECT,
-            itemProps: {
-              name: "category_id",
-              label: "Category",
-              rules: [{ required: true }],
-            },
-            fieldProps: {
-              options: category.map((cat) => ({
-                value: cat._id,
-                label: cat.title as string,
-              })),
-            },
-          },
+          ...getSpendCashForm(
+            categories,
+            <Tooltip>
+              <Button
+                type="ghost"
+                onClick={() => {
+                  formRef.current?.setFieldValue(
+                    "amount",
+                    (bundle?.total_amount || 0) - (bundle?.cashout_amount || 0)
+                  );
+                }}
+              >
+                All
+              </Button>
+            </Tooltip>
+          ),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {
@@ -59,7 +57,7 @@ export function NewBankWithdrawalTx({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Transaction",
+                  children: "Spend Cash",
                 },
               },
             ],
@@ -69,3 +67,4 @@ export function NewBankWithdrawalTx({
     </Root>
   );
 }
+export const SpendCash = React.memo(SpendCashFn);

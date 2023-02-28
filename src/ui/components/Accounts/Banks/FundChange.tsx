@@ -2,7 +2,7 @@ import { Divider, FormInstance } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
-import { BankTxType, IBank } from "../types";
+import { BankTxType, IOrgBank } from "../types";
 import { bankLabelMap } from "./data";
 import { INewBankDepositTxProps, NewBankDepositTx } from "./NewBankTx";
 import {
@@ -13,10 +13,10 @@ import {
 const Root = styled.div``;
 
 export interface IBankFundChangeProps {
-  bank?: IBank;
+  bank?: IOrgBank;
   bankAction?: BankTxType;
   infoBoardProps?: Omit<
-    IInfoBoardProps<keyof IBank>,
+    IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
   >;
   newDepositTxProps?: INewBankDepositTxProps;
@@ -30,10 +30,9 @@ export function BankFundChange({
   newDepositTxProps,
   newWithdrawalTxProps,
 }: IBankFundChangeProps) {
-  const formRef = React.useRef<FormInstance>(null);
   return (
     <Root>
-      <InfoBoard<keyof IBank>
+      <InfoBoard<keyof IOrgBank>
         {...infoBoardProps}
         title={bank?.bank}
         data={bank}

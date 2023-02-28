@@ -2,27 +2,21 @@ import { FormInstance } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IPaymentCategory } from "../../types";
-import { bankTxInputForm } from "../data";
+import { IBank, ICashBundle } from "../types";
+import { getCashMovementForm } from "./data";
 
 const Root = styled.div``;
-const FormTitle = styled.h3``;
 
-export interface INewBankWithdrawalTxProps {
-  title?: React.ReactNode;
-  category?: IPaymentCategory[];
+export interface IToBankProps {
+  bundle?: ICashBundle;
   onCreateItem?: React.MouseEventHandler;
+  banks?: IBank[];
 }
 
-export function NewBankWithdrawalTx({
-  title,
-  category = [],
-  onCreateItem,
-}: INewBankWithdrawalTxProps) {
+export function ToBank({ bundle, onCreateItem, banks }: IToBankProps) {
   const formRef = React.useRef<FormInstance>(null);
   return (
     <Root>
-      <FormTitle>{title}</FormTitle>
       <Form
         formRef={formRef}
         formProps={{
@@ -30,24 +24,13 @@ export function NewBankWithdrawalTx({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
+          initialValues: {
+            amount: bundle?.total_amount,
+          },
           onFinish: onCreateItem,
         }}
         items={[
-          ...bankTxInputForm,
-          {
-            fieldType: FORM_FIELD_TYPES.SELECT,
-            itemProps: {
-              name: "category_id",
-              label: "Category",
-              rules: [{ required: true }],
-            },
-            fieldProps: {
-              options: category.map((cat) => ({
-                value: cat._id,
-                label: cat.title as string,
-              })),
-            },
-          },
+          ...getCashMovementForm(banks),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {
@@ -59,7 +42,7 @@ export function NewBankWithdrawalTx({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Transaction",
+                  children: "Move Cash",
                 },
               },
             ],

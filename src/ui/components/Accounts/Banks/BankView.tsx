@@ -9,15 +9,15 @@ import {
   IToolbarProps,
   Toolbar,
 } from "ui/common";
-import { BankTxType, IBank, IBankTx } from "../types";
+import { BankTxType, IOrgBank, IBankTx } from "../types";
 import { bankLabelMap, getBankTxTableColumns } from "./data";
 
 const Root = styled.div``;
 
 export interface IBankViewProps {
-  bank?: IBank;
+  bank?: IOrgBank;
   infoBoardProps?: Omit<
-    IInfoBoardProps<keyof IBank>,
+    IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
   >;
   toolbarProps?: Omit<IToolbarProps, "dropdownProps"> & {
@@ -49,7 +49,7 @@ export function BankView({
       </Button>
       {state.showDetail && (
         <>
-          <InfoBoard<keyof IBank>
+          <InfoBoard<keyof IOrgBank>
             {...infoBoardProps}
             title={bank?.bank}
             data={bank}
