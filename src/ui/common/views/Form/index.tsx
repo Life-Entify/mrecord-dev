@@ -9,6 +9,10 @@ import {
   InputProps,
   Select,
   SelectProps,
+  Switch,
+  SwitchProps,
+  TreeSelect,
+  TreeSelectProps,
 } from "antd";
 import type { FormInstance, FormItemProps, FormProps } from "antd/es/form";
 import { TextAreaProps } from "antd/es/input";
@@ -28,6 +32,9 @@ export enum FORM_FIELD_TYPES {
   BUTTON = 6,
   DATE = 7,
   TEXT_AREA = 8,
+  SWITCH = 9,
+  TREE_SELECT = 10,
+  HIDDEN = 11,
 }
 type BtnProps = ButtonProps;
 type IFieldProps =
@@ -35,22 +42,38 @@ type IFieldProps =
   | TextAreaProps
   | DatePickerProps
   | SelectField
-  | BtnProps;
+  | BtnProps
+  | SwitchProps
+  | TreeSelectProps;
 type IFieldsProps = {
   fieldProps: IFieldProps;
   fieldType: FORM_FIELD_TYPES;
 };
 export interface IFormItems {
   itemProps: FormItemProps;
-  fieldProps?: IFieldProps | IFieldsProps[];
+  fieldProps?: IFieldProps | IFieldsProps[] | IFormItems;
+  itemFunc?: (
+    props?: Partial<FormInstance>,
+    fieldForm?: React.FC<IFormItems>,
+    fieldData?: IFormItems
+  ) => React.ReactNode | null;
   fieldType: FORM_FIELD_TYPES;
 }
 export const FormFields: React.FC<IFormItems> = ({
   fieldType,
   fieldProps,
   itemProps,
+  itemFunc,
 }) => {
   switch (fieldType) {
+    case FORM_FIELD_TYPES.HIDDEN:
+      return (
+        <AntForm.Item noStyle {...itemProps}>
+          {(props) => {
+            return itemFunc?.(props, FormFields, fieldProps as IFormItems);
+          }}
+        </AntForm.Item>
+      );
     case FORM_FIELD_TYPES.TEXT_AREA:
       return (
         <AntForm.Item {...itemProps}>
@@ -61,6 +84,18 @@ export const FormFields: React.FC<IFormItems> = ({
       return (
         <AntForm.Item {...itemProps}>
           <Input {...(fieldProps as InputProps)} />
+        </AntForm.Item>
+      );
+    case FORM_FIELD_TYPES.TREE_SELECT:
+      return (
+        <AntForm.Item {...itemProps}>
+          <TreeSelect {...(fieldProps as TreeSelectProps)} />
+        </AntForm.Item>
+      );
+    case FORM_FIELD_TYPES.SWITCH:
+      return (
+        <AntForm.Item {...itemProps}>
+          <Switch {...(fieldProps as SwitchProps)} />
         </AntForm.Item>
       );
     case FORM_FIELD_TYPES.DATE:
@@ -131,14 +166,7 @@ export const Form: React.FC<IFormProps> = ({
   return (
     <AntForm ref={formRef} style={{ maxWidth: 600 }} {...formProps} form={form}>
       {items?.map((item, index) => {
-        return (
-          <FormFields
-            key={index}
-            itemProps={item.itemProps}
-            fieldProps={item.fieldProps}
-            fieldType={item.fieldType}
-          />
-        );
+        return <FormFields key={index} {...item} />;
       })}
     </AntForm>
   );

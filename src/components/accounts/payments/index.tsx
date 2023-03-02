@@ -1,17 +1,22 @@
 import React, { useState } from "react";
-import { IPayment, Payments, PAYMENT_DIALOG_TYPE } from "ui";
+import { IPayment, IPaymentForm, Payments, PAYMENT_DIALOG_TYPE } from "ui";
 import { dummy } from "../../dummy";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
   dialogType: PAYMENT_DIALOG_TYPE;
 }
+const dialogNewPayment: Partial<IPaymentState> = {
+  dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT,
+  drawerTitle: "New Payment",
+};
 export default function PaymentComponent() {
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
   const setState = (state: Partial<IPaymentState>) =>
     _setState((_state) => ({ ..._state, ...state }));
+  const [paymentForm, setPaymentForm] = useState<IPaymentForm>();
 
   const [payment, setPayment] = useState<IPayment>();
 
@@ -23,8 +28,7 @@ export default function PaymentComponent() {
           onClick: () =>
             setState({
               openDrawer: true,
-              dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT,
-              drawerTitle: "New Payment",
+              ...dialogNewPayment,
             }),
           title: "New Payment",
         },
@@ -54,8 +58,7 @@ export default function PaymentComponent() {
       paymentCategoryProps={{
         incomeProps: {
           listProps: {
-            onActionClick(type, item) {
-            },
+            onActionClick(type, item) {},
             dataSource: dummy.category,
           },
         },
@@ -78,6 +81,9 @@ export default function PaymentComponent() {
           },
         },
       }}
+      receiverProps={{
+        receivers: dummy.receivers,
+      }}
       paymentTxsProps={{
         payment,
         txTableProps: {
@@ -95,6 +101,38 @@ export default function PaymentComponent() {
           setState({
             dialogType: PAYMENT_DIALOG_TYPE.PAYMENT_TXS,
             drawerTitle: "Payment Transactions",
+          });
+        },
+      }}
+      newPaymentProps={{
+        initialValues: paymentForm,
+        banks: dummy.orgBanks,
+        cheques: [],
+        onCreateItem(values) {
+          console.log(values);
+        },
+        openClient(form) {
+          setState({
+            dialogType: PAYMENT_DIALOG_TYPE.SHOW_CLIENT,
+            drawerTitle: "Select Client",
+          });
+          setPaymentForm(form.current?.getFieldsValue());
+        },
+      }}
+      personProps={{
+        toolbarProps: {
+          dateRangePickerProps: {},
+        },
+        tableProps: {
+          rowSelection: {
+            type: "radio",
+            selectedRowKeys: [-1],
+            onSelect(person) {},
+          },
+        },
+        onBack: () => {
+          setState({
+            ...dialogNewPayment,
           });
         },
       }}

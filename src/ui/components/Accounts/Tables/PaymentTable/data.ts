@@ -22,11 +22,11 @@ export const getPaymentTableColumns = (
       render: render?.("person_id"),
     },
     {
-      key: "amount",
+      key: "total_amount",
       dataIndex: "total_amount",
       title: "Amount",
       fixed: "left",
-      render: render?.("amount"),
+      render: render?.("total_amount"),
     },
     {
       key: "tx_type",

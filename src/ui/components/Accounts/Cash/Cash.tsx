@@ -1,8 +1,8 @@
-import { Button, Drawer, DrawerProps, Tabs } from "antd";
+import { Button, DrawerProps, Tabs } from "antd";
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
-import { AppDrawer } from "ui/components/Common";
+import { AppDrawer } from "ui/common/views/AppDrawer/AppDrawer";
 import { BundledCash, IBundledCashProps } from "./BundledCash/BundledCash";
 import { ISpendCashProps, SpendCash } from "./SpendCash";
 import { IToBankProps, ToBank } from "./ToBank";

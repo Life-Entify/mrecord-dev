@@ -1,4 +1,4 @@
-export const routeNames: IRouteNames = {
+export const routeNames = {
   dashboard: "/",
   patients: "/patients",
   families: "/families",
@@ -6,22 +6,9 @@ export const routeNames: IRouteNames = {
   payments: "/accounts/payments",
   banks: "/accounts/banks",
   cash: "/accounts/cash",
+  cheques: "/accounts/cheques",
   users: "/users",
   staff: "/hr/staff",
   settings: "/settings",
   logout: "/logout",
 };
-
-interface IRouteNames {
-  dashboard: string;
-  patients: string;
-  families: string;
-  appointments: string;
-  payments: string;
-  banks: string;
-  cash: string;
-  settings: string;
-  staff: string;
-  users: string;
-  logout: string;
-}
