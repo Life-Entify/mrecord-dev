@@ -22,10 +22,11 @@ export const items = [
   getItem("Patients", routeNames.patients, <UserOutlined />),
   getItem("Families", routeNames.families, <UsergroupAddOutlined />),
   getItem("Accounts", "", <MoneyCollectOutlined />, [
-    getItem("Payments", routeNames.payments),
     getItem("Banks", routeNames.banks),
     getItem("Cash", routeNames.cash),
     getItem("Cheques", routeNames.cheques),
+    getItem("Payments", routeNames.payments),
+    getItem("Payrolls", routeNames.payrolls),
   ]),
   getItem("Human Resource", routeNames.appointments, <UserOutlined />, [
     getItem("Staff", routeNames.staff),

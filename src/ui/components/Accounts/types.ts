@@ -48,10 +48,12 @@ export enum IIncomeActions {
   receive_deposit = "receive_deposit",
   redeem_credit = "redeem_credit",
   register_credit = "register_credit",
+  loan_repayment = "loan_repayment",
 }
 export enum IExpenditureAction {
   deposit_withdrawal = "deposit_withdrawal",
   pay = "pay",
+  loan = "loan",
 }
 export enum AccountAction {
   receive_pay = "receive_pay",
@@ -60,6 +62,8 @@ export enum AccountAction {
   deposit_withdrawal = "deposit_withdrawal",
   register_credit = "register_credit",
   redeem_credit = "redeem_credit",
+  loan = "loan",
+  loan_repayment = "loan_repayment",
 }
 export interface IPayment {
   _id: string;
@@ -82,6 +86,7 @@ export interface IPayment {
   //monitor delayed transfer entry
   unresolved?: boolean;
 }
+
 export enum BankTxType {
   DEPOSIT = "deposit",
   WITHDRAWAL = "withdrawal",
@@ -113,6 +118,16 @@ export interface ICashBundle {
   cashout_payments?: IPayment[];
 }
 
+export type IPaymentForm = Pick<
+  IPayment,
+  "tx_type" | "pay_type" | "total_amount" | "person_id" | "description"
+> & {
+  txs: Pick<
+    ITx,
+    "amount" | "category_id" | "created_at" | "remark" | "tx_type"
+  >;
+};
+
 export type IPaymentTypeCount = Partial<
   Record<PaymentType, Partial<Record<keyof typeof TxType, number>>>
 >;
@@ -135,12 +150,48 @@ export interface ICheque {
 }
 export type IChequeForm = ICheque;
 
-export type IPaymentForm = Pick<
-  IPayment,
-  "tx_type" | "pay_type" | "total_amount" | "person_id" | "description"
-> & {
-  txs: Pick<
-    ITx,
-    "amount" | "category_id" | "created_at" | "remark" | "tx_type"
-  >;
-};
+export enum PAYROLL_ACTION_TYPES {
+  bonus = "bonus",
+  deduction = "deduction",
+}
+export enum PAYROLL_ACTION_KINDS {
+  value = "value",
+  percent = "percent",
+}
+export interface IPayrollAction {
+  _id?: string;
+  name: string;
+  description: string;
+  active: boolean;
+  is_general: boolean;
+  staff_ids?: string[];
+  action_type: keyof typeof PAYROLL_ACTION_TYPES;
+  action_kind: keyof typeof PAYROLL_ACTION_KINDS;
+  amount: number; // value or percent
+  is_constant: boolean;
+  repeat?: number; //number of times
+  // dynamic
+  count?: number; //number of times done
+  total_value?: number;
+}
+export interface IPaySlip {
+  _id: string;
+  staff_id: string;
+  bonus_amount: number;
+  deducted_amount: number;
+  //dynamics
+  staff?: IStaff;
+  bonus_ids?: string[];
+  bonuses?: IPayrollAction[];
+  deduction_ids?: string[];
+  deductions?: IPayrollAction[];
+  created_at?: string;
+}
+export interface IPayroll {
+  _id?: string;
+  name: string;
+  description?: string;
+  //dynamically added in server in creating
+  pay_slips?: IPaySlip[];
+  total_amount?: number;
+}

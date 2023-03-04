@@ -1,4 +1,3 @@
-import { FormInstance } from "antd";
 import React from "react";
 import { FORM_FIELD_TYPES, IFormItems } from "ui/common";
 import {
@@ -7,7 +6,6 @@ import {
   ICheque,
   IIncomeActions,
   IPayment,
-  IPaymentForm,
   PaymentType,
   TxType,
 } from "../types";
@@ -52,6 +50,7 @@ export const paymentForm = (
               value: AccountAction.deposit_withdrawal,
               title: "Withdraw Deposit",
             },
+            { value: AccountAction.loan, title: "Loan" },
           ],
         },
         {
@@ -63,6 +62,7 @@ export const paymentForm = (
             { value: AccountAction.receive_deposit, title: "Receive Deposit" },
             { value: AccountAction.register_credit, title: "On Credit" },
             { value: AccountAction.redeem_credit, title: "Redeem Debt" },
+            { value: AccountAction.loan_repayment, title: "Loan Repayment" },
           ],
         },
       ],

@@ -1,28 +1,15 @@
-import { FormInstance, Steps } from "antd";
+import { FormInstance } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IBank, ICheque, IPaymentForm } from "../types";
-import { paymentForm } from "./data";
+import { IPayrollAction } from "../../types";
+import { getPayrollActionForm } from "./data";
 
 const Root = styled.div``;
 
-export interface INewPaymentProps {
-  onCreateItem?: (values: IPaymentForm) => void;
-  openClient?: (form: React.RefObject<FormInstance<IPaymentForm>>) => void;
-  initialValues?: IPaymentForm;
-  cheques?: ICheque[];
-  banks?: IBank[];
-}
-
-export function NewPayment({
-  onCreateItem,
-  openClient,
-  initialValues,
-  cheques,
-  banks,
-}: INewPaymentProps) {
-  const formRef = React.useRef<FormInstance<IPaymentForm>>(null);
+export interface INewPayrollActionProps {}
+function NewDeductionFunc({}: INewPayrollActionProps) {
+  const formRef = React.useRef<FormInstance<IPayrollAction>>(null);
   return (
     <Root>
       <Form
@@ -32,11 +19,11 @@ export function NewPayment({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
-          onFinish: onCreateItem,
-          initialValues,
+          // onFinish: onCreateItem,
+          // initialValues,
         }}
         items={[
-          ...paymentForm(() => openClient?.(formRef), cheques, banks),
+          ...getPayrollActionForm(),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {
@@ -48,7 +35,7 @@ export function NewPayment({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Payment",
+                  children: "Create Action",
                 },
               },
             ],
@@ -58,3 +45,4 @@ export function NewPayment({
     </Root>
   );
 }
+export const NewPayrollAction = React.memo(NewDeductionFunc);

@@ -8,6 +8,9 @@ import {
   ITx,
   IPaymentCategory,
   IPaymentReceiver,
+  IPayroll,
+  IPaySlip,
+  IPayrollAction,
 } from "ui";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
@@ -155,9 +158,46 @@ const paymentReceiver: IPaymentReceiver = {
     register_credit: 4000,
     deposit_withdrawal: 5000,
     pay: 3000,
+    loan: 0,
+    loan_repayment: 3000,
   },
   date: "",
 };
+const bonus: IPayrollAction = {
+  name: "Gross salary",
+  description: "this is the gross salary of the staff",
+  active: true,
+  is_general: true,
+  action_kind: "value",
+  amount: 10000,
+  is_constant: true,
+  action_type: "bonus",
+};
+const deduction: IPayrollAction = {
+  name: "Gross Deduction",
+  description: "this is the gross salary of the staff",
+  active: true,
+  is_general: false,
+  action_kind: "value",
+  amount: 10000,
+  is_constant: true,
+  action_type: "deduction",
+};
+const paySlip: IPaySlip = {
+  _id: "1",
+  bonus_amount: 100000,
+  deducted_amount: 20000,
+  staff_id: "1",
+  bonuses: [bonus],
+};
+const payroll: IPayroll = {
+  _id: "1",
+  name: "Salary Feb, 2022",
+  description: "This is the description for the payroll item",
+  total_amount: 3000000,
+  pay_slips: [paySlip],
+};
+
 export const dummy = {
   category,
   cashBundles,
@@ -167,4 +207,7 @@ export const dummy = {
   bankTx: [bankTx],
   orgBanks: [orgBank],
   receivers: [paymentReceiver, paymentReceiver],
+  payrolls: [payroll],
+  deductions: [deduction],
+  bonuses: [bonus],
 };
