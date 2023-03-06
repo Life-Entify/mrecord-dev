@@ -1,5 +1,5 @@
 import { Button, DrawerProps, Table, TableProps, Tabs } from "antd";
-import React from "react";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
 import { AppDrawer } from "ui/common/views/AppDrawer/AppDrawer";
@@ -8,6 +8,7 @@ import { INewPayrollActionProps, NewPayrollAction } from "./Actions";
 import { getPayrollTableColumns } from "./data";
 import { IPayrollDeductionProps, PayrollAction } from "./Actions/PayrollAction";
 import { IViewPayrollProps, ViewPayroll } from "./ViewPayroll";
+import { IPaySlipProps, PaySlip } from "./PaySlip";
 
 const Root = styled.div``;
 const Container = styled.div`
@@ -18,6 +19,7 @@ export enum PAYROLL_DIALOG_TYPE {
   NEW_PAYROLL,
   NEW_ACTION,
   VIEW_PAYROLL,
+  SHOW_PAYSLIP,
 }
 export interface IPayrollsProps {
   payrolls: IPayroll[];
@@ -34,6 +36,9 @@ export interface IPayrollsProps {
     "columns" | "size" | "dataSource"
   >;
   viewPayrollProps?: IViewPayrollProps;
+  paySlipProps?: IPaySlipProps & {
+    onBack?: React.MouseEventHandler
+  };
 }
 
 export function Payrolls({
@@ -45,9 +50,21 @@ export function Payrolls({
   newPayrollAction,
   payrollTableProps,
   viewPayrollProps,
+  paySlipProps,
 }: IPayrollsProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { onOpenNewAction, ...deepToolbarProps } = toolbarProps || {};
+  const {onBack: paySlipBack, ...deepPaySlipProps} = paySlipProps || {};
+  const getExtra = useCallback(
+    (type?: PAYROLL_DIALOG_TYPE) => {
+      switch (type) {
+        case PAYROLL_DIALOG_TYPE.SHOW_PAYSLIP:
+          return <Button onClick={paySlipBack}>Back</Button>;
+      }
+      return null;
+    },
+    [!!paySlipBack]
+  );
   return (
     <Root>
       {toolbarProps && (
@@ -74,12 +91,15 @@ export function Payrolls({
           </Tabs.TabPane>
         </Tabs>
         {/* <Table<IPatient> {...tableProps} /> */}
-        <AppDrawer {...deepDrawerProps}>
+        <AppDrawer {...deepDrawerProps} extra={getExtra(drawerType)}>
           {drawerType === PAYROLL_DIALOG_TYPE.NEW_ACTION && (
             <NewPayrollAction {...newPayrollAction} />
           )}
           {drawerType === PAYROLL_DIALOG_TYPE.VIEW_PAYROLL && (
             <ViewPayroll {...viewPayrollProps} />
+          )}
+          {drawerType === PAYROLL_DIALOG_TYPE.SHOW_PAYSLIP && (
+            <PaySlip {...deepPaySlipProps} />
           )}
         </AppDrawer>
       </Container>

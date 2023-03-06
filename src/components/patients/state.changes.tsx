@@ -1,9 +1,6 @@
 import { Space, Button, INewPtNotificationProps } from "ui";
-import { patientDataMapping } from "./data";
 import React from "react";
-import { IDisplayPatientRecord } from "./types";
-import { QPatient } from "app/graph.queries/patients/types";
-import { QProfile } from "app/graph.queries/persons/types";
+import { IPerson } from "ui/components/Person";
 export function foundNewPatientNotification({
   title,
   description,
@@ -12,14 +9,14 @@ export function foundNewPatientNotification({
 }: {
   title: React.ReactNode;
   description: React.ReactNode;
-  person: IDisplayPatientRecord;
+  person: IPerson;
   onClick?: React.MouseEventHandler;
-}): INewPtNotificationProps<keyof (QPatient & QProfile)> {
+}): INewPtNotificationProps {
   return {
     title,
     description,
+    person,
     infoBoardProps: {
-      title: person.last_name + " " + person.first_name,
       descriptionProps: {
         extra: (
           <Space>
@@ -28,8 +25,6 @@ export function foundNewPatientNotification({
           </Space>
         ),
       },
-      data: person,
-      dataMap: patientDataMapping,
     },
   };
 }

@@ -1,20 +1,9 @@
+import { IAddress, IProfile } from "ui/components/Person";
+
 export interface QDataPerson {
   _id: string;
   person_id: string;
-  profile: QProfile;
-}
-export interface QProfile {
-  last_name: string;
-  first_name: string;
-  middle_name: string;
-  phone_number: string;
-  gender: string;
-  old_id?: string;
-  occupation: string;
-  national_identity: string;
-  dob: string;
-  email: string;
-  addresses: QAddress[];
+  profile: IProfile;
 }
 export interface QAddress {
   _id: string;
@@ -27,12 +16,12 @@ export interface QAddress {
 export interface QPerson {
   person_id: string;
   _id: string;
-  profile: QProfile;
+  profile: IProfile;
 }
-export type IPersonQueryArray = (keyof QAddress)[] | (keyof QProfile)[];
+export type IPersonQueryArray = (keyof (QAddress & IProfile))[];
 export interface NestedPersonObject {
-  addresses?: (keyof QAddress)[];
-  profile?: (keyof QProfile)[];
+  addresses?: (keyof IAddress)[];
+  profile?: (keyof IProfile)[];
 }
 export interface QPersonQueryParams {
   keyword?: QKeywordPerson;
@@ -43,7 +32,7 @@ export type QKeywordPerson = Partial<
   Pick<QPerson, "_id" | "person_id"> & {
     profile: Partial<
       Pick<
-        QProfile,
+        IProfile,
         | "first_name"
         | "last_name"
         | "middle_name"

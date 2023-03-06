@@ -1,5 +1,5 @@
-import { Drawer, DrawerProps, Table, TableProps } from "antd";
-import React from "react";
+import { Button, Drawer, DrawerProps, Table, TableProps } from "antd";
+import React, { useCallback } from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
 import { INewPatientProps, NewPatient } from "./NewPatient";
@@ -9,6 +9,8 @@ import {
   NewPtNotification,
 } from "./NewPtNotification";
 import { IViewPatientProps, ViewPatient } from "./ViewPatient/ViewPatient";
+import { IPatient } from "./types";
+import { getPatientColumns } from "./data";
 
 const TableContainer = styled.div`
   margin-top: 50px;
@@ -20,36 +22,19 @@ export enum PATIENT_DIALOG_TYPE {
   VIEW_PATIENT = 3,
   EDIT_PROFILE = 4,
 }
-export interface IPatientProps<
-  IFormProfile,
-  IFormNextOfKin,
-  IPatient,
-  IInforBoardMapKeys extends string | number | symbol,
-  INextOfKinData,
-  IPerson
-> {
+export interface IPatientProps {
   toolbarProps?: IToolbarProps;
   drawerProps?: DrawerProps & { drawerType?: PATIENT_DIALOG_TYPE };
-  newPatientProps?: INewPatientProps<IFormProfile, IFormNextOfKin>;
-  newPtNotificationProps?: INewPtNotificationProps<IInforBoardMapKeys>;
-  tableProps?: TableProps<IPatient>;
-  viewPatientProps?: IViewPatientProps<
-    IPatient,
-    INextOfKinData,
-    IPerson,
-    IInforBoardMapKeys
-  >;
-  editProfileProps?: EditProfileFormProps<IFormProfile>;
+  newPatientProps?: INewPatientProps;
+  newPtNotificationProps?: INewPtNotificationProps;
+  tableProps?: Omit<TableProps<IPatient>, "columns" | "scroll">;
+  viewPatientProps?: IViewPatientProps;
+  editProfileProps?: EditProfileFormProps & {
+    onBack?: React.MouseEventHandler;
+  };
 }
 
-export function Patients<
-  IFormProfile,
-  IFormNextOfKin,
-  IPatient extends object,
-  IInforBoardMapKeys extends string | number | symbol,
-  INextOfKinData,
-  IPerson
->({
+export function Patients({
   drawerProps,
   toolbarProps,
   newPatientProps,
@@ -57,35 +42,41 @@ export function Patients<
   tableProps,
   viewPatientProps,
   editProfileProps,
-}: IPatientProps<
-  IFormProfile,
-  IFormNextOfKin,
-  IPatient,
-  IInforBoardMapKeys,
-  INextOfKinData,
-  IPerson
->) {
+}: IPatientProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
+  const { onBack: editOnBack, ...deepEditProfileProps } =
+    editProfileProps || {};
+  const getExtra = useCallback(
+    (type?: PATIENT_DIALOG_TYPE) => {
+      switch (type) {
+        case PATIENT_DIALOG_TYPE.EDIT_PROFILE:
+          return <Button onClick={editOnBack}>Back</Button>;
+      }
+    },
+    [!!editOnBack]
+  );
   return (
     <div>
       <Toolbar {...toolbarProps} />
       <TableContainer>
-        <Table<IPatient> {...tableProps} />
+        <Table
+          {...tableProps}
+          scroll={{ x: true }}
+          columns={getPatientColumns()}
+        />
       </TableContainer>
-      <Drawer {...deepDrawerProps}>
+      <Drawer {...deepDrawerProps} extra={getExtra(drawerType)}>
         {drawerType === PATIENT_DIALOG_TYPE.NEW_PATIENT && (
           <NewPatient {...newPatientProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION && (
-          <NewPtNotification<IInforBoardMapKeys> {...newPtNotificationProps} />
+          <NewPtNotification {...newPtNotificationProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.VIEW_PATIENT && (
-          <ViewPatient<IPatient, INextOfKinData, IPerson, IInforBoardMapKeys>
-            {...viewPatientProps}
-          />
+          <ViewPatient {...viewPatientProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.EDIT_PROFILE && (
-          <EditProfileForm<IFormProfile> {...editProfileProps} />
+          <EditProfileForm {...deepEditProfileProps} />
         )}
       </Drawer>
     </div>

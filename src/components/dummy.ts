@@ -12,6 +12,7 @@ import {
   IPaySlip,
   IPayrollAction,
 } from "ui";
+import { IPatient } from "ui/components/Patients/types";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
 const sampleBank: IBank = {
@@ -102,6 +103,7 @@ const person: IPerson = {
     email: "chokey2nv@yahoo.com",
     addresses: [
       {
+        _id: "address1",
         street: "11 Eze street",
         town: "Enugu",
         lga: "Enugu-East",
@@ -111,6 +113,13 @@ const person: IPerson = {
     ],
   },
   bank: sampleBank,
+};
+const patient: IPatient = {
+  _id: "1",
+  patient_id: "1",
+  old_id: "1",
+  person_id: "1",
+  person: person,
 };
 const staff: IStaff = {
   staff_id: "1",
@@ -210,4 +219,5 @@ export const dummy = {
   payrolls: [payroll],
   deductions: [deduction],
   bonuses: [bonus],
+  patients: [patient],
 };

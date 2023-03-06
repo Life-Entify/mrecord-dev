@@ -1,69 +1,24 @@
 import { ApolloError } from "@apollo/client";
-import { QAddress, QProfile, QPerson } from "app/graph.queries/persons/types";
-import { INewPatientData } from "ui/components/Patients/NewPatient";
-import { IFormNextOfKin, IFormProfile } from "components/patients/types";
 import { AppError } from "ui";
 import {
   QTransferPatient,
   QTransferPatientMD,
 } from "app/graph.queries/patients/types";
 import { IWithPatientProps } from "components/base/hoc/with.patients";
-
-const actionRefactorProfile = <T extends IFormProfile | IFormNextOfKin>(
-  target: T
-): {
-  oldId?: string | null;
-  profile: Omit<T, "old_id" | keyof QAddress> & {
-    addresses: QAddress[];
-  };
-  relationship?: string | null;
-} => {
-  let oldId;
-  let relationship;
-
-  if (target.phone_number.includes("+")) {
-    target.phone_number = target.phone_number.replaceAll("+", "");
-  }
-  if ((target as IFormProfile).old_id) {
-    oldId = (target as IFormProfile).old_id;
-    delete (target as IFormProfile).old_id;
-  }
-  if ((target as IFormNextOfKin).relationship) {
-    relationship = (target as IFormNextOfKin).relationship;
-    delete (target as IFormNextOfKin).relationship;
-  }
-  const address: Partial<QAddress> = {};
-  const addressKeys: (keyof QAddress)[] = [
-    "street",
-    "town",
-    "lga",
-    "nstate",
-    "country",
-  ];
-  for (let i = 0; i < addressKeys.length; i++) {
-    const addKey = addressKeys[i];
-    if (target[addKey]) {
-      address[addKey] = target[addKey];
-      delete target[addKey];
-    }
-  }
-  address._id = "address1";
-  return {
-    oldId,
-    profile: { ...target, addresses: [address as QAddress] },
-    relationship,
-  };
-};
-export const actionRemoveNoks = (values: Record<string, any>) => {
-  const newValue: Record<string, any> = {};
-  for (const name in values) {
-    if (Object.prototype.hasOwnProperty.call(values, name)) {
-      newValue[name.includes("nok_") ? name.replace("nok_", "") : name] =
-        values[name];
-    }
-  }
-  return newValue;
-};
+import {
+  IAddress,
+  IFormNextOfKin,
+  IFormPerson,
+  INewPersonData,
+  IProfile,
+  IPerson,
+} from "ui/components/Person";
+import { IFormPatient } from "ui/components/Patients/types";
+import {
+  actionRefactorProfile,
+  actionRemoveNoks,
+  IFormNextOfKinData,
+} from "ui/components/Person/common";
 
 type IActionCreatePatientNokMDProps = Pick<
   IWithPatientProps,
@@ -76,12 +31,12 @@ export async function actionCreatePatientWithNokMD({
   createPerson,
   createPatientMD,
   info,
-}: IActionCreatePatientNokMDProps): Promise<AppError<QPerson> | null> {
+}: IActionCreatePatientNokMDProps): Promise<AppError<IPerson> | null> {
   try {
     const { profile, oldId, next_of_kins } = info;
     const { data } = await createPerson({
       variables: {
-        profile,
+        profile: profile as IProfile,
       },
     });
     if (!data?.person?.person_id) {
@@ -102,11 +57,11 @@ export async function actionCreatePatientWithNokMD({
     return null;
   } catch (err) {
     if (err instanceof ApolloError) {
-      return new AppError<QPerson>((err as ApolloError).message, {
+      return new AppError<IPerson>((err as ApolloError).message, {
         cause: { code: 1, label: "User Exists" },
       });
     }
-    return err as AppError<QPerson>;
+    return err as AppError<IPerson>;
   }
 }
 type IActionCreatePatientMetaProps = Pick<
@@ -120,7 +75,7 @@ export async function actionCreatePatientWithMD({
   createPerson,
   createPatientMD,
   info,
-}: IActionCreatePatientMetaProps): Promise<AppError<QPerson> | null> {
+}: IActionCreatePatientMetaProps): Promise<AppError<IPerson> | null> {
   try {
     const { person_id, oldId, next_of_kins } = info;
 
@@ -161,17 +116,17 @@ export async function actionCreatePatientWithMD({
       next_of_kins.map((nok) =>
         createPerson({
           variables: {
-            profile: nok.next_of_kin as QProfile,
+            profile: nok.next_of_kin as IProfile,
           },
         })
       )
     );
-    const successfulReq: { index: number; person: QPerson }[] = [];
+    const successfulReq: { index: number; person: IPerson }[] = [];
     const failedReq = [];
     for (let i = 0; i < noks.length; i++) {
       const req = noks[i];
       if (req.status === "fulfilled") {
-        successfulReq.push({ index: i, person: req.value as QPerson });
+        successfulReq.push({ index: i, person: req.value as IPerson });
       } else {
         failedReq.push({ index: i, reason: req.reason });
       }
@@ -199,18 +154,18 @@ export async function actionCreatePatientWithMD({
     return null;
   } catch (err) {
     if (err instanceof ApolloError) {
-      return new AppError<QPerson>((err as ApolloError).message, {
+      return new AppError<IPerson>((err as ApolloError).message, {
         cause: { code: 1, label: "User Exists" },
       });
     }
-    return err as AppError<QPerson>;
+    return err as AppError<IPerson>;
   }
 }
 type IActionCreatePatientProps = Pick<
   IWithPatientProps,
   "getPatients" | "getPersons" | "createPatient"
 > & {
-  info: INewPatientData<IFormProfile, IFormNextOfKin>;
+  info: INewPersonData<IFormPatient>;
 };
 export async function actionCreatePatient({
   getPersons,
@@ -218,19 +173,17 @@ export async function actionCreatePatient({
   createPatient,
   info,
 }: IActionCreatePatientProps): Promise<AppError<{
-  result?: QPerson;
+  result?: IPerson;
   info?: Pick<IActionCreatePatientMetaProps, "info">;
 }> | null> {
   try {
     const { profile, next_of_kins } = info;
     const cNextOfKins = next_of_kins.map((nextOfKin) => {
-      return actionRefactorProfile<IFormNextOfKin>(
-        actionRemoveNoks(nextOfKin) as any
+      return actionRefactorProfile(
+        actionRemoveNoks(nextOfKin as IFormNextOfKin)
       );
     });
-    const cProfile = actionRefactorProfile<IFormProfile>(
-      profile as IFormProfile
-    );
+    const cProfile = actionRefactorProfile(profile as IFormPatient);
     const patient: QTransferPatient = {
       oldId: cProfile.oldId,
       profile: cProfile.profile,
@@ -366,7 +319,7 @@ export async function actionCreatePatient({
       });
     }
     return err as AppError<{
-      result?: QPerson;
+      result?: IPerson;
       info: Pick<IActionCreatePatientMetaProps, "info">;
     }>;
   }

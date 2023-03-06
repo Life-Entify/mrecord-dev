@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { IPersonQueryArray, NestedPersonObject, QPerson } from "./types";
+import { IPerson } from "ui/components/Person";
+import { IPersonQueryArray, NestedPersonObject } from "./types";
 
 function queryStringBuilder(
-  query: (keyof QPerson)[] | IPersonQueryArray,
+  query: (keyof IPerson)[] | IPersonQueryArray,
   nestedValues?: NestedPersonObject
 ) {
   let queryString = "";
@@ -18,7 +19,7 @@ function queryStringBuilder(
   return queryString;
 }
 export const graphGetPersonsByID = (
-  person?: (keyof QPerson)[],
+  person?: (keyof IPerson)[],
   nestedValues?: NestedPersonObject
 ) => {
   const query = person ? queryStringBuilder(person, nestedValues) : "_id";
@@ -30,7 +31,7 @@ export const graphGetPersonsByID = (
     }`;
 };
 export const graphGetPersons = (
-  person?: (keyof QPerson)[],
+  person?: (keyof IPerson)[],
   nestedValues?: NestedPersonObject
 ) => {
   const query = person ? queryStringBuilder(person, nestedValues) : "_id";
@@ -42,7 +43,7 @@ export const graphGetPersons = (
     }`;
 };
 export const graphCreatePerson = (
-  person?: (keyof QPerson)[],
+  person?: (keyof IPerson)[],
   nestedValues?: NestedPersonObject
 ) => {
   const query = person ? queryStringBuilder(person, nestedValues) : "_id";

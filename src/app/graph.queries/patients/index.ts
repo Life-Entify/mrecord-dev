@@ -1,8 +1,9 @@
 import { gql } from "@apollo/client";
-import { IQueryArray, NestedPatientObject, QPatient } from "./types";
+import { IPatient } from "ui/components/Patients/types";
+import { IQueryArray, NestedPatientObject } from "./types";
 
 function queryStringBuilder(
-  query: (keyof QPatient)[] | IQueryArray,
+  query: (keyof IPatient)[] | IQueryArray,
   nestedValues?: NestedPatientObject
 ) {
   let queryString = "";
@@ -19,7 +20,7 @@ function queryStringBuilder(
 }
 
 export const graphUpdatePatient = (
-  patient?: (keyof QPatient)[],
+  patient?: (keyof IPatient)[],
   nestedValues?: NestedPatientObject
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
@@ -31,7 +32,7 @@ export const graphUpdatePatient = (
     }`;
 };
 export const graphCreatePatient = (
-  patient?: (keyof QPatient)[],
+  patient?: (keyof IPatient)[],
   nestedValues?: NestedPatientObject
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
@@ -43,7 +44,7 @@ export const graphCreatePatient = (
     }`;
 };
 export const graphCreatePatientMD = (
-  patient?: (keyof QPatient)[],
+  patient?: (keyof IPatient)[],
   nestedValues?: NestedPatientObject
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
@@ -55,7 +56,7 @@ export const graphCreatePatientMD = (
     }`;
 };
 export const graphGetPatients = (
-  patient?: (keyof QPatient)[],
+  patient?: (keyof IPatient)[],
   nestedValues?: NestedPatientObject
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
