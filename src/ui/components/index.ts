@@ -4,3 +4,5 @@ export * from "./Patients";
 export * from "./Accounts";
 export * from "./Settings";
 export * from "./Staff";
+export * from "./Appointments";
+export * from "./Departments";

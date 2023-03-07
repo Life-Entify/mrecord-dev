@@ -10,6 +10,7 @@ export const routeNames = {
   payrolls: "/accounts/payrolls",
   users: "/users",
   staff: "/hr/staff",
+  departments: "/hr/departments",
   settings: "/settings",
   logout: "/logout",
 };

@@ -57,7 +57,7 @@ export function Patients({
   );
   return (
     <div>
-      <Toolbar {...toolbarProps} />
+      {toolbarProps && <Toolbar {...toolbarProps} />}
       <TableContainer>
         <Table
           {...tableProps}

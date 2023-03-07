@@ -11,7 +11,9 @@ import {
   IPayroll,
   IPaySlip,
   IPayrollAction,
+  IDepartment,
 } from "ui";
+import { IAppointment } from "ui/components/Appointments/types";
 import { IPatient } from "ui/components/Patients/types";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
@@ -207,6 +209,19 @@ const payroll: IPayroll = {
   pay_slips: [paySlip],
 };
 
+const department: IDepartment = {
+  _id: "1",
+  name: "Records",
+  description: "Store patient information",
+};
+const appointment: IAppointment = {
+  _id: "1",
+  date: new Date().toLocaleString(),
+  patient_id: patient._id,
+  department_id: department._id as string,
+  patient,
+  department,
+};
 export const dummy = {
   category,
   cashBundles,
@@ -220,4 +235,6 @@ export const dummy = {
   deductions: [deduction],
   bonuses: [bonus],
   patients: [patient],
+  departments: [department],
+  appointments: [appointment],
 };

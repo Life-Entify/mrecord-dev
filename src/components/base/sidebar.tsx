@@ -30,6 +30,7 @@ export const items = [
   ]),
   getItem("Human Resource", routeNames.appointments, <UserOutlined />, [
     getItem("Staff", routeNames.staff),
+    getItem("Departments", routeNames.departments),
   ]),
   getItem("Appointments", routeNames.appointments, <BookOutlined />),
   getItem("Users", routeNames.users, <UserAddOutlined />),
