@@ -5,6 +5,7 @@ import { IStaff } from "../Staff";
 export interface IPaymentCategory {
   _id: string;
   title: React.ReactNode;
+  type: keyof typeof TxType;
   description?: React.ReactNode;
 }
 

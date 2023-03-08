@@ -12,6 +12,8 @@ import {
   IPaySlip,
   IPayrollAction,
   IDepartment,
+  APPLICATIONS,
+  ILogin,
 } from "ui";
 import { IAppointment } from "ui/components/Appointments/types";
 import { IPatient } from "ui/components/Patients/types";
@@ -29,11 +31,13 @@ const category: IPaymentCategory[] = [
   {
     _id: "1",
     title: "New Folders",
+    type: "income",
     description: "This is the new folders",
   },
   {
     _id: "2",
     title: "New Folders",
+    type: "expenditure",
     description: "This is the new folders",
   },
 ];
@@ -123,12 +127,20 @@ const patient: IPatient = {
   person_id: "1",
   person: person,
 };
+const login: ILogin = {
+  _id: "1",
+  username: "chokey2nv",
+  password: "1234",
+  department_id: "1",
+};
 const staff: IStaff = {
   staff_id: "1",
   person: structuredClone(person) as IPerson,
-  _id: "",
-  person_id: "",
-  departments: [],
+  _id: "1",
+  person_id: "1",
+  department_ids: ["1"],
+  // departments: [],
+  logins: [login],
 };
 const bankTx: IBankTx = {
   _id: "129484",
@@ -213,6 +225,7 @@ const department: IDepartment = {
   _id: "1",
   name: "Records",
   description: "Store patient information",
+  app: APPLICATIONS.records,
 };
 const appointment: IAppointment = {
   _id: "1",

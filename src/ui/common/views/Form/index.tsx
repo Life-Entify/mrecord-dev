@@ -45,10 +45,10 @@ type IFieldProps =
   | BtnProps
   | SwitchProps
   | TreeSelectProps;
-type IFieldsProps = {
+export interface IFieldsProps {
   fieldProps: IFieldProps;
   fieldType: FORM_FIELD_TYPES;
-};
+}
 export interface IFormItems {
   itemProps: FormItemProps;
   fieldProps?: IFieldProps | IFieldsProps[] | IFormItems;

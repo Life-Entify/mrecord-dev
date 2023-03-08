@@ -1,11 +1,12 @@
 import React from "react";
-import { FORM_FIELD_TYPES, IFormItems } from "ui/common";
+import { FORM_FIELD_TYPES, IFormItems, IFieldsProps } from "ui/common";
 import {
   AccountAction,
   IBank,
   ICheque,
   IIncomeActions,
   IPayment,
+  IPaymentCategory,
   PaymentType,
   TxType,
 } from "../types";
@@ -28,6 +29,7 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
 
 export const paymentForm = (
   openClient?: React.MouseEventHandler,
+  openCategory?: (txType: TxType) => void,
   cheques?: ICheque[],
   banks?: IBank[]
 ): IFormItems[] => [
@@ -207,6 +209,52 @@ export const paymentForm = (
           fieldProps: {
             children: "Open Client",
             onClick: openClient,
+          },
+        },
+      ],
+    },
+  },
+  //here
+  {
+    fieldType: FORM_FIELD_TYPES.HIDDEN,
+    itemProps: {
+      noStyle: true,
+      shouldUpdate: (prevValues, currentValues) => {
+        return prevValues.action_type !== currentValues.action_type;
+      },
+    },
+    itemFunc(formInstance, fieldForm, fieldData) {
+      const value = formInstance?.getFieldValue?.("action_type");
+      return [AccountAction.receive_pay, AccountAction.pay].includes(value)
+        ? fieldData &&
+            fieldForm?.({
+              ...fieldData,
+              fieldProps: [
+                {
+                  ...(fieldData.fieldProps as IFieldsProps[])?.[0],
+                  fieldProps: {
+                    ...(fieldData.fieldProps as IFieldsProps[])?.[0]
+                      ?.fieldProps,
+                    onClick: () => {
+                      openCategory?.(value);
+                    },
+                  },
+                },
+              ],
+            })
+        : null;
+    },
+    fieldProps: {
+      fieldType: FORM_FIELD_TYPES.FIELDS,
+      itemProps: {
+        name: "category_id",
+        label: "Categories",
+      },
+      fieldProps: [
+        {
+          fieldType: FORM_FIELD_TYPES.BUTTON,
+          fieldProps: {
+            children: "Select Tx Category",
           },
         },
       ],

@@ -57,6 +57,7 @@ export default function StaffComponent() {
       }}
       staffViewProps={{
         staff,
+        departments: dummy.departments,
         infoBoardProps: {
           skipMap: [
             "person",
@@ -64,6 +65,9 @@ export default function StaffComponent() {
             "next_of_kins",
             "next_of_kins_details",
           ],
+        },
+        staffDepartmentProps:{
+          
         },
         staffAccountProps: {
           showNewBankForm() {

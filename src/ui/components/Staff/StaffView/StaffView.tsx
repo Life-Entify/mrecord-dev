@@ -1,14 +1,16 @@
-import { Button, Divider, Dropdown, Tabs, TabsProps } from "antd";
+import { Button, Divider, Dropdown, Tabs, TabsProps, Tag } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
+import { IDepartment } from "ui/components/Departments";
 import { IPerson, IProfile } from "ui/components/Person";
 import { staffDataMapping } from "../data";
 import { IStaff } from "../types";
 import { IStaffAccountProps, StaffAccount } from "./StaffAccount";
+import { IStaffDepartments, StaffDepartments } from "./StaffDepartments";
 
 const Root = styled.div``;
-const Title = styled.h2``;
+const Title = styled.h3``;
 const Description = styled.div``;
 const StyledTabs = styled(Tabs)`
   // margin-top: 50px;
@@ -19,6 +21,9 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+`;
+const DeptContainer = styled.div`
+  margin-bottom: 50px;
 `;
 
 export interface IStaffViewProps {
@@ -31,6 +36,9 @@ export interface IStaffViewProps {
   >;
   tabProps?: TabsProps;
   staffAccountProps?: IStaffAccountProps;
+  departments?: IDepartment[];
+  removeDept?: (dept: IDepartment) => void;
+  staffDepartmentProps?: Omit<IStaffDepartments, "departments" | "staff">;
 }
 export function StaffView({
   title,
@@ -39,6 +47,9 @@ export function StaffView({
   infoBoardProps,
   tabProps,
   staffAccountProps,
+  departments,
+  staffDepartmentProps,
+  removeDept,
 }: IStaffViewProps) {
   const [showDetails, setShowDetail] = useState<boolean>();
   return (
@@ -77,9 +88,37 @@ export function StaffView({
           <Divider style={{ margin: "20px 0px" }} />
         </>
       )}
-      <StyledTabs type="card" {...tabProps}>
+
+      <Divider style={{ margin: "20px 0px" }} />
+      <DeptContainer>
+        <Title>Departments</Title>
+        {staff?.department_ids?.map((deptId, index) => {
+          const dept = departments?.find((d) => d._id === deptId);
+          if (!dept) return null;
+          return (
+            <Tag
+              color="blue"
+              key={`staff-dept-${index}`}
+              closable
+              onClose={(e) => {
+                e.preventDefault();
+                removeDept?.(dept);
+              }}
+            >
+              {dept.name}
+            </Tag>
+          );
+        })}
+      </DeptContainer>
+      <StyledTabs tabIndex={2} type="card" {...tabProps}>
         <Tabs.TabPane tab="Family" key={1}></Tabs.TabPane>
-        <Tabs.TabPane tab="Departments" key={2}></Tabs.TabPane>
+        <Tabs.TabPane tab="Departments" key={2}>
+          <StaffDepartments
+            {...staffDepartmentProps}
+            departments={departments}
+            staff={staff}
+          />
+        </Tabs.TabPane>
         <Tabs.TabPane tab="Account" key={3}>
           <StaffAccount {...staffAccountProps} staff={staff} />
         </Tabs.TabPane>
