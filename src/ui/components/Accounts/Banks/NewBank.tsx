@@ -1,16 +1,16 @@
-import { FormInstance, Steps } from "antd";
+import { FormInstance } from "antd";
 import React from "react";
 import styled from "styled-components";
-import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { bankInputForm } from "./data";
+import { Form, FORM_FIELD_TYPES, IFormItems } from "ui/common";
 
 const Root = styled.div``;
 
 export interface INewBankProps {
   onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
+  inputFields: IFormItems[];
 }
 
-export function NewBank({ onCreateItem }: INewBankProps) {
+export function NewBank({ onCreateItem, inputFields }: INewBankProps) {
   const formRef = React.useRef<FormInstance>(null);
   return (
     <Root>
@@ -22,9 +22,10 @@ export function NewBank({ onCreateItem }: INewBankProps) {
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
+          onFinish: onCreateItem
         }}
         items={[
-          ...bankInputForm,
+          ...inputFields,
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {
@@ -37,7 +38,6 @@ export function NewBank({ onCreateItem }: INewBankProps) {
                   type: "primary",
                   htmlType: "submit",
                   children: "Create Bank",
-                  onClick: onCreateItem,
                 },
               },
             ],

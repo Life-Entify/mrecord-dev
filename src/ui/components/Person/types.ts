@@ -1,3 +1,5 @@
+import { IBank } from "../Accounts";
+
 export interface IProfile {
   last_name: string;
   first_name: string;
@@ -11,7 +13,6 @@ export interface IProfile {
   addresses: IAddress[];
 }
 export interface IAddress {
-  _id: string;
   street: string;
   town: string;
   lga: string;
@@ -22,4 +23,14 @@ export interface IPerson {
   _id: string;
   person_id: string;
   profile: IProfile;
+  next_of_kins: INextOfKin[];
+  next_of_kins_details?: IPerson[];
+  bank?: IBank;
 }
+
+export interface INextOfKin {
+  person_id: string;
+  relationship: string;
+}
+
+export type IFormPerson = Omit<IProfile, "addresses"> & IAddress;

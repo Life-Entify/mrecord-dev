@@ -1,6 +1,7 @@
 import { RenderedCell } from "rc-table/lib/interface";
+import React from "react";
 import { FORM_FIELD_TYPES, IFormItems, TableColumnType } from "ui/common";
-import { BankTxType, IBank, IBankTx, PaymentType } from "../types";
+import { IOrgBank, IBankTx, PaymentType } from "../types";
 
 export const bankFundEditForm: IFormItems[] = [
   {
@@ -57,6 +58,16 @@ export const bankInputForm: IFormItems[] = [
     },
   },
   {
+    fieldType: FORM_FIELD_TYPES.TEXT_AREA,
+    itemProps: {
+      name: "description",
+      label: "Other description of account",
+    },
+  },
+];
+export const orgBankInputForm: IFormItems[] = [
+  ...bankInputForm,
+  {
     fieldType: FORM_FIELD_TYPES.TEXT,
     itemProps: {
       name: "balance",
@@ -65,13 +76,6 @@ export const bankInputForm: IFormItems[] = [
     },
     fieldProps: {
       type: "number",
-    },
-  },
-  {
-    fieldType: FORM_FIELD_TYPES.TEXT_AREA,
-    itemProps: {
-      name: "description",
-      label: "Other description of account",
     },
   },
 ];
@@ -86,15 +90,15 @@ export const bankTxInputForm: IFormItems[] = [
     fieldProps: {
       options: [
         {
-          value: PaymentType.CASH,
+          value: PaymentType.cash,
           label: "Cash",
         },
         {
-          value: PaymentType.CHEQUE,
+          value: PaymentType.cheque,
           label: "Cheque",
         },
         {
-          value: PaymentType.TRANSFER,
+          value: PaymentType.transfer,
           label: "Transfer",
         },
       ],
@@ -146,10 +150,10 @@ export const getBankTableColumns = (
     keyIndex: string
   ) => (
     value: any,
-    record: IBank,
+    record: IOrgBank,
     index: number
-  ) => React.ReactNode | RenderedCell<IBank>
-): TableColumnType<IBank>[] => [
+  ) => React.ReactNode | RenderedCell<IOrgBank>
+): TableColumnType<IOrgBank>[] => [
   {
     key: "bank",
     dataIndex: "bank",
@@ -194,7 +198,7 @@ export const getBankTableColumns = (
     render: render?.("action"),
   },
 ];
-export const bankLabelMap: Record<keyof IBank, string> = {
+export const bankLabelMap: Record<keyof IOrgBank, string> = {
   name: "Account Name",
   number: "Account Number",
   description: "Account Description",
@@ -258,7 +262,7 @@ export const getBankTxTableColumns = (
     render: render?.("action"),
   },
 ];
-export const bankTxLabelMap: Record<keyof IBankTx, string> = {
+export const bankTxLabelMap: Record<keyof IBankTx, React.ReactNode> = {
   _id: "Tx ID",
   ref_id: "Tx Ref",
   description: "Account Description",
@@ -270,5 +274,5 @@ export const bankTxLabelMap: Record<keyof IBankTx, string> = {
   payment_id: "Payment ID",
   bank: "",
   staff: "",
-  payment: ""
+  payment: "",
 };

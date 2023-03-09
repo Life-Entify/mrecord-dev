@@ -1,150 +1,113 @@
+import { INotificationProps } from "components/types";
 import React, { useState } from "react";
-import { Banks, BANK_DIALOG_TYPE, IBank, BankTxType } from "ui";
-import { dummy } from "../dummy";
-interface IPaymentState {
+import { Cash, CASH_DIALOG_TYPE, ICashBundle, notification } from "ui";
+import { dummy } from "../../dummy";
+interface ICashState {
   openDrawer: boolean;
   drawerTitle: string;
-  dialogType: BANK_DIALOG_TYPE;
-}
-interface IBankState {
-  bank: IBank;
-  bankAction: BankTxType;
+  dialogType: CASH_DIALOG_TYPE;
 }
 export default function PaymentComponent() {
-  const [state, _setState] = useState<Partial<IPaymentState>>({
+  const [state, _setState] = useState<Partial<ICashState>>({
     openDrawer: false,
   });
-  const setState = (state: Partial<IPaymentState>) =>
+  const setState = (state: Partial<ICashState>) =>
     _setState((_state) => ({ ..._state, ...state }));
-
-  const [bankState, _setBankState] = useState<Partial<IBankState>>({});
-  const setBankState = (state: Partial<IBankState>) =>
-    _setBankState((_state) => ({ ..._state, ...state }));
-
+  const [bundle, setBundle] = useState<ICashBundle>();
+  const [api, contextHolder] = notification.useNotification();
   const closeDialog = () =>
     setState({
       openDrawer: false,
       drawerTitle: undefined,
       dialogType: undefined,
     });
+  const openNotification = ({
+    message,
+    description,
+    onClose,
+    duration,
+    key,
+    btn,
+  }: INotificationProps) => {
+    api.error({
+      message,
+      description,
+      onClose,
+      duration,
+      key,
+      btn,
+    });
+  };
   return (
-    <Banks
-      toolbarProps={{
-        newBtnProps: {
-          style: { marginLeft: 10 },
-          onClick: () =>
-            setState({
-              openDrawer: true,
-              dialogType: BANK_DIALOG_TYPE.NEW_BANK,
-              drawerTitle: "New Bank",
-            }),
-          title: "New Bank",
-        },
-      }}
-      drawerProps={{
-        title: state.drawerTitle,
-        open: state.openDrawer,
-        drawerType: state.dialogType,
-        onClose: closeDialog,
-        size: "large",
-      }}
-      tableProps={{
-        scroll: { x: true },
-        rowSelection: {
-          // selections: true,
-          onSelect(record) {
-            setState({
-              openDrawer: true,
-              dialogType: BANK_DIALOG_TYPE.VIEW_BANK,
-              drawerTitle: "Bank Transactions",
-            });
-            setBankState({ bank: record });
-          },
-          selectedRowKeys: [],
-          type: "radio",
-        },
-        onFundEdit(record, action) {
-          setState({
-            openDrawer: true,
-            dialogType: BANK_DIALOG_TYPE.FUND_CHANGE,
-            drawerTitle: `${
-              action === BankTxType.DEPOSIT
-                ? "Deposit funds to"
-                : "Withdraw funds from"
-            } ${record.bank}`,
-          });
-          setBankState({ bank: record, bankAction: action });
-        },
-        dataSource: [
-          {
-            _id: "1",
-            name: "St. Mary",
-            bank: "First Bank",
-            description: "Our main bank",
-            balance: 0,
-            number: 8989900000,
-            branch: "Owerri",
-          },
-        ],
-      }}
-      fundChangeProps={{
-        bank: bankState.bank,
-        bankAction: bankState.bankAction,
-        newDepositTxProps: {
-          category: dummy.category,
-          title: <center>Deposit</center>,
-        },
-        newWithdrawalTxProps: {
-          category: dummy.category,
-          title: <center>Withdrawal</center>,
-        },
-      }}
-      bankTxProps={{
-        onBack: () => {
-          setState({
-            dialogType: BANK_DIALOG_TYPE.VIEW_BANK,
-            drawerTitle: "Bank Transactions",
-          });
-        },
-        bank: bankState.bank,
-        toolbarProps: {
-          onNewTransaction(key) {
-            const isDeposit = key === BankTxType.DEPOSIT;
-            setState({
-              dialogType: isDeposit
-                ? BANK_DIALOG_TYPE.NEW_BANK_TX_DEPOSIT
-                : BANK_DIALOG_TYPE.NEW_BANK_TX_WITHDRAWAL,
-              drawerTitle: `${bankState.bank?.bank} ${
-                isDeposit ? "Deposit" : "Withdrawal"
-              }`,
-            });
-          },
+    <>
+      {contextHolder}
+      <Cash
+        toolbarProps={{
           dateRangePickerProps: {},
-        },
-        tableProps: {
-          dataSource: [
-            {
-              _id: "129484",
-              ref_id: "ref from bank",
-              staff_id: "3455sd",
-              bank_id: "dfsfds",
-              amount: 30000,
-              description: "staff salary",
-              created_at: "2023-02-25",
-              tx_type: "expenditure",
-              payment_id: "",
+        }}
+        drawerProps={{
+          drawerType: state.dialogType,
+          title: state.drawerTitle,
+          open: state.openDrawer,
+          onClose: closeDialog,
+        }}
+        moveToBankProps={{
+          banks: dummy.orgBanks,
+          bundle: dummy.cashBundles?.[0],
+        }}
+        bundledCashProps={{
+          allBundleProps: {
+            bundles: dummy.cashBundles,
+            onShowUsages(bundle) {
+              setState({
+                dialogType: CASH_DIALOG_TYPE.SHOW_BUNDLE,
+                drawerTitle: bundle.title,
+                openDrawer: true,
+              });
+              setBundle(bundle);
             },
-          ],
-        },
-      }}
-      newBankTxProps={{
-        depositProps: {
-          category: dummy.category,
-        },
-        withdrawalProps: {
-          category: dummy.category,
-        },
-      }}
-    />
+            onMoveToBank(bundle) {
+              if (false) {
+                //!dummy.orgBanks?.[0]){
+                openNotification({
+                  key: "no-bank-created-for-cash-transfer",
+                  message: "No Bank Registered",
+                  description: "Go to bank and add new bank!",
+                });
+              } else {
+                setState({
+                  openDrawer: true,
+                  dialogType: CASH_DIALOG_TYPE.CASH_TO_BANK,
+                  drawerTitle: "Move Cash to Bank",
+                });
+              }
+            },
+          },
+        }}
+        unbundledCashProps={{
+          payments: dummy.payments,
+        }}
+        viewBundleProps={{
+          bundle,
+          onDisplaySpendCash() {
+            setState({
+              openDrawer: true,
+              drawerTitle: "Spend Cash - Payment",
+              dialogType: CASH_DIALOG_TYPE.SPEND_CASH,
+            });
+          },
+        }}
+        spendCashProps={{
+          bundle,
+          categories: dummy.category,
+          onBack() {
+            setState({
+              dialogType: CASH_DIALOG_TYPE.SHOW_BUNDLE,
+              drawerTitle: bundle?.title,
+            });
+          },
+        }}
+      />
+    </>
   );
 }

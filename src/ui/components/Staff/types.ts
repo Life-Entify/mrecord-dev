@@ -1,9 +1,13 @@
+import { IPerson } from "../Person";
+
 export enum DEPARTMENTS {
-  RECORDS = "records",
-  ACCOUNTS = "accounts",
+  records = "records",
+  accounts = "accounts",
 }
 export interface IStaff {
   _id: string;
+  staff_id: string;
   person_id: string;
   departments: DEPARTMENTS[];
+  person?: IPerson;
 }

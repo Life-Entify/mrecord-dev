@@ -4,13 +4,13 @@ import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { categoryFormInputs } from "./data";
-import { ITxCategory, LIST_ACTIONS } from "../../types";
+import { IPaymentCategory, LIST_ACTIONS } from "../../types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-export interface IExpenditureCategoryProps<List = ITxCategory> {
+export interface IExpenditureCategoryProps<List = IPaymentCategory> {
   listProps?: ListProps<List> & {
     onActionClick?: (type: LIST_ACTIONS, item: List) => void;
     onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
@@ -53,6 +53,7 @@ export function ExpenditureCategory({ listProps }: IExpenditureCategoryProps) {
                   name: "income-new-form",
                   layout: "vertical",
                   initialValues: deepListProps?.dataSource?.[0],
+                  onFinish: onCreateItem
                 }}
                 items={[
                   ...categoryFormInputs,
@@ -65,7 +66,6 @@ export function ExpenditureCategory({ listProps }: IExpenditureCategoryProps) {
                       type: "primary",
                       htmlType: "submit",
                       children: "Create Category",
-                      onClick: onCreateItem,
                     },
                   },
                 ]}

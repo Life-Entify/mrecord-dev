@@ -2,7 +2,7 @@ import { FormInstance } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { ITxCategory } from "../../types";
+import { IPaymentCategory } from "../../types";
 import { bankTxInputForm } from "../data";
 
 const Root = styled.div``;
@@ -10,12 +10,14 @@ const FormTitle = styled.h3``;
 
 export interface INewBankDepositTxProps {
   title?: React.ReactNode;
-  category?: ITxCategory[];
+  category?: IPaymentCategory[];
+  onCreateItem?: React.MouseEventHandler
 }
 
 export function NewBankDepositTx({
   title,
   category = [],
+  onCreateItem
 }: INewBankDepositTxProps) {
   const formRef = React.useRef<FormInstance>(null);
   return (
@@ -29,6 +31,7 @@ export function NewBankDepositTx({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
+          onFinish: onCreateItem
         }}
         items={[
           ...bankTxInputForm,
@@ -57,8 +60,7 @@ export function NewBankDepositTx({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Transaction",
-                  // onClick: onCreateItem,
+                  children: "Create Transaction"
                 },
               },
             ],

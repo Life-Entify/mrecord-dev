@@ -10,8 +10,8 @@ import {
 import React from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
-import { BankTxType, IBank } from "../types";
-import { getBankTableColumns } from "./data";
+import { BankTxType, IOrgBank } from "../types";
+import { getBankTableColumns, orgBankInputForm } from "./data";
 import { INewBankProps, NewBank } from "./NewBank";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { BankFundChange, IBankFundChangeProps } from "./FundChange";
@@ -38,9 +38,9 @@ export interface IBanksProps {
   drawerProps?: DrawerProps & {
     drawerType?: BANK_DIALOG_TYPE;
   };
-  newBankProps?: INewBankProps;
-  tableProps?: Omit<TableProps<IBank>, "columns"> & {
-    onFundEdit?: (record: IBank, action: BankTxType) => void;
+  newBankProps?: Omit<INewBankProps, "inputFields">;
+  tableProps?: Omit<TableProps<IOrgBank>, "columns"> & {
+    onFundEdit?: (record: IOrgBank, action: BankTxType) => void;
   };
   fundChangeProps?: IBankFundChangeProps;
   bankTxProps?: IBankViewProps & { onBack?: React.MouseEventHandler };
@@ -78,7 +78,7 @@ export function Banks({
     <div>
       {toolbarProps && <Toolbar {...toolbarProps} />}
       <TableContainer>
-        <Table<IBank>
+        <Table<IOrgBank>
           {...deepTableProps}
           columns={getBankTableColumns((dataIndex) => (value, record) => {
             if (dataIndex === "action") {
@@ -87,9 +87,7 @@ export function Banks({
                   <Tooltip title={`Add fund to bank ${record.bank}`}>
                     <Button
                       size="small"
-                      onClick={() =>
-                        onFundEdit?.(record, BankTxType.DEPOSIT)
-                      }
+                      onClick={() => onFundEdit?.(record, BankTxType.DEPOSIT)}
                     >
                       <PlusOutlined size={10} />
                     </Button>
@@ -109,11 +107,12 @@ export function Banks({
             }
             return value;
           })}
+          size="small"
         />
       </TableContainer>
       <Drawer {...deepDrawerProps} extra={getExtra(drawerType, onBack)}>
         {drawerType === BANK_DIALOG_TYPE.NEW_BANK && (
-          <NewBank {...newBankProps} />
+          <NewBank {...newBankProps} inputFields={orgBankInputForm} />
         )}
         {drawerType === BANK_DIALOG_TYPE.FUND_CHANGE && (
           <BankFundChange {...fundChangeProps} />
