@@ -25,8 +25,8 @@ export interface IBank {
 }
 
 export enum TxType {
-  income,
-  expenditure,
+  income = "income",
+  expenditure = "expenditure",
 }
 export interface ITx {
   _id: string;
@@ -43,6 +43,16 @@ export enum PaymentType {
   transfer = "transfer",
   cheque = "cheque",
 }
+export enum IIncomeActions {
+  receive_pay = "receive_pay",
+  receive_deposit = "receive_deposit",
+  redeem_credit = "redeem_credit",
+  register_credit = "register_credit",
+}
+export enum IExpenditureAction {
+  deposit_withdrawal = "deposit_withdrawal",
+  pay = "pay",
+}
 export enum AccountAction {
   receive_pay = "receive_pay",
   pay = "pay",
@@ -56,13 +66,21 @@ export interface IPayment {
   pay_type: keyof typeof PaymentType;
   tx_type: keyof typeof TxType;
   action: keyof typeof AccountAction;
-  person_id: string;
+  // receive/pay money from pt or staff or write description
+  person_id?: string;
   person?: IPerson;
+  description?: string;
+  //staff in charge of the system
   staff_id: string;
+  //txs that show the categories in the payment
   txIds: string[];
   txs?: ITx[];
+
   total_amount: number;
   created_at: string;
+
+  //monitor delayed transfer entry
+  unresolved?: boolean;
 }
 export enum BankTxType {
   DEPOSIT = "deposit",
@@ -94,3 +112,35 @@ export interface ICashBundle {
   cashout_payment_ids?: string[];
   cashout_payments?: IPayment[];
 }
+
+export type IPaymentTypeCount = Partial<
+  Record<PaymentType, Partial<Record<keyof typeof TxType, number>>>
+>;
+export type IPaymentActionCount = Record<AccountAction, number>;
+export interface IPaymentReceiver extends IStaff {
+  date: string;
+  action_count?: IPaymentActionCount;
+  type_count?: IPaymentTypeCount;
+  payments?: IPayment[];
+}
+export interface ICheque {
+  _id?: string;
+  cheque_number: string;
+  cheque_leaflets: number;
+  bank_id: string;
+  description?: string;
+  bank?: IBank;
+  used_leaflets?: number;
+  created_at?: string;
+}
+export type IChequeForm = ICheque;
+
+export type IPaymentForm = Pick<
+  IPayment,
+  "tx_type" | "pay_type" | "total_amount" | "person_id" | "description"
+> & {
+  txs: Pick<
+    ITx,
+    "amount" | "category_id" | "created_at" | "remark" | "tx_type"
+  >;
+};

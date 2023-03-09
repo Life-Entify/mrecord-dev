@@ -7,6 +7,7 @@ import {
   IStaff,
   ITx,
   IPaymentCategory,
+  IPaymentReceiver,
 } from "ui";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
@@ -131,6 +132,32 @@ const orgBank: IOrgBank = {
   ...sampleBank,
   balance: 0,
 };
+const paymentReceiver: IPaymentReceiver = {
+  ...staff,
+  type_count: {
+    cash: {
+      income: 20000,
+      expenditure: 20000,
+    },
+    cheque: {
+      income: 140000,
+      expenditure: 30000,
+    },
+    transfer: {
+      income: 3443,
+      // expenditure: 399000,
+    },
+  },
+  action_count: {
+    receive_deposit: 20000,
+    receive_pay: 3000,
+    redeem_credit: 30000,
+    register_credit: 4000,
+    deposit_withdrawal: 5000,
+    pay: 3000,
+  },
+  date: "",
+};
 export const dummy = {
   category,
   cashBundles,
@@ -139,4 +166,5 @@ export const dummy = {
   staff: [staff],
   bankTx: [bankTx],
   orgBanks: [orgBank],
+  receivers: [paymentReceiver, paymentReceiver],
 };

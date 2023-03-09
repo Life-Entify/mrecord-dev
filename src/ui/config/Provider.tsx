@@ -12,6 +12,7 @@ export const Provider: React.FC<IProviderProps> = function ({
   children,
   appTheme,
 }) {
+  if (appTheme) appTheme.colorBgCard = "#c6cacd";
   return (
     <ConfigProvider
       theme={{

@@ -6,6 +6,9 @@ const Payments = React.lazy(
   () => import("../../components/accounts/payments/index")
 );
 const Cash = React.lazy(() => import("../../components/accounts/cash/index"));
+const Cheques = React.lazy(
+  () => import("../../components/accounts/cheques/index")
+);
 const Banks = React.lazy(() => import("../../components/accounts/banks/index"));
 const Staff = React.lazy(() => import("../../components/staff/index"));
 export const routes: {
@@ -31,6 +34,10 @@ export const routes: {
   {
     path: routeNames.cash,
     Component: Cash,
+  },
+  {
+    path: routeNames.cheques,
+    Component: Cheques,
   },
   {
     path: routeNames.staff,

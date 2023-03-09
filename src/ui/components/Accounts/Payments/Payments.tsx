@@ -2,6 +2,7 @@ import { Button, ButtonProps, Drawer, DrawerProps, Space, Tabs } from "antd";
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
+import { IPersonProps, Person } from "ui/components/Person";
 import { IPaymentTableProps, PaymentTable } from "../Tables";
 import {
   IPaymentCategoryProps,
@@ -10,6 +11,7 @@ import {
 import { INewPaymentProps, NewPayment } from "./NewPayment";
 import { IPaymentReceiptProps, PaymentReceipt } from "./PaymentReceipt";
 import { IPaymentTxProps, PaymentTxs } from "./PaymentTxs";
+import { IReceiverProps, Receivers } from "./Receivers";
 
 const Root = styled.div``;
 const Container = styled.div`
@@ -17,10 +19,11 @@ const Container = styled.div`
 `;
 
 export enum PAYMENT_DIALOG_TYPE {
-  CATEGORIES = 1,
-  NEW_PAYMENT = 2,
-  PAYMENT_TXS = 3,
-  SHOW_RECEIPT = 4,
+  CATEGORIES,
+  NEW_PAYMENT,
+  PAYMENT_TXS,
+  SHOW_RECEIPT,
+  SHOW_CLIENT,
 }
 export interface IPaymentsProps {
   toolbarProps?: Omit<IToolbarProps, "extra"> & {
@@ -36,6 +39,10 @@ export interface IPaymentsProps {
   paymentReceiptProps?: IPaymentReceiptProps & {
     onBack?: React.MouseEventHandler;
   };
+  receiverProps?: IReceiverProps;
+  personProps?: IPersonProps & {
+    onBack?: React.MouseEventHandler;
+  };
 }
 
 export function Payments({
@@ -46,19 +53,24 @@ export function Payments({
   paymentTableProps,
   paymentTxsProps,
   paymentReceiptProps,
+  receiverProps,
+  personProps,
 }: IPaymentsProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { extra, ...deepToolbarProps } = toolbarProps || {};
   const { onBack: receiptOnBack, ...deepPaymentReceiptProps } =
     paymentReceiptProps || {};
+  const { onBack: personOnBack, ...deepPersonProps } = personProps || {};
   const getExtra = useCallback(
     (type: PAYMENT_DIALOG_TYPE) => {
       switch (type) {
         case PAYMENT_DIALOG_TYPE.SHOW_RECEIPT:
-          return <Button onClick={receiptOnBack}>Back to Txs</Button>;
+          return <Button onClick={receiptOnBack}>Back</Button>;
+        case PAYMENT_DIALOG_TYPE.SHOW_CLIENT:
+          return <Button onClick={personOnBack}>Back</Button>;
       }
     },
-    [receiptOnBack]
+    [!!receiptOnBack, !!personOnBack]
   );
   return (
     <Root>
@@ -80,7 +92,7 @@ export function Payments({
             <PaymentTable {...paymentTableProps} />
           </Tabs.TabPane>
           <Tabs.TabPane key={2} tab="Receivers">
-            This is the receivers
+            <Receivers {...receiverProps} />
           </Tabs.TabPane>
         </Tabs>
         {/* <Table<IPatient> {...tableProps} /> */}
@@ -99,6 +111,9 @@ export function Payments({
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.SHOW_RECEIPT && (
             <PaymentReceipt {...deepPaymentReceiptProps} />
+          )}
+          {drawerType === PAYMENT_DIALOG_TYPE.SHOW_CLIENT && (
+            <Person {...deepPersonProps} />
           )}
         </Drawer>
       </Container>
