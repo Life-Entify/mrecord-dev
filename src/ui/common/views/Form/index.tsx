@@ -153,38 +153,44 @@ export const FormFields: React.FC<IFormItems> = ({
         <AntForm.List name={`${itemProps.name}-list`}>
           {(fields, { add, remove }) => (
             <>
-              {fields?.map((listField) => (
-                <div key={listField.key} style={{ display: "flex" }}>
-                  {(fieldProps as IFieldsProps[])?.map((field, index) => {
-                    return (
-                      <FormFields
-                        key={index}
-                        fieldType={field.fieldType}
-                        fieldProps={field.fieldProps}
-                        itemProps={{
-                          // ...listField,
-                          wrapperCol: { span: 20 },
-                          name: [
-                            listField.name,
-                            field.itemProps?.name as string,
-                          ],
-                          ...field.itemProps,
-                        }}
+              {fields?.map((listField) => {
+                return (
+                  <div
+                    key={listField.key}
+                    style={{ display: "flex", justifyContent: "space-around" }}
+                  >
+                    {(fieldProps as IFieldsProps[])?.map((field, index) => {
+                      return (
+                        <FormFields
+                          key={index}
+                          fieldType={field.fieldType}
+                          fieldProps={{
+                            ...field.fieldProps,
+                            style: { width: "200px" },
+                          }}
+                          itemProps={{
+                            ...field.itemProps,
+                            ...listField,
+                            name: [
+                              listField.name,
+                              field.itemProps?.name as string,
+                            ],
+                          }}
+                        />
+                      );
+                    })}
+                    <AntForm.Item>
+                      <MinusCircleOutlined
+                        onClick={() => remove(listField.name)}
                       />
-                    );
-                  })}
-                  <AntForm.Item>
-                    <MinusCircleOutlined
-                      onClick={() => remove(listField.name)}
-                    />
-                  </AntForm.Item>
-                </div>
-              ))}
-              <AntForm.Item>
+                    </AntForm.Item>
+                  </div>
+                );
+              })}
+              <AntForm.Item wrapperCol={{ offset: 20 }}>
                 <Button
                   type="dashed"
                   onClick={() => add()}
-                  block
                   icon={<PlusOutlined />}
                 >
                   Add item
