@@ -12,8 +12,6 @@ import {
   graphUpdatePatient,
 } from "app/graph.queries/patients";
 import {
-  QNextOfKin,
-  QPatient,
   QPatientQueryParams,
   QTransferPatient,
   QTransferPatientMD,
@@ -25,23 +23,22 @@ import {
   graphGetPersonsByID,
 } from "app/graph.queries/persons";
 import {
-  QAddress,
   QDataPerson,
-  QPerson,
   QPersonQueryParams,
-  QProfile,
 } from "app/graph.queries/persons/types";
 import React from "react";
+import { IPatient } from "ui/components/Patients/types";
+import { IAddress, INextOfKin, IPerson, IProfile } from "ui/components/Person";
 interface IReturnedData {
-  patient: (keyof QPatient)[];
-  person: (keyof QPerson)[];
-  profile: (keyof QProfile)[];
-  addresses: (keyof QAddress)[];
-  next_of_kins: (keyof QNextOfKin)[];
+  patient: (keyof IPatient)[];
+  person: (keyof IPerson)[];
+  profile: (keyof IProfile)[];
+  addresses: (keyof IAddress)[];
+  next_of_kins: (keyof INextOfKin)[];
 }
 const graphReturnedData: IReturnedData = {
-  patient: ["_id", "patient_id", "person", "old_id", "next_of_kins"],
-  person: ["_id", "person_id", "profile"],
+  patient: ["_id", "patient_id", "person", "old_id"],
+  person: ["_id", "person_id", "profile", "next_of_kins"],
   profile: [
     "last_name",
     "first_name",
@@ -58,33 +55,33 @@ const graphReturnedData: IReturnedData = {
   next_of_kins: ["person_id", "relationship"],
 };
 export interface IWithPatientProps {
-  getPersons: LazyQueryExecFunction<{ persons: QPerson[] }, QPersonQueryParams>;
+  getPersons: LazyQueryExecFunction<{ persons: IPerson[] }, QPersonQueryParams>;
   getPersonsByID: LazyQueryExecFunction<
-    { persons: QPerson[] },
+    { persons: IPerson[] },
     { _ids: string[] }
   >;
   createPerson: (
-    options: MutationFunctionOptions<{ person: QPerson }, { profile: QProfile }>
-  ) => Promise<FetchResult<{ person: QPerson }>>;
+    options: MutationFunctionOptions<{ person: IPerson }, { profile: IProfile }>
+  ) => Promise<FetchResult<{ person: IPerson }>>;
   createPatient: (
-    options: MutationFunctionOptions<{ patient: QPatient }, QTransferPatient>
+    options: MutationFunctionOptions<{ patient: IPatient }, QTransferPatient>
   ) => Promise<FetchResult>;
   createPatientMD: (
-    options: MutationFunctionOptions<{ patient: QPatient }, QTransferPatientMD>
+    options: MutationFunctionOptions<{ patient: IPatient }, QTransferPatientMD>
   ) => Promise<FetchResult>;
   updatePatient: (
     options: MutationFunctionOptions<
-      { patient: QPatient },
+      { patient: IPatient },
       QUpdatePtProfileTransfer
     >
   ) => Promise<FetchResult>;
   getPatients: LazyQueryExecFunction<
     {
-      patients: QPatient[];
+      patients: IPatient[];
     },
     QPatientQueryParams
   >;
-  patients?: QPatient[];
+  patients?: IPatient[];
 }
 export function WithPatient<T extends IWithPatientProps>(
   ChildComponent: React.ComponentType<T>
@@ -103,7 +100,7 @@ export function WithPatient<T extends IWithPatientProps>(
       })
     );
     const [getPatients, { data: ptData }] = useLazyQuery<
-      { patients: QPatient[] },
+      { patients: IPatient[] },
       QPatientQueryParams
     >(
       graphGetPatients(graphReturnedData.patient, {
@@ -114,11 +111,11 @@ export function WithPatient<T extends IWithPatientProps>(
       })
     );
     const [updatePatient] = useMutation<
-      { patient: QPatient },
+      { patient: IPatient },
       QUpdatePtProfileTransfer
     >(graphUpdatePatient(["_id"]));
 
-    const [createPerson] = useMutation<QPerson, QDataPerson>(
+    const [createPerson] = useMutation<IPerson, QDataPerson>(
       graphCreatePerson(graphReturnedData.person, {
         profile: graphReturnedData.profile,
       })

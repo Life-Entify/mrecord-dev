@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { IPayment, IPaymentForm, Payments, PAYMENT_DIALOG_TYPE } from "ui";
+import {
+  IPayment,
+  IPaymentForm,
+  Payments,
+  PAYMENT_DIALOG_TYPE,
+  TxType,
+} from "ui";
 import { dummy } from "../../dummy";
 interface IPaymentState {
   openDrawer: boolean;
@@ -19,6 +25,7 @@ export default function PaymentComponent() {
   const [paymentForm, setPaymentForm] = useState<IPaymentForm>();
 
   const [payment, setPayment] = useState<IPayment>();
+  const [txType, setTxType] = useState<TxType>();
 
   return (
     <Payments
@@ -118,6 +125,14 @@ export default function PaymentComponent() {
           });
           setPaymentForm(form.current?.getFieldsValue());
         },
+        openPaymentCategory(form, txType) {
+          setState({
+            dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
+            drawerTitle: "Select Payment Categories(s)",
+          });
+          setTxType(txType);
+          setPaymentForm(form.current?.getFieldsValue());
+        },
       }}
       personProps={{
         toolbarProps: {
@@ -135,6 +150,10 @@ export default function PaymentComponent() {
             ...dialogNewPayment,
           });
         },
+      }}
+      newPaymentCatProps={{
+        incomeCats: dummy.category,
+        expenditureCats: dummy.category,
       }}
     />
   );

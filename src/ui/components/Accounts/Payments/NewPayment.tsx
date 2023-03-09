@@ -2,7 +2,7 @@ import { FormInstance, Steps } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IBank, ICheque, IPaymentForm } from "../types";
+import { IBank, ICheque, IPaymentForm, TxType } from "../types";
 import { paymentForm } from "./data";
 
 const Root = styled.div``;
@@ -10,6 +10,11 @@ const Root = styled.div``;
 export interface INewPaymentProps {
   onCreateItem?: (values: IPaymentForm) => void;
   openClient?: (form: React.RefObject<FormInstance<IPaymentForm>>) => void;
+  openPaymentCategory?: (
+    form: React.RefObject<FormInstance<IPaymentForm>>,
+    txType: TxType
+  ) => void;
+
   initialValues?: IPaymentForm;
   cheques?: ICheque[];
   banks?: IBank[];
@@ -18,6 +23,7 @@ export interface INewPaymentProps {
 export function NewPayment({
   onCreateItem,
   openClient,
+  openPaymentCategory,
   initialValues,
   cheques,
   banks,
@@ -28,15 +34,22 @@ export function NewPayment({
       <Form
         formRef={formRef}
         formProps={{
-          name: "income-new-form",
+          name: "payment-new-form",
           layout: "horizontal",
-          labelCol: { span: 10 },
+          labelCol: { span: 8 },
           wrapperCol: { span: 14 },
           onFinish: onCreateItem,
           initialValues,
         }}
         items={[
-          ...paymentForm(() => openClient?.(formRef), cheques, banks),
+          ...paymentForm(
+            () => openClient?.(formRef),
+            (txType) => {
+              openPaymentCategory?.(formRef, txType);
+            },
+            cheques,
+            banks
+          ),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {

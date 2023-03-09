@@ -2,20 +2,20 @@ import { FormInstance } from "antd";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES, IFormItems } from "ui/common/views";
+import { actionRemoveNoks, IFormNextOfKinData } from "./common";
 import { nextOfKinForm } from "./data";
-import { IFormPerson } from "./types";
+import { IFormNextOfKin, IFormPerson } from "./types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-type IFormNextOfKin = Partial<IFormPerson>;
 export interface INewPersonData<T extends IFormPerson> {
   profile: T;
-  next_of_kins: IFormNextOfKin[];
+  next_of_kins: IFormNextOfKinData[];
 }
 export interface INewPersonProps<T extends IFormPerson> {
-  createPatient?: (
+  createPerson?: (
     info?: INewPersonData<T>,
     error?: Error,
     options?: {
@@ -27,7 +27,7 @@ export interface INewPersonProps<T extends IFormPerson> {
   values?: INewPersonData<T>;
 }
 export function NewPerson<T extends IFormPerson>({
-  createPatient,
+  createPerson,
   personForm,
   values,
 }: INewPersonProps<T>) {
@@ -50,8 +50,8 @@ export function NewPerson<T extends IFormPerson>({
       } else {
         const nextOfKin: IFormNextOfKin[] = [values as IFormNextOfKin];
         if (!person) {
-          createPatient &&
-            createPatient(
+          createPerson &&
+            createPerson(
               undefined,
               new Error(
                 "person profile not returned from NewPerson Component (UI)"
@@ -59,18 +59,18 @@ export function NewPerson<T extends IFormPerson>({
             );
           return;
         }
-        createPatient &&
-          createPatient(
+        createPerson &&
+          createPerson(
             {
               profile: person,
-              next_of_kins: structuredClone(nextOfKin),
+              next_of_kins: [actionRemoveNoks(structuredClone(nextOfKin))],
             },
             undefined,
             { resetForm }
           );
       }
     },
-    [pageIndex, JSON.stringify(person), !!createPatient]
+    [pageIndex, JSON.stringify(person), !!createPerson]
   );
   return (
     <Root>

@@ -1,50 +1,30 @@
-import { IFormNextOfKin, IFormProfile } from "components/patients/types";
-import { QAddress, QKeywordPerson, QPerson, QProfile } from "../persons/types";
+import { IPatient } from "ui/components/Patients/types";
+import { IAddress, INextOfKin, IPerson, IProfile } from "ui/components/Person";
+import { QKeywordPerson } from "../persons/types";
 
 export interface QUpdatePtProfileTransfer {
   _id?: string;
-  patient?: Partial<QPatient>;
+  patient?: Partial<IPatient>;
   person_id?: string;
-  profile?: Partial<QProfile>;
-}
-export interface QNextOfKin {
-  person_id: string;
-  relationship: string;
-}
-export interface QNextOfKinData {
-  person: QPerson;
-  relationship: string;
-}
-export interface QPatient {
-  _id: string;
-  patient_id: string;
-  person: QPerson;
-  old_id: string;
-  next_of_kins: QNextOfKin[];
+  profile?: Partial<IProfile>;
 }
 export interface QTransferPatientMD {
   oldId?: string | null;
   person_id: string;
-  next_of_kins: {
-    person_id: string;
-    relationship: string;
-  }[];
+  next_of_kins: INextOfKin[];
+}
+export interface QNextOfKins {
+  relationship: string;
+  next_of_kin: Partial<IProfile>;
 }
 export interface QTransferPatient {
   oldId?: string | null;
-  profile: Omit<IFormProfile, "old_id" | keyof QAddress> & {
-    addresses: QAddress[];
-  };
-  next_of_kins: {
-    next_of_kin: Omit<IFormNextOfKin, "old_id" | keyof QAddress> & {
-      addresses: QAddress[];
-    };
-    relationship: string;
-  }[];
+  profile: Partial<IProfile>;
+  next_of_kins: QNextOfKins[];
 }
 
 export type QKeywordPatient = {
-  patient?: Pick<QPatient, "_id" | "patient_id"> & {
+  patient?: Pick<IPatient, "_id" | "patient_id"> & {
     old_id: string;
   };
   person?: QKeywordPerson;
@@ -56,13 +36,13 @@ export interface QPatientQueryParams {
 }
 
 export type IQueryArray =
-  | (keyof QAddress)[]
-  | (keyof QProfile)[]
-  | (keyof QPerson)[]
-  | (keyof QNextOfKin)[];
+  | (keyof IAddress)[]
+  | (keyof IProfile)[]
+  | (keyof IPerson)[]
+  | (keyof INextOfKin)[];
 export interface NestedPatientObject {
-  addresses?: (keyof QAddress)[];
-  profile?: (keyof QProfile)[];
-  person?: (keyof QPerson)[];
-  next_of_kins?: (keyof QNextOfKin)[];
+  addresses?: (keyof IAddress)[];
+  profile?: (keyof IProfile)[];
+  person?: (keyof IPerson)[];
+  next_of_kins?: (keyof INextOfKin)[];
 }

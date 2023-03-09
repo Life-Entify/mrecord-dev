@@ -9,6 +9,7 @@ import {
   PaymentCategories,
 } from "./Categories/Categories";
 import { INewPaymentProps, NewPayment } from "./NewPayment";
+import { INewPaymentCatProps, NewPaymentCat } from "./NewPaymentCat";
 import { IPaymentReceiptProps, PaymentReceipt } from "./PaymentReceipt";
 import { IPaymentTxProps, PaymentTxs } from "./PaymentTxs";
 import { IReceiverProps, Receivers } from "./Receivers";
@@ -21,6 +22,7 @@ const Container = styled.div`
 export enum PAYMENT_DIALOG_TYPE {
   CATEGORIES,
   NEW_PAYMENT,
+  NEW_PAYMENT_CAT,
   PAYMENT_TXS,
   SHOW_RECEIPT,
   SHOW_CLIENT,
@@ -34,6 +36,7 @@ export interface IPaymentsProps {
   drawerProps?: DrawerProps & { drawerType?: PAYMENT_DIALOG_TYPE };
   paymentCategoryProps?: IPaymentCategoryProps;
   newPaymentProps?: INewPaymentProps;
+  newPaymentCatProps?: INewPaymentCatProps;
   paymentTableProps?: IPaymentTableProps;
   paymentTxsProps?: IPaymentTxProps;
   paymentReceiptProps?: IPaymentReceiptProps & {
@@ -50,6 +53,7 @@ export function Payments({
   toolbarProps,
   paymentCategoryProps,
   newPaymentProps,
+  newPaymentCatProps,
   paymentTableProps,
   paymentTxsProps,
   paymentReceiptProps,
@@ -105,6 +109,9 @@ export function Payments({
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.NEW_PAYMENT && (
             <NewPayment {...newPaymentProps} />
+          )}
+          {drawerType === PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT && (
+            <NewPaymentCat {...newPaymentCatProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.PAYMENT_TXS && (
             <PaymentTxs {...paymentTxsProps} />

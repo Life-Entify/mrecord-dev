@@ -8,7 +8,15 @@ import {
   ITx,
   IPaymentCategory,
   IPaymentReceiver,
+  IPayroll,
+  IPaySlip,
+  IPayrollAction,
+  IDepartment,
+  APPLICATIONS,
+  ILogin,
 } from "ui";
+import { IAppointment } from "ui/components/Appointments/types";
+import { IPatient } from "ui/components/Patients/types";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
 const sampleBank: IBank = {
@@ -23,11 +31,13 @@ const category: IPaymentCategory[] = [
   {
     _id: "1",
     title: "New Folders",
+    type: "income",
     description: "This is the new folders",
   },
   {
     _id: "2",
     title: "New Folders",
+    type: "expenditure",
     description: "This is the new folders",
   },
 ];
@@ -99,6 +109,7 @@ const person: IPerson = {
     email: "chokey2nv@yahoo.com",
     addresses: [
       {
+        _id: "address1",
         street: "11 Eze street",
         town: "Enugu",
         lga: "Enugu-East",
@@ -109,12 +120,27 @@ const person: IPerson = {
   },
   bank: sampleBank,
 };
+const patient: IPatient = {
+  _id: "1",
+  patient_id: "1",
+  old_id: "1",
+  person_id: "1",
+  person: person,
+};
+const login: ILogin = {
+  _id: "1",
+  username: "chokey2nv",
+  password: "1234",
+  department_id: "1",
+};
 const staff: IStaff = {
   staff_id: "1",
   person: structuredClone(person) as IPerson,
-  _id: "",
-  person_id: "",
-  departments: [],
+  _id: "1",
+  person_id: "1",
+  department_ids: ["1"],
+  // departments: [],
+  logins: [login],
 };
 const bankTx: IBankTx = {
   _id: "129484",
@@ -155,8 +181,59 @@ const paymentReceiver: IPaymentReceiver = {
     register_credit: 4000,
     deposit_withdrawal: 5000,
     pay: 3000,
+    loan: 0,
+    loan_repayment: 3000,
   },
   date: "",
+};
+const bonus: IPayrollAction = {
+  name: "Gross salary",
+  description: "this is the gross salary of the staff",
+  active: true,
+  is_general: true,
+  action_kind: "value",
+  amount: 10000,
+  is_constant: true,
+  action_type: "bonus",
+};
+const deduction: IPayrollAction = {
+  name: "Gross Deduction",
+  description: "this is the gross salary of the staff",
+  active: true,
+  is_general: false,
+  action_kind: "value",
+  amount: 10000,
+  is_constant: true,
+  action_type: "deduction",
+};
+const paySlip: IPaySlip = {
+  _id: "1",
+  bonus_amount: 100000,
+  deducted_amount: 20000,
+  staff_id: "1",
+  bonuses: [bonus],
+};
+const payroll: IPayroll = {
+  _id: "1",
+  name: "Salary Feb, 2022",
+  description: "This is the description for the payroll item",
+  total_amount: 3000000,
+  pay_slips: [paySlip],
+};
+
+const department: IDepartment = {
+  _id: "1",
+  name: "Records",
+  description: "Store patient information",
+  app: APPLICATIONS.records,
+};
+const appointment: IAppointment = {
+  _id: "1",
+  date: new Date().toLocaleString(),
+  patient_id: patient._id,
+  department_id: department._id as string,
+  patient,
+  department,
 };
 export const dummy = {
   category,
@@ -167,4 +244,10 @@ export const dummy = {
   bankTx: [bankTx],
   orgBanks: [orgBank],
   receivers: [paymentReceiver, paymentReceiver],
+  payrolls: [payroll],
+  deductions: [deduction],
+  bonuses: [bonus],
+  patients: [patient],
+  departments: [department],
+  appointments: [appointment],
 };

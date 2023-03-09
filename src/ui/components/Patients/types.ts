@@ -6,9 +6,8 @@ export interface IPatient {
   patient_id: string;
   person_id: string;
   person?: IPerson;
-  next_of_kins: IPerson[];
 }
 
 export interface IFormPatient extends IFormPerson {
-  old_id: string;
+  old_id?: string;
 }

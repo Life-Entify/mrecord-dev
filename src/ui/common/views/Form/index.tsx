@@ -9,6 +9,7 @@ import {
   InputProps,
   Select,
   SelectProps,
+  Space,
   Switch,
   SwitchProps,
   TreeSelect,
@@ -16,6 +17,7 @@ import {
 } from "antd";
 import type { FormInstance, FormItemProps, FormProps } from "antd/es/form";
 import { TextAreaProps } from "antd/es/input";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 const { Option } = Select;
 
@@ -35,6 +37,7 @@ export enum FORM_FIELD_TYPES {
   SWITCH = 9,
   TREE_SELECT = 10,
   HIDDEN = 11,
+  LIST = 12,
 }
 type BtnProps = ButtonProps;
 type IFieldProps =
@@ -45,10 +48,11 @@ type IFieldProps =
   | BtnProps
   | SwitchProps
   | TreeSelectProps;
-type IFieldsProps = {
+export interface IFieldsProps {
   fieldProps: IFieldProps;
   fieldType: FORM_FIELD_TYPES;
-};
+  itemProps?: FormItemProps;
+}
 export interface IFormItems {
   itemProps: FormItemProps;
   fieldProps?: IFieldProps | IFieldsProps[] | IFormItems;
@@ -114,23 +118,25 @@ export const FormFields: React.FC<IFormItems> = ({
       return (
         <AntForm.Item {...itemProps}>
           <Select allowClear {...(fieldProps as SelectField).field}>
-            {(fieldProps as SelectField)?.options.map((option, optionIndex) => {
-              return (
-                <Option
-                  key={`selectoption--${optionIndex}`}
-                  value={option.value}
-                >
-                  {option.label}
-                </Option>
-              );
-            })}
+            {(fieldProps as SelectField)?.options?.map(
+              (option, optionIndex) => {
+                return (
+                  <Option
+                    key={`selectoption--${optionIndex}`}
+                    value={option.value}
+                  >
+                    {option.label}
+                  </Option>
+                );
+              }
+            )}
           </Select>
         </AntForm.Item>
       );
     case FORM_FIELD_TYPES.FIELDS:
       return (
         <AntForm.Item {...itemProps}>
-          {(fieldProps as IFieldsProps[]).map((field, index) => {
+          {(fieldProps as IFieldsProps[])?.map((field, index) => {
             return (
               <FormFields
                 key={index}
@@ -141,6 +147,52 @@ export const FormFields: React.FC<IFormItems> = ({
             );
           })}
         </AntForm.Item>
+      );
+    case FORM_FIELD_TYPES.LIST:
+      return (
+        <AntForm.List name={`${itemProps.name}-list`}>
+          {(fields, { add, remove }) => (
+            <>
+              {fields?.map((listField) => (
+                <div key={listField.key} style={{ display: "flex" }}>
+                  {(fieldProps as IFieldsProps[])?.map((field, index) => {
+                    return (
+                      <FormFields
+                        key={index}
+                        fieldType={field.fieldType}
+                        fieldProps={field.fieldProps}
+                        itemProps={{
+                          // ...listField,
+                          wrapperCol: { span: 20 },
+                          name: [
+                            listField.name,
+                            field.itemProps?.name as string,
+                          ],
+                          ...field.itemProps,
+                        }}
+                      />
+                    );
+                  })}
+                  <AntForm.Item>
+                    <MinusCircleOutlined
+                      onClick={() => remove(listField.name)}
+                    />
+                  </AntForm.Item>
+                </div>
+              ))}
+              <AntForm.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Add item
+                </Button>
+              </AntForm.Item>
+            </>
+          )}
+        </AntForm.List>
       );
   }
   return null;
@@ -164,7 +216,14 @@ export const Form: React.FC<IFormProps> = ({
   }
 
   return (
-    <AntForm ref={formRef} style={{ maxWidth: 600 }} {...formProps} form={form}>
+    <AntForm
+      ref={formRef}
+      style={{ justifyContent: "center", padding: 20 /* maxWidth: 600 */ }}
+      // labelCol={{ span: 8 }}
+      // wrapperCol={{ span: 14 }}
+      {...formProps}
+      form={form}
+    >
       {items?.map((item, index) => {
         return <FormFields key={index} {...item} />;
       })}

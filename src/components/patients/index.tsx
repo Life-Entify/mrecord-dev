@@ -1,37 +1,27 @@
-import { QAddress, QPerson, QProfile } from "app/graph.queries/persons/types";
+import { QAddress } from "app/graph.queries/persons/types";
 import React, { useCallback, useEffect, useState } from "react";
 import { Patients, PATIENT_DIALOG_TYPE } from "ui/components/Patients";
-import {
-  IDisplayPatientRecord,
-  IFormNextOfKin,
-  IFormProfile,
-} from "components/patients/types";
-import { actionCreatePatient, actionRemoveNoks } from "./actions";
-import {
-  nextOfKinForm,
-  patientDataMapping,
-  patientForm,
-  tableColumns,
-} from "./data";
-import {
-  QNextOfKinData,
-  QPatient,
-  QUpdatePtProfileTransfer,
-} from "app/graph.queries/patients/types";
-import { INewPatientData } from "ui/components/Patients/NewPatient";
+import { actionCreatePatient } from "./actions";
 import { Button, notification, Space } from "ui/common";
 import { WithPatient } from "components/base/hoc/with.patients";
 import { INewPtNotificationProps } from "ui/components/Patients/NewPtNotification";
 import moment from "moment";
-import { fullAddress, spreadPatientData } from "app/common/common";
 import { foundNewPatientNotification } from "./state.changes";
-
-interface IPatientState<IFormProfile, IFormNextOfKin> {
+import { IFormPatient, IPatient } from "ui/components/Patients/types";
+import {
+  fullAddress,
+  IFamilyMemberDetails,
+  INewPersonData,
+  INextOfKinDetails,
+  IProfile,
+} from "ui/components/Person";
+import { QUpdatePtProfileTransfer } from "app/graph.queries/patients/types";
+import { dummy } from "components/dummy";
+interface IPatientState {
   openDrawer: boolean;
   dialogType: PATIENT_DIALOG_TYPE;
   drawerTitle?: React.ReactNode;
   pagination?: { skip: number; limit: number };
-  initialFormData?: INewPatientData<IFormProfile, IFormNextOfKin>;
 }
 interface INotificationProps {
   key: React.Key;
@@ -49,40 +39,29 @@ export default WithPatient(function PatientComponent({
   createPatient,
   updatePatient,
   createPatientMD,
-  patients,
+  // dummy.patients,
   createPerson,
 }) {
-  const [state, _setState] = useState<
-    Partial<IPatientState<IFormProfile, IFormNextOfKin>>
-  >({
+  const [state, _setState] = useState<Partial<IPatientState>>({
     openDrawer: false,
   });
-  const setState = (
-    state: Partial<IPatientState<IFormProfile, IFormNextOfKin>>
-  ) => _setState((_state) => ({ ..._state, ...state }));
+  const setState = (state: Partial<IPatientState>) =>
+    _setState((_state) => ({ ..._state, ...state }));
 
-  const [notifProps, setNotifProps] = useState<
-    INewPtNotificationProps<keyof (QProfile & QPatient)>
-  >({});
+  const [notifProps, setNotifProps] = useState<INewPtNotificationProps>({});
 
-  const [formData, setFormData] =
-    useState<INewPatientData<IFormProfile, IFormNextOfKin>>();
+  const [formData, setFormData] = useState<INewPersonData<IFormPatient>>();
 
-  const [patient, setPatient] = useState<QPatient>();
+  const [patient, setPatient] = useState<IPatient>();
 
   const [api, contextHolder] = notification.useNotification();
 
   const [familyState, setFamilyState] = useState<{
-    nextOfKins?: {
-      person: QPerson;
-      relationship: string;
-    }[];
-    members?: QPerson[];
+    nextOfKins?: INextOfKinDetails[];
+    members?: IFamilyMemberDetails[];
   }>();
 
-  const closeDialog = (
-    state?: Partial<IPatientState<IFormProfile, IFormNextOfKin>>
-  ) => {
+  const closeDialog = (state?: Partial<IPatientState>) => {
     setState({
       openDrawer: false,
       drawerTitle: undefined,
@@ -92,9 +71,9 @@ export default WithPatient(function PatientComponent({
   };
 
   const [editProfileState, _setEditProfileState] = useState<{
-    fieldChanges?: Partial<IFormProfile>;
+    fieldChanges?: Partial<IFormPatient>;
   }>({ fieldChanges: {} });
-  const setEditProfileState = (state: { fieldChanges?: IFormProfile }) =>
+  const setEditProfileState = (state: { fieldChanges?: IFormPatient }) =>
     _setEditProfileState((_state) => ({ ..._state, ...state }));
   const openNotification = ({
     message,
@@ -114,7 +93,7 @@ export default WithPatient(function PatientComponent({
     });
   };
   const handleCreatePatient = async (
-    info?: INewPatientData<IFormProfile, IFormNextOfKin>,
+    info?: INewPersonData<IFormPatient>,
     error?: Error,
     options?: {
       resetForm: () => void;
@@ -122,14 +101,11 @@ export default WithPatient(function PatientComponent({
   ) => {
     const { resetForm } = options || {};
     if (info) {
-      const clonedInfo = structuredClone(info);
+      const clonedInfo = structuredClone(info) as INewPersonData<IFormPatient>;
       clonedInfo.profile = {
         ...clonedInfo.profile,
         dob: moment(clonedInfo.profile.dob.toString()).format("YYYY-MM-DD"),
       };
-      clonedInfo.next_of_kins = clonedInfo.next_of_kins?.map(
-        (i: IFormNextOfKin) => actionRemoveNoks(i)
-      );
       if (
         clonedInfo.profile.phone_number ===
         clonedInfo.next_of_kins?.[0]?.phone_number
@@ -165,7 +141,7 @@ export default WithPatient(function PatientComponent({
             });
             let cPerson = structuredClone(cause.data?.result?.profile);
 
-            let recPerson: IDisplayPatientRecord = {
+            let recPerson = {
               ...cPerson,
               addresses:
                 cPerson.addresses?.[0] && fullAddress(cPerson.addresses[0]),
@@ -194,7 +170,7 @@ export default WithPatient(function PatientComponent({
               drawerTitle: "New Patient Error",
             });
             let cPerson = structuredClone(cause.data?.result?.profile);
-            let recPerson: Record<keyof QProfile | keyof QPatient, string> = {
+            let recPerson: Record<keyof (IProfile & IPatient), string> = {
               ...cPerson,
               addresses:
                 cPerson.addresses?.[0] && fullAddress(cPerson.addresses[0]),
@@ -223,8 +199,6 @@ export default WithPatient(function PatientComponent({
                     </Space>
                   ),
                 },
-                data: recPerson,
-                dataMap: patientDataMapping,
               },
             });
             break;
@@ -255,11 +229,11 @@ export default WithPatient(function PatientComponent({
     // );
   }, []);
   const displayPatientDetails = useCallback(
-    (shouldSetPatient: boolean, record?: QPatient) => {
+    (shouldSetPatient: boolean, record?: IPatient) => {
       if (shouldSetPatient) {
         setPatient(record);
-        if (record?.next_of_kins && record.next_of_kins.length > 0) {
-          const { next_of_kins } = record;
+        const { next_of_kins } = record?.person || {};
+        if (next_of_kins && next_of_kins.length > 0) {
           getPersonsByID({
             variables: {
               _ids: next_of_kins?.map((nok) => nok.person_id),
@@ -267,14 +241,14 @@ export default WithPatient(function PatientComponent({
           }).then(
             ({ data }) => {
               if (data?.persons && data.persons.length > 0) {
-                const noksCollection: QNextOfKinData[] = [];
+                const noksCollection: INextOfKinDetails[] = [];
                 const { persons } = data;
                 for (let i = 0; i < next_of_kins.length; i++) {
                   const nok = next_of_kins[i];
                   const p = persons?.find((p) => p._id === nok.person_id);
                   if (p)
                     noksCollection.push({
-                      person: p,
+                      next_of_kin: p,
                       relationship: nok.relationship,
                     });
                 }
@@ -300,8 +274,8 @@ export default WithPatient(function PatientComponent({
     [JSON.stringify(patient)]
   );
   const onEditProfileFinish = useCallback(
-    (values: IFormProfile) => {
-      const changedFields: Partial<IFormProfile> & { addresses?: QAddress[] } =
+    (values: IFormPatient) => {
+      const changedFields: Partial<IFormPatient> & { addresses?: QAddress[] } =
         {};
       const addressFields: (keyof QAddress)[] = [
         "street",
@@ -315,13 +289,13 @@ export default WithPatient(function PatientComponent({
       const cAddress: Partial<QAddress> = {};
       for (const key in values) {
         if (Object.prototype.hasOwnProperty.call(values, key)) {
-          const value = values[key as keyof IFormProfile];
+          const value = values[key as keyof IFormPatient];
           if (addressFields.includes(key as keyof QAddress)) {
             if (addr?.[key as keyof QAddress] !== value) {
               cAddress[key as keyof QAddress] = value;
             }
-          } else if (value !== profile?.[key as keyof QProfile]) {
-            changedFields[key as keyof IFormProfile] = value;
+          } else if (value !== profile?.[key as keyof IProfile]) {
+            changedFields[key as keyof IFormPatient] = value;
           }
         }
       }
@@ -345,7 +319,7 @@ export default WithPatient(function PatientComponent({
         delete changedFields.old_id;
       }
       if (Object.keys(changedFields).length > 0) {
-        changeData.person_id = patient?.person._id;
+        changeData.person_id = patient?.person?._id;
         changeData.profile = changedFields;
       }
       updatePatient({
@@ -367,16 +341,8 @@ export default WithPatient(function PatientComponent({
   return (
     <>
       {contextHolder}
-      <Patients<
-        IFormProfile,
-        IFormNextOfKin,
-        QPatient,
-        keyof (QPatient & QProfile),
-        QNextOfKinData,
-        QPerson
-      >
+      <Patients
         tableProps={{
-          scroll: { x: true },
           rowSelection: {
             // selections: true,
             onSelect(record) {
@@ -385,21 +351,7 @@ export default WithPatient(function PatientComponent({
             selectedRowKeys: [],
             type: "radio",
           },
-          columns: tableColumns,
-          dataSource: patients?.map((p) => ({
-            ...p,
-            person: {
-              ...p.person,
-              profile: {
-                ...p.person.profile,
-                gender: p.person?.profile?.gender
-                  ? p.person.profile.gender === "m"
-                    ? "Male"
-                    : "Female"
-                  : "",
-              },
-            },
-          })),
+          dataSource: dummy.patients,
           size: "small",
           pagination: {
             total: 500,
@@ -407,9 +359,6 @@ export default WithPatient(function PatientComponent({
         }}
         newPtNotificationProps={notifProps}
         newPatientProps={{
-          patientFormData: patientForm,
-          nextOfKinFormData: nextOfKinForm,
-          values: formData,
           createPatient: handleCreatePatient,
         }}
         toolbarProps={{
@@ -436,72 +385,40 @@ export default WithPatient(function PatientComponent({
           size: "large",
         }}
         editProfileProps={{
-          profileFormData: patientForm,
-          formProps: {
-            name: "profile-edit-form",
-            initialValues: {
-              ...patient?.person?.profile,
-              ...patient?.person?.profile?.addresses?.[0],
-              old_id: patient?.old_id,
-            } as IFormProfile,
-            onChange(event) {
-              const target = event.target as HTMLInputElement;
-              const name = target.id.replace("profile-edit-form_", "");
-              setEditProfileState({
-                fieldChanges: {
-                  ...editProfileState.fieldChanges,
-                  [name]: target.value,
-                } as IFormProfile,
-              });
-            },
-            onFinish: onEditProfileFinish,
-          },
+          patient,
+          onBack: () => displayPatientDetails(false),
+
+          // onFinish,
         }}
         viewPatientProps={{
-          patient: spreadPatientData(
-            patient as QPatient
-          ) as unknown as QPatient,
-          title:
-            patient &&
-            patient.person.profile.last_name +
-              " " +
-              patient.person.profile.first_name,
+          patient,
+          onShowEditPage(patient) {
+            setState({
+              dialogType: PATIENT_DIALOG_TYPE.EDIT_PROFILE,
+              drawerTitle: "Profile Edit",
+              // drawerTitle: (
+              //   <Space
+              //     style={{
+              //       display: "flex",
+              //       justifyContent: "space-between",
+              //     }}
+              //   >
+              //     Edit Profile
+              //     <Button
+              //       onClick={() => displayPatientDetails(false)}
+              //     >
+              //       Back to profile
+              //     </Button>
+              //   </Space>
+              // ),
+            });
+            setPatient(patient);
+          },
           infoBoardProps: {
             descriptionProps: {
               layout: "vertical",
               title: "Bio Information",
-              extra: (
-                <Space>
-                  <Button
-                    onClick={() => {
-                      setState({
-                        openDrawer: true,
-                        dialogType: PATIENT_DIALOG_TYPE.EDIT_PROFILE,
-                        drawerTitle: (
-                          <Space
-                            style={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            Edit Profile
-                            <Button
-                              onClick={() => displayPatientDetails(false)}
-                            >
-                              Back to profile
-                            </Button>
-                          </Space>
-                        ),
-                      });
-                      setPatient(patient);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                </Space>
-              ),
             },
-            dataMap: patientDataMapping,
           },
           familyProps: {
             familyMembers: {
@@ -515,7 +432,6 @@ export default WithPatient(function PatientComponent({
                 }
                 return value;
               },
-              dataMap: patientDataMapping,
             },
           },
         }}

@@ -1,45 +1,39 @@
-import { FormInstance, FormProps } from "antd";
-import React, { useCallback, useState } from "react";
+import { FormInstance } from "antd";
+import React, { useCallback } from "react";
 import styled from "styled-components";
-import {
-  Form,
-  FORM_FIELD_TYPES,
-  IFormItems,
-  IFormProps,
-} from "ui/common/views";
+import { Form, FORM_FIELD_TYPES } from "ui/common/views";
+import { spreadPatientData } from "./common";
+import { patientForm } from "./data";
+import { IFormPatient, IPatient } from "./types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
 
-export interface EditProfileFormProps<IFormProfile> {
+export interface EditProfileFormProps {
   updateProfile?: (
-    info?: IFormProfile,
+    info?: IFormPatient,
     error?: Error,
     options?: {
       resetForm: () => void;
     }
   ) => void;
-  profileFormData?: IFormItems[];
-  values?: IFormProfile;
-  formProps?: FormProps;
+  patient?: IPatient;
 }
-export function EditProfileForm<IFormProfile>({
+export function EditProfileForm({
   updateProfile,
-  profileFormData,
-  values,
-  formProps,
-}: EditProfileFormProps<IFormProfile>) {
+  patient,
+}: EditProfileFormProps) {
   const formRef = React.useRef<FormInstance>(null);
   const resetForm = () => {
     formRef.current?.resetFields();
   };
   const onFinish = useCallback(
-    (values: IFormProfile) => {
+    (values: IFormPatient) => {
       updateProfile && updateProfile(values, undefined, { resetForm });
     },
-    [JSON.stringify(values), !!updateProfile]
+    [!!updateProfile]
   );
   return (
     <Root>
@@ -50,10 +44,12 @@ export function EditProfileForm<IFormProfile>({
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
           layout: "horizontal",
-          ...formProps,
+          onFinish,
+          //TODO:// spread date to single
+          initialValues: { ...spreadPatientData(patient), dob: "" },
         }}
         items={[
-          ...(profileFormData ? profileFormData : []),
+          ...(patientForm ? patientForm : []),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {

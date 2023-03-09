@@ -13,6 +13,7 @@ export interface IProfile {
   addresses: IAddress[];
 }
 export interface IAddress {
+  _id: string;
   street: string;
   town: string;
   lga: string;
@@ -24,7 +25,7 @@ export interface IPerson {
   person_id: string;
   profile: IProfile;
   next_of_kins: INextOfKin[];
-  next_of_kins_details?: IPerson[];
+  next_of_kins_details?: INextOfKinDetails[];
   bank?: IBank;
 }
 
@@ -32,5 +33,24 @@ export interface INextOfKin {
   person_id: string;
   relationship: string;
 }
+export interface IFamilyMemberDetails {
+  next_of_kin: Partial<IPerson>;
+  relationship: string;
+}
+
+export interface INextOfKinDetails extends IFamilyMemberDetails {}
 
 export type IFormPerson = Omit<IProfile, "addresses"> & IAddress;
+
+type AddPrefix<T, K extends string> = {
+  [P in keyof T as P extends string ? `${K}${P}` : never]: T[P];
+};
+
+export type IFormNextOfKin = Partial<
+  AddPrefix<
+    IFormPerson & {
+      relationship?: string;
+    },
+    "nok_"
+  >
+>;

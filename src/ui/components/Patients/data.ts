@@ -1,21 +1,19 @@
-import { FORM_FIELD_TYPES, IFormItems } from "ui/common/views";
+import { FORM_FIELD_TYPES } from "ui/common/views";
 import type { TableColumnType } from "ui/common/base";
-import { QPatient } from "app/graph.queries/patients/types";
-import { QProfile } from "app/graph.queries/persons/types";
 import { personDataMapping, personForm } from "../Person/data";
 import { IPatient } from "./types";
 import { RenderedCell } from "rc-table/lib/interface";
 import { IPerson, IProfile } from "../Person";
 import React from "react";
 
-export const patientFormFields = personForm.unshift({
+export const patientForm = [{
   fieldType: FORM_FIELD_TYPES.TEXT,
   itemProps: {
     name: "old_id",
     label: "Old Patient ID",
     rules: [{ required: true }],
   },
-});
+}, ...personForm];
 const defaultRender = (keyIndex: string, record: IPatient) => {
   type skipKey = keyof (IPatient & IPerson & IProfile);
   const skips: skipKey[] = ["person", "addresses", "next_of_kins"];

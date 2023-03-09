@@ -115,4 +115,6 @@ export const staffDataMapping: Record<
   person: "Person",
   ...{ ...personDataMapping, _id: "Staff ID (Gen)" },
   departments: "Departments",
+  department_ids: "Departments",
+  logins: "",
 };

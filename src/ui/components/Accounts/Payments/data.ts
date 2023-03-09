@@ -1,13 +1,12 @@
-import { FormInstance } from "antd";
 import React from "react";
-import { FORM_FIELD_TYPES, IFormItems } from "ui/common";
+import { FORM_FIELD_TYPES, IFormItems, IFieldsProps } from "ui/common";
 import {
   AccountAction,
   IBank,
   ICheque,
   IIncomeActions,
   IPayment,
-  IPaymentForm,
+  IPaymentCategory,
   PaymentType,
   TxType,
 } from "../types";
@@ -27,9 +26,45 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   description: "Description",
   unresolved: "Unresolved",
 };
-
+export const payTxCategoryForm = (
+  categories?: IPaymentCategory[]
+): IFormItems[] => [
+  {
+    fieldType: FORM_FIELD_TYPES.LIST,
+    itemProps: {
+      rules: [{ required: true }],
+    },
+    fieldProps: [
+      {
+        fieldType: FORM_FIELD_TYPES.SELECT,
+        itemProps: {
+          name: "category_id",
+          wrapperCol: { span: 10 },
+        },
+        fieldProps: {
+          options: categories?.map((cat) => ({
+            value: cat._id,
+            label: cat.title as string,
+          })),
+        },
+      },
+      {
+        fieldType: FORM_FIELD_TYPES.TEXT,
+        itemProps: {
+          name: "amount",
+          wrapperCol: { span: 10},
+        },
+        fieldProps: {
+          type: "number",
+          width: 600,
+        },
+      },
+    ],
+  },
+];
 export const paymentForm = (
   openClient?: React.MouseEventHandler,
+  openCategory?: (txType: TxType) => void,
   cheques?: ICheque[],
   banks?: IBank[]
 ): IFormItems[] => [
@@ -52,6 +87,7 @@ export const paymentForm = (
               value: AccountAction.deposit_withdrawal,
               title: "Withdraw Deposit",
             },
+            { value: AccountAction.loan, title: "Loan" },
           ],
         },
         {
@@ -63,6 +99,7 @@ export const paymentForm = (
             { value: AccountAction.receive_deposit, title: "Receive Deposit" },
             { value: AccountAction.register_credit, title: "On Credit" },
             { value: AccountAction.redeem_credit, title: "Redeem Debt" },
+            { value: AccountAction.loan_repayment, title: "Loan Repayment" },
           ],
         },
       ],
@@ -207,6 +244,52 @@ export const paymentForm = (
           fieldProps: {
             children: "Open Client",
             onClick: openClient,
+          },
+        },
+      ],
+    },
+  },
+  //here
+  {
+    fieldType: FORM_FIELD_TYPES.HIDDEN,
+    itemProps: {
+      noStyle: true,
+      shouldUpdate: (prevValues, currentValues) => {
+        return prevValues.action_type !== currentValues.action_type;
+      },
+    },
+    itemFunc(formInstance, fieldForm, fieldData) {
+      const value = formInstance?.getFieldValue?.("action_type");
+      return [AccountAction.receive_pay, AccountAction.pay].includes(value)
+        ? fieldData &&
+            fieldForm?.({
+              ...fieldData,
+              fieldProps: [
+                {
+                  ...(fieldData.fieldProps as IFieldsProps[])?.[0],
+                  fieldProps: {
+                    ...(fieldData.fieldProps as IFieldsProps[])?.[0]
+                      ?.fieldProps,
+                    onClick: () => {
+                      openCategory?.(value);
+                    },
+                  },
+                },
+              ],
+            })
+        : null;
+    },
+    fieldProps: {
+      fieldType: FORM_FIELD_TYPES.FIELDS,
+      itemProps: {
+        name: "category_id",
+        label: "Categories",
+      },
+      fieldProps: [
+        {
+          fieldType: FORM_FIELD_TYPES.BUTTON,
+          fieldProps: {
+            children: "Select Tx Category",
           },
         },
       ],
