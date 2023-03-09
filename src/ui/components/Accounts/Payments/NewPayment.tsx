@@ -36,7 +36,7 @@ export function NewPayment({
         formProps={{
           name: "payment-new-form",
           layout: "horizontal",
-          labelCol: { span: 10 },
+          labelCol: { span: 8 },
           wrapperCol: { span: 14 },
           onFinish: onCreateItem,
           initialValues,

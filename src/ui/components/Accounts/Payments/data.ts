@@ -26,7 +26,42 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   description: "Description",
   unresolved: "Unresolved",
 };
-
+export const payTxCategoryForm = (
+  categories?: IPaymentCategory[]
+): IFormItems[] => [
+  {
+    fieldType: FORM_FIELD_TYPES.LIST,
+    itemProps: {
+      rules: [{ required: true }],
+    },
+    fieldProps: [
+      {
+        fieldType: FORM_FIELD_TYPES.SELECT,
+        itemProps: {
+          name: "category_id",
+          wrapperCol: { span: 10 },
+        },
+        fieldProps: {
+          options: categories?.map((cat) => ({
+            value: cat._id,
+            label: cat.title as string,
+          })),
+        },
+      },
+      {
+        fieldType: FORM_FIELD_TYPES.TEXT,
+        itemProps: {
+          name: "amount",
+          wrapperCol: { span: 10},
+        },
+        fieldProps: {
+          type: "number",
+          width: 600,
+        },
+      },
+    ],
+  },
+];
 export const paymentForm = (
   openClient?: React.MouseEventHandler,
   openCategory?: (txType: TxType) => void,
