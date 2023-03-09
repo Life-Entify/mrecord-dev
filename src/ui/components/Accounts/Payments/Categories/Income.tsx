@@ -4,21 +4,25 @@ import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { categoryFormInputs } from "./data";
-import { ICategoryListItem, LIST_ACTIONS } from "./types";
+import { ITxCategory, LIST_ACTIONS } from "../../types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
-export interface IIncomeCategoryProps<List = ICategoryListItem> {
+export interface IIncomeCategoryProps<List = ITxCategory> {
   listProps?: ListProps<List> & {
     onActionClick?: (type: LIST_ACTIONS, item: List) => void;
     onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
   };
 }
+export interface IIncomeCategoryState {
+  editCat: ITxCategory;
+}
 export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
   const { onActionClick, onCreateItem, ...deepListProps } = listProps || {};
   const formRef = React.useRef<FormInstance>(null);
+  let incomeCatForm: FormInstance<ITxCategory>;
   return (
     <Root>
       <List
@@ -32,7 +36,7 @@ export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
           <List.Item
             actions={[
               <EditOutlined
-                onClick={() => onActionClick?.(LIST_ACTIONS.EDIT, item)}
+                onClick={() => incomeCatForm?.setFieldsValue(item)}
               />,
               <DeleteOutlined
                 onClick={() => onActionClick?.(LIST_ACTIONS.DELETE, item)}
@@ -53,6 +57,7 @@ export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
                   name: "income-new-form",
                   layout: "vertical",
                 }}
+                getForm={(form) => (incomeCatForm = form)}
                 items={[
                   ...categoryFormInputs,
                   {

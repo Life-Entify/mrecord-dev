@@ -1,14 +1,19 @@
 import { Tabs } from "antd";
 import React from "react";
 import styled from "styled-components";
+import { ExpenditureCategory, IExpenditureCategoryProps } from "./Expenditure";
 import { IIncomeCategoryProps, IncomeCategory } from "./Income";
 
 const Root = styled.div``;
 
 export interface IPaymentCategoryProps {
   incomeProps?: IIncomeCategoryProps;
+  expenditureProps?: IExpenditureCategoryProps;
 }
-export function PaymentCategories({ incomeProps }: IPaymentCategoryProps) {
+export function PaymentCategories({
+  incomeProps,
+  expenditureProps,
+}: IPaymentCategoryProps) {
   return (
     <Root>
       <Tabs>
@@ -16,7 +21,7 @@ export function PaymentCategories({ incomeProps }: IPaymentCategoryProps) {
           <IncomeCategory {...incomeProps} />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Expenditure" tabKey="2" key={2}>
-          Expenditure component
+          <ExpenditureCategory {...expenditureProps} />
         </Tabs.TabPane>
       </Tabs>
     </Root>

@@ -1,4 +1,12 @@
-import { Button, ButtonProps, DatePicker, Input, theme } from "antd";
+import {
+  Button,
+  ButtonProps,
+  DatePicker,
+  Dropdown,
+  DropdownProps,
+  Input,
+  theme,
+} from "antd";
 import { SearchProps } from "antd/es/input";
 import React from "react";
 import styled from "styled-components";
@@ -25,6 +33,7 @@ export interface IToolbarProps {
   datePickerProps?: DatePickerProps;
   dateRangePickerProps?: RangePickerProps;
   extra?: React.ReactNode;
+  dropdownProps?: DropdownProps & { btnProps?: ButtonProps };
 }
 
 export const Toolbar: React.FC<IToolbarProps> = ({
@@ -32,22 +41,40 @@ export const Toolbar: React.FC<IToolbarProps> = ({
   newBtnProps,
   datePickerProps,
   dateRangePickerProps,
+  dropdownProps,
   extra,
 }) => {
   const myTheme = theme.useToken();
   const {
     token: { colorBgLayout },
   } = myTheme;
+  const { btnProps: dropdownBtnProps, ...deepDropdownProps } =
+    dropdownProps || {};
   return (
     <Root style={{ background: colorBgLayout }}>
       <Space style={{ display: "flex" }}>
-        {searchProps && <Input.Search {...searchProps} />}
-        {datePickerProps && <DatePicker {...datePickerProps} />}
+        {searchProps && (
+          <div>
+            <Input.Search {...searchProps} />
+          </div>
+        )}
+        {datePickerProps && (
+          <div>
+            <DatePicker {...datePickerProps} />
+          </div>
+        )}
         {dateRangePickerProps && (
-          <DatePicker.RangePicker {...dateRangePickerProps} />
+          <div>
+            <DatePicker.RangePicker {...dateRangePickerProps} />
+          </div>
         )}
         <Gap />
         {extra}
+        {dropdownProps && (
+          <Dropdown {...deepDropdownProps}>
+            <Button type="primary" {...dropdownBtnProps} />
+          </Dropdown>
+        )}
         {newBtnProps && (
           <Button type="primary" {...newBtnProps}>
             {newBtnProps.title}
