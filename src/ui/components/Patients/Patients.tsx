@@ -26,7 +26,9 @@ export interface IPatientProps {
   toolbarProps?: IToolbarProps;
   drawerProps?: DrawerProps & { drawerType?: PATIENT_DIALOG_TYPE };
   newPatientProps?: INewPatientProps;
-  newPtNotificationProps?: INewPtNotificationProps;
+  newPtNotificationProps?: INewPtNotificationProps & {
+    onBack?: React.MouseEventHandler;
+  };
   tableProps?: Omit<TableProps<IPatient>, "columns" | "scroll">;
   viewPatientProps?: IViewPatientProps;
   editProfileProps?: EditProfileFormProps & {
@@ -46,14 +48,20 @@ export function Patients({
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { onBack: editOnBack, ...deepEditProfileProps } =
     editProfileProps || {};
+  const { onBack: newPtNotifBack, ...deepNewPtNotificationProps } =
+    newPtNotificationProps || {};
   const getExtra = useCallback(
     (type?: PATIENT_DIALOG_TYPE) => {
       switch (type) {
         case PATIENT_DIALOG_TYPE.EDIT_PROFILE:
           return <Button onClick={editOnBack}>Back</Button>;
       }
+      switch (type) {
+        case PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION:
+          return <Button onClick={newPtNotifBack}>Back</Button>;
+      }
     },
-    [!!editOnBack]
+    [!!editOnBack, !!newPtNotifBack]
   );
   return (
     <div>
@@ -70,7 +78,7 @@ export function Patients({
           <NewPatient {...newPatientProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION && (
-          <NewPtNotification {...newPtNotificationProps} />
+          <NewPtNotification {...deepNewPtNotificationProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.VIEW_PATIENT && (
           <ViewPatient {...viewPatientProps} />

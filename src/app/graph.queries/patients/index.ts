@@ -25,8 +25,8 @@ export const graphUpdatePatient = (
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation updatePatient($_id: String, $patient: PatientInputType, $person_id : String, $profile: ProfileInputType) {
-        patient : updatePatient(_id: $_id, patient: $patient, person_id : $person_id, profile: $profile) {
+    mutation updatePatient($_id: String, $patient: PatientInputType, $person_xid : String, $profile: ProfileInputType) {
+        patient : updatePatient(_id: $_id, patient: $patient, person_xid : $person_xid, profile: $profile) {
             ${query}
         }
     }`;

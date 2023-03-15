@@ -27,12 +27,12 @@ export default function PaymentComponent() {
   const [payment, setPayment] = useState<IPayment>();
   const [txType, setTxType] = useState<TxType>();
 
-  useEffect(() => {
-    setState({
-      openDrawer: true,
-      dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
-    });
-  }, []);
+  // useEffect(() => {
+  //   setState({
+  //     openDrawer: true,
+  //     dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
+  //   });
+  // }, []);
   return (
     <Payments
       toolbarProps={{
@@ -157,9 +157,10 @@ export default function PaymentComponent() {
           });
         },
       }}
-      newPaymentCatProps={{
+      addPaymentCatProps={{
         incomeCats: dummy.category,
         expenditureCats: dummy.category,
+        txType,
       }}
     />
   );

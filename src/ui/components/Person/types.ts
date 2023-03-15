@@ -22,7 +22,7 @@ export interface IAddress {
 }
 export interface IPerson {
   _id: string;
-  person_id: string;
+  person_id: number;
   profile: IProfile;
   next_of_kins: INextOfKin[];
   next_of_kins_details?: INextOfKinDetails[];
@@ -30,7 +30,7 @@ export interface IPerson {
 }
 
 export interface INextOfKin {
-  person_id: string;
+  person_id: number;
   relationship: string;
 }
 export interface IFamilyMemberDetails {
@@ -54,3 +54,7 @@ export type IFormNextOfKin = Partial<
     "nok_"
   >
 >;
+export interface IFormNextOfKinData
+  extends Partial<IFormPerson> {
+  relationship?: string;
+}

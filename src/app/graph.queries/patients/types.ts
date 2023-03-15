@@ -5,7 +5,7 @@ import { QKeywordPerson } from "../persons/types";
 export interface QUpdatePtProfileTransfer {
   _id?: string;
   patient?: Partial<IPatient>;
-  person_id?: string;
+  person_xid?: string;
   profile?: Partial<IProfile>;
 }
 export interface QTransferPatientMD {

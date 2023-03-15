@@ -95,8 +95,13 @@ const cashBundles: ICashBundle[] = [
 ];
 const person: IPerson = {
   _id: "1",
-  person_id: "1",
-  next_of_kins: [],
+  person_id: 1,
+  next_of_kins: [
+    {
+      relationship: "father",
+      person_id: 1,
+    },
+  ],
   profile: {
     last_name: "Agu",
     first_name: "chijioke",
@@ -104,9 +109,9 @@ const person: IPerson = {
     dob: "1988/08/11",
     occupation: "physiotherapist",
     national_identity: "234",
-    phone_number: "08064757757",
+    phone_number: "+2348064668635",
     gender: "m",
-    email: "chokey2nv@yahoo.com",
+    email: "chokey2nv@gmail.com",
     addresses: [
       {
         _id: "address1",
