@@ -1,4 +1,4 @@
-import { Button, ButtonProps } from "antd";
+import { Button, ButtonProps, Space } from "antd";
 import React, { ReactElement } from "react";
 
 export * from "@ant-design/icons";
@@ -23,6 +23,10 @@ export interface INotifyObjectProps extends Omit<INotificationProps, "btn"> {
 export const notifyObject = (props: INotifyObjectProps): INotificationProps => {
   return {
     ...props,
-    btn: props?.btn?.map((prop) => React.createElement(Button, prop)),
+    btn: React.createElement(
+      Space,
+      {},
+      props?.btn?.map((prop) => React.createElement(Button, prop))
+    ),
   };
 };

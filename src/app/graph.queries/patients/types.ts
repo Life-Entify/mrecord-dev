@@ -8,19 +8,29 @@ export interface QUpdatePtProfileTransfer {
   person_xid?: string;
   profile?: Partial<IProfile>;
 }
-export interface QTransferPatientMD {
-  oldId?: string | null;
-  person_id: string;
+export interface QTransferPatient {
+  oldId?: string;
+  profile: Partial<IProfile>;
+  next_of_kins: QNextOfKins[];
+}
+export interface QTransferPtWithPerson {
+  old_id?: string;
+  person_id: number;
+  next_of_kins: QNextOfKins[];
+}
+export interface QTransferPtWithNok {
+  old_id?: string;
+  profile: Partial<IProfile>;
+  next_of_kins: INextOfKin[];
+}
+export interface QTransferPtWithMeta {
+  old_id?: string;
+  person_id: number;
   next_of_kins: INextOfKin[];
 }
 export interface QNextOfKins {
   relationship: string;
   next_of_kin: Partial<IProfile>;
-}
-export interface QTransferPatient {
-  oldId?: string | null;
-  profile: Partial<IProfile>;
-  next_of_kins: QNextOfKins[];
 }
 
 export type QKeywordPatient = {

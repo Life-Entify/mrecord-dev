@@ -3,7 +3,7 @@ import React from "react";
 // import { AppError } from "ui";
 // import {
 //   QTransferPatient,
-//   QTransferPatientMD,
+//   QTransferPtWithPerson,
 // } from "app/graph.queries/patients/types";
 // import { IWithPatientProps } from "components/base/hoc/with.patients";
 // import {
@@ -22,14 +22,14 @@ import React from "react";
 
 // type IActionCreatePatientNokMDProps = Pick<
 //   IWithPatientProps,
-//   "getPersons" | "createPatientMD" | "createPerson"
+//   "getPersons" | "createPtWithPerson" | "createPerson"
 // > & {
 //   info: Pick<QTransferPatient, "oldId" | "profile"> &
-//     Pick<QTransferPatientMD, "next_of_kins">;
+//     Pick<QTransferPtWithPerson, "next_of_kins">;
 // };
 // export async function actionCreatePatientWithNokMD({
 //   createPerson,
-//   createPatientMD,
+//   createPtWithPerson,
 //   info,
 // }: IActionCreatePatientNokMDProps): Promise<AppError<IPerson> | null> {
 //   try {
@@ -47,7 +47,7 @@ import React from "react";
 //         },
 //       });
 //     }
-//     // createPatientMD({
+//     // createPtWithPerson({
 //     //   variables: {
 //     //     person_id: data?.person.person_id,
 //     //     oldId,
@@ -66,14 +66,14 @@ import React from "react";
 // }
 // type IActionCreatePatientMetaProps = Pick<
 //   IWithPatientProps,
-//   "getPersons" | "createPatientMD" | "createPerson"
+//   "getPersons" | "createPtWithPerson" | "createPerson"
 // > & {
 //   info: Omit<QTransferPatient, "profile"> & { person_id: string };
 // };
 // export async function actionCreatePatientWithMD({
 //   getPersons,
 //   createPerson,
-//   createPatientMD,
+//   createPtWithPerson,
 //   info,
 // }: IActionCreatePatientMetaProps): Promise<AppError<IPerson> | null> {
 //   try {
@@ -141,7 +141,7 @@ import React from "react";
 //         },
 //       });
 //     }
-//     // const newPatient = await createPatientMD({
+//     // const newPatient = await createPtWithPerson({
 //     //   variables: {
 //     //     oldId: oldId,
 //     //     person_id: person_id,

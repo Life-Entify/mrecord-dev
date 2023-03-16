@@ -43,13 +43,37 @@ export const graphCreatePatient = (
         }
     }`;
 };
-export const graphCreatePatientMD = (
+export const graphCreatePtWithPerson = (
   patient?: (keyof IPatient)[],
   nestedValues?: NestedPatientObject
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation createPatient($oldId: String, $person_id : String, $next_of_kins: [NextOfKinInputType]) {
+    mutation createPatient($oldId: String, $person_id : Int, $next_of_kins: [NextOfKinInputType]) {
+        patient : createPatient(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
+            ${query}
+        }
+    }`;
+};
+export const graphCreatePtWithNok = (
+  patient?: (keyof IPatient)[],
+  nestedValues?: NestedPatientObject
+) => {
+  const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
+  return gql`
+    mutation createPatient($oldId: String,  $profile : ProfileInputType, $next_of_kins: [NextOfKinMetaInputType]) {
+        patient : createPatient(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
+            ${query}
+        }
+    }`;
+};
+export const graphCreatePtWithMeta = (
+  patient?: (keyof IPatient)[],
+  nestedValues?: NestedPatientObject
+) => {
+  const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
+  return gql`
+    mutation createPatient($oldId: String, $person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
         patient : createPatient(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
             ${query}
         }

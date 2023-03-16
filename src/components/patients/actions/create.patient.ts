@@ -25,7 +25,7 @@ export async function actionCreatePatient({
   });
   const cProfile = patientFormRefactor(profile as IFormPatient);
   const patient: QTransferPatient = {
-    oldId: cProfile.oldId,
+    oldId: cProfile.oldId as string,
     profile: cProfile.profile,
     next_of_kins: cNextOfKins.map((i) => ({
       next_of_kin: i.profile,

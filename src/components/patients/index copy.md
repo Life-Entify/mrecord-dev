@@ -36,7 +36,7 @@ export default WithPatient(function PatientComponent({
   getPersonsByID,
   createPatient,
   updatePatient,
-  createPatientMD,
+  createPtWithPerson,
   // dummy.patients,
   createPerson,
 }) {

@@ -7,14 +7,18 @@ import {
 } from "@apollo/client";
 import {
   graphCreatePatient,
-  graphCreatePatientMD,
+  graphCreatePtWithPerson,
+  graphCreatePtWithNok,
+  graphCreatePtWithMeta,
   graphGetPatients,
   graphUpdatePatient,
 } from "app/graph.queries/patients";
 import {
   QPatientQueryParams,
   QTransferPatient,
-  QTransferPatientMD,
+  QTransferPtWithMeta,
+  QTransferPtWithNok,
+  QTransferPtWithPerson,
   QUpdatePtProfileTransfer,
 } from "app/graph.queries/patients/types";
 import React from "react";
@@ -49,8 +53,17 @@ export interface IPatientGraphQlActions {
   createPatient: (
     options: MutationFunctionOptions<{ patient: IPatient }, QTransferPatient>
   ) => Promise<FetchResult>;
-  createPatientMD: (
-    options: MutationFunctionOptions<{ patient: IPatient }, QTransferPatientMD>
+  createPtWithPerson: (
+    options: MutationFunctionOptions<
+      { patient: IPatient },
+      QTransferPtWithPerson
+    >
+  ) => Promise<FetchResult>;
+  createPatientWithNok: (
+    options: MutationFunctionOptions<{ patient: IPatient }, QTransferPtWithNok>
+  ) => Promise<FetchResult>;
+  createPatientWithMeta: (
+    options: MutationFunctionOptions<{ patient: IPatient }, QTransferPtWithMeta>
   ) => Promise<FetchResult>;
   updatePatient: (
     options: MutationFunctionOptions<
@@ -72,15 +85,40 @@ export function usePatient(): IPatientGraphQlActions {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
+      addresses: graphReturnedData.addresses
     })
   );
-  const [createPatientMD] = useMutation<
+  const [createPtWithPerson] = useMutation<
     { patient: IPatient },
-    QTransferPatientMD
+    QTransferPtWithPerson
   >(
-    graphCreatePatientMD(graphReturnedData.patient, {
+    graphCreatePtWithPerson(graphReturnedData.patient, {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
+      next_of_kins: graphReturnedData.next_of_kins,
+      addresses: graphReturnedData.addresses
+    })
+  );
+  const [createPatientWithNok] = useMutation<
+    { patient: IPatient },
+    QTransferPtWithNok
+  >(
+    graphCreatePtWithNok(graphReturnedData.patient, {
+      person: graphReturnedData.person,
+      profile: graphReturnedData.profile,
+      next_of_kins: graphReturnedData.next_of_kins,
+      addresses: graphReturnedData.addresses
+    })
+  );
+  const [createPatientWithMeta] = useMutation<
+    { patient: IPatient },
+    QTransferPtWithMeta
+  >(
+    graphCreatePtWithMeta(graphReturnedData.patient, {
+      person: graphReturnedData.person,
+      profile: graphReturnedData.profile,
+      next_of_kins: graphReturnedData.next_of_kins,
+      addresses: graphReturnedData.addresses
     })
   );
   const [getPatients] = useLazyQuery<
@@ -104,7 +142,9 @@ export function usePatient(): IPatientGraphQlActions {
 
   return {
     createPatient,
-    createPatientMD,
+    createPtWithPerson,
+    createPatientWithNok,
+    createPatientWithMeta,
     getPatients,
     updatePatient,
   };

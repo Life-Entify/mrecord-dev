@@ -1,27 +1,21 @@
-import { QAddress } from "app/graph.queries/persons/types";
 import React, { useEffect, useState } from "react";
 import { Patients, PATIENT_DIALOG_TYPE } from "ui/components/Patients";
 import {
-  AppError,
   INotificationTypes,
   INotifyObjectProps,
   notification,
   notifyObject,
 } from "ui/common";
 import { INewPtNotificationProps } from "ui/components/Patients/NewPtNotification";
-import { IFormPatient, IPatient } from "ui/components/Patients/types";
+import { IFormPatient } from "ui/components/Patients/types";
 import {
-  fullAddress,
   IFamilyMemberDetails,
   IFormNextOfKinData,
   INewPersonData,
   INextOfKinDetails,
-  IPerson,
-  spreadPersonData,
 } from "ui/components/Person";
 import { usePatientActions } from "./actions";
 import { patientToForm } from "ui/components/Patients/common";
-import { INotificationProps } from "components/types";
 import { dummy } from "components/dummy";
 interface IPatientState {
   openDrawer: boolean;
@@ -39,6 +33,7 @@ export default function PatientComponent() {
     updateProfile,
     createPatient,
     createPtWithPerson,
+    createPtWithNok,
   } = usePatientActions();
 
   const [state, _setState] = useState<Partial<IPatientState>>({
@@ -119,6 +114,7 @@ export default function PatientComponent() {
               dialogType: PATIENT_DIALOG_TYPE.NEW_PATIENT,
             }),
           onUsePerson(person) {
+            console.log(existingPerson);
             (async () => {
               if (!person)
                 return openNotification("error", {
@@ -126,22 +122,26 @@ export default function PatientComponent() {
                   message: "Program Error",
                   description: "Person object is undefined",
                 });
-              await createPtWithPerson(person);
+              if (existingPerson?.who === "patient") {
+                await createPtWithPerson(person, {
+                  notify: openNotification,
+                  onViewExistingPerson() {
+                    api.destroy();
+                    setState({
+                      dialogType: PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION,
+                      drawerTitle: "Existing Person",
+                    });
+                  },
+                });
+              } else {
+                await createPtWithNok(person, {
+                  notify: openNotification,
+                });
+              }
             })();
           },
-          // onEditProfile(person) {
-          //   setFormData({
-          //     profile: patientToForm({ person }) as IFormPatient,
-          //     next_of_kins: [],
-          //   }); //TODO: convert IPatient to IFormPatient
-          //   setState({
-          //     dialogType: PATIENT_DIALOG_TYPE.EDIT_PROFILE,
-          //     drawerTitle: "New Patient - Edit",
-          //   });
-          // },
         }}
         newPatientProps={{
-          // createPatient: handleCreatePatient,
           values: {
             profile: patientToForm(dummy.patients?.[0]) as IFormPatient,
             next_of_kins: dummy.patients?.[0].person?.next_of_kins?.map(
@@ -160,7 +160,7 @@ export default function PatientComponent() {
                   key: "create-patient-form-error",
                 });
               if (info) {
-                createPatient(info, {
+                createPatient(structuredClone(info), {
                   notify: openNotification,
                   onViewExistingPerson() {
                     api.destroy();

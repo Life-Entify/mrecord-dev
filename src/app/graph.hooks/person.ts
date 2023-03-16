@@ -7,14 +7,14 @@ import {
 } from "@apollo/client";
 import {
   graphCreatePatient,
-  graphCreatePatientMD,
+  graphCreatePtWithPerson,
   graphGetPatients,
   graphUpdatePatient,
 } from "app/graph.queries/patients";
 import {
   QPatientQueryParams,
   QTransferPatient,
-  QTransferPatientMD,
+  QTransferPtWithPerson,
   QUpdatePtProfileTransfer,
 } from "app/graph.queries/patients/types";
 import {

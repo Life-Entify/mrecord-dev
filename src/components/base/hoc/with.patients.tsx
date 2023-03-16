@@ -7,14 +7,14 @@ import {
 } from "@apollo/client";
 import {
   graphCreatePatient,
-  graphCreatePatientMD,
+  graphCreatePtWithPerson,
   graphGetPatients,
   graphUpdatePatient,
 } from "app/graph.queries/patients";
 import {
   QPatientQueryParams,
   QTransferPatient,
-  QTransferPatientMD,
+  QTransferPtWithPerson,
   QUpdatePtProfileTransfer,
 } from "app/graph.queries/patients/types";
 import {
@@ -66,8 +66,11 @@ export interface IWithPatientProps {
   createPatient: (
     options: MutationFunctionOptions<{ patient: IPatient }, QTransferPatient>
   ) => Promise<FetchResult>;
-  createPatientMD: (
-    options: MutationFunctionOptions<{ patient: IPatient }, QTransferPatientMD>
+  createPtWithPerson: (
+    options: MutationFunctionOptions<
+      { patient: IPatient },
+      QTransferPtWithPerson
+    >
   ) => Promise<FetchResult>;
   updatePatient: (
     options: MutationFunctionOptions<
@@ -93,8 +96,8 @@ export function WithPatient<T extends IWithPatientProps>(
         profile: graphReturnedData.profile,
       })
     );
-    const [createPatientMD] = useMutation(
-      graphCreatePatientMD(graphReturnedData.patient, {
+    const [createPtWithPerson] = useMutation(
+      graphCreatePtWithPerson(graphReturnedData.patient, {
         person: graphReturnedData.person,
         profile: graphReturnedData.profile,
       })
@@ -142,7 +145,7 @@ export function WithPatient<T extends IWithPatientProps>(
       <ChildComponent
         {...props}
         createPatient={savePatient}
-        createPatientMD={createPatientMD}
+        createPtWithPerson={createPtWithPerson}
         createPerson={createPerson}
         getPatients={getPatients}
         getPersons={getPersons}

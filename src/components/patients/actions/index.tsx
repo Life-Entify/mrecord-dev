@@ -1,7 +1,10 @@
 import { usePatient } from "app/graph.hooks/patient";
 import { usePerson } from "app/graph.hooks/person";
 import {
+  QNextOfKins,
   QPatientQueryParams,
+  QTransferPtWithMeta,
+  QTransferPtWithNok,
   QUpdatePtProfileTransfer,
 } from "app/graph.queries/patients/types";
 import { INotificationProps } from "components/types";
@@ -11,14 +14,34 @@ import { IFormPatient, IPatient } from "ui/components/Patients/types";
 import {
   formToPerson,
   IFamilyMemberDetails,
+  IFormNextOfKinData,
   INewPersonData,
+  INextOfKin,
   INextOfKinDetails,
   IPerson,
+  IProfile,
 } from "ui/components/Person";
+import { createErrorHandler } from "./create.error.handler";
 import { actionCreatePatient } from "./create.patient";
+import { actionCreatePtWithPerson } from "./create.pt.wt.person";
 
+export interface IExistingPersonState {
+  person: IPerson;
+  who: "next_of_kin" | "patient";
+}
+export type INotify = (
+  type: INotificationTypes,
+  props: INotifyObjectProps
+) => void;
 export const usePatientActions = () => {
-  const { getPatients, updatePatient, createPatient } = usePatient();
+  const {
+    getPatients,
+    updatePatient,
+    createPatient,
+    createPtWithPerson,
+    createPatientWithMeta,
+    createPatientWithNok,
+  } = usePatient();
   const { getPersonsByID, getPersons, createPerson } = usePerson();
   const [ptQueryParams, setPtQueryParams] = useState<QPatientQueryParams>({
     skip: 0,
@@ -32,15 +55,13 @@ export const usePatientActions = () => {
   }>();
   const [newPtFormData, setNewPtFormData] =
     useState<INewPersonData<IFormPatient>>();
-  const [existingPerson, setExistingPerson] = useState<{
-    person: IPerson;
-    who: "next_of_kin" | "patient";
-  }>();
+  const [existingPerson, setExistingPerson] = useState<IExistingPersonState>();
+  const [patientData, setPtData] = useState<INewPersonData<IFormPatient>>();
 
   const setPatientAndGetFamily = (
     record: IPatient,
     getFamily: boolean,
-    notify: (type: INotificationTypes, props: INotifyObjectProps) => void
+    notify: INotify
   ) => {
     setPatient(record);
     if (!getFamily) return;
@@ -125,7 +146,7 @@ export const usePatientActions = () => {
       onViewExistingPerson,
       onClose,
     }: {
-      notify: (type: INotificationTypes, props: INotifyObjectProps) => void;
+      notify: INotify;
       onViewExistingPerson?: () => void;
       onClose: () => void;
     }
@@ -136,7 +157,7 @@ export const usePatientActions = () => {
         createPerson,
         getPatients,
         createPatient,
-        info,
+        info: structuredClone(info),
       });
       await getPatients();
       notify("success", {
@@ -146,56 +167,96 @@ export const usePatientActions = () => {
       });
     } catch (e) {
       const error = e as AppError<IPerson>;
-      if (error.cause?.code === 0)
-        notify("error", {
-          key: "create-pt-error",
-          message: "Create Patient Error",
-          description: (e as Error).message,
-        });
-      else if (error.cause?.code === 1) {
-        const { data: person } = error?.cause || {};
-        const { last_name, phone_number } = error.cause?.data?.profile || {};
-        setExistingPerson({ person: person as IPerson, who: "patient" });
+      if (error.cause?.code !== 0) {
         setNewPtFormData(info);
-        notify("error", {
-          key: "create-pt-select-error",
-          message: "Existing person!",
-          description: `We found the name (${last_name}) with this phone number ${phone_number}. Do you want to use this profile instead?`,
-          btn: [
-            { children: "Close", onClick: onClose },
-            {
-              children: "View Profile",
-              type: "primary",
-              onClick: onViewExistingPerson,
-            },
-          ],
-        });
-      } else if (error.cause?.code === 2) {
-        const { data: person } = error?.cause || {};
-        const { last_name, phone_number } = error.cause?.data?.profile || {};
-        setExistingPerson({ person: person as IPerson, who: "next_of_kin" });
-        notify("error", {
-          key: "create-pt-select-error",
-          message: "Existing Next of Kin!",
-          description: `We found the name (${last_name}) with this phone number ${phone_number}. Do you want to use this profile instead?`,
-          btn: [
-            { children: "Close", onClick: onClose },
-            {
-              children: "View Profile",
-              type: "primary",
-              onClick: onViewExistingPerson,
-            },
-          ],
-        });
       }
+      createErrorHandler(structuredClone(info), error, {
+        setExistingPerson,
+        onClose,
+        onViewExistingPerson,
+        notify,
+      });
       throw e;
     }
   };
-  const createPtWithPerson = useCallback(
-    (person: IPerson) => {
-      
+  const createPtWPerson = useCallback(
+    (
+      person: IPerson,
+      {
+        notify,
+        onViewExistingPerson,
+      }: {
+        notify: (type: INotificationTypes, props: INotifyObjectProps) => void;
+        onViewExistingPerson?: () => void;
+      }
+    ) => {
+      (async () => {
+        const updatedInfo = {
+          person_id: person.person_id,
+          old_id: newPtFormData?.profile?.old_id as string,
+          next_of_kins: newPtFormData?.next_of_kins as QNextOfKins[],
+        };
+        try {
+          const newPatient = await actionCreatePtWithPerson({
+            getPersons,
+            createPtWithPerson,
+            info: updatedInfo,
+          });
+          return newPatient;
+        } catch (e) {
+          const error = e as AppError<IPerson>;
+          if (error.cause?.code === 2) {
+            setPtData(updatedInfo);
+          }
+          createErrorHandler(
+            newPtFormData as INewPersonData<IFormPatient>,
+            error,
+            {
+              setExistingPerson,
+              notify,
+              onViewExistingPerson,
+            }
+          );
+          throw error;
+        }
+      })();
     },
     [JSON.stringify(newPtFormData)]
+  );
+  const createPtWNok = useCallback(
+    (person: IPerson, { notify }: { notify: INotify }) => {
+      if (patientData?.person_id) {
+        // run meta
+        const data: QTransferPtWithMeta = {
+          person_id: patientData?.person_id,
+          old_id: patientData?.old_id,
+          next_of_kins: [
+            {
+              relationship: newPtFormData?.next_of_kins?.[0].relationship,
+              person_id: person?.person_id,
+            } as INextOfKin,
+          ],
+        };
+        createPatientWithMeta({
+          variables: data,
+        });
+      } else {
+        const data: QTransferPtWithNok = {
+          profile: newPtFormData?.profile as Partial<IProfile>,
+          old_id: patientData?.old_id,
+          next_of_kins: [
+            {
+              relationship: newPtFormData?.next_of_kins?.[0].relationship,
+              person_id: person?.person_id,
+            } as INextOfKin,
+          ],
+        };
+        createPatientWithNok({
+          variables: data,
+        });
+      }
+    },
+    [JSON.stringify(patientData), JSON.stringify(newPtFormData)]
   );
   useEffect(() => {
     getPatients({
@@ -210,7 +271,7 @@ export const usePatientActions = () => {
       setPatients(data?.patients);
     })();
   }, []);
-
+  console.log(newPtFormData);
   return {
     patients,
     patient,
@@ -220,6 +281,7 @@ export const usePatientActions = () => {
     setPatient: setPatientAndGetFamily,
     updateProfile,
     createPatient: createPt,
-    createPtWithPerson,
+    createPtWithPerson: createPtWPerson,
+    createPtWithNok: createPtWNok,
   };
 };

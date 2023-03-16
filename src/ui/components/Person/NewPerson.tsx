@@ -4,15 +4,22 @@ import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES, IFormItems } from "ui/common/views";
 import { actionAddNoks, actionRemoveNoks } from "./common";
 import { nextOfKinForm } from "./data";
-import { IFormNextOfKin, IFormNextOfKinData, IFormPerson } from "./types";
+import {
+  IFormNextOfKin,
+  IFormNextOfKinData,
+  IFormPerson,
+  INextOfKin,
+} from "./types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
 export interface INewPersonData<T extends IFormPerson> {
-  profile: T;
-  next_of_kins: IFormNextOfKinData[];
+  profile?: T;
+  person_id?: number;
+  old_id?: string;
+  next_of_kins: IFormNextOfKinData[] | INextOfKin[];
 }
 export interface INewPersonProps<T extends IFormPerson> {
   createPerson?: (
