@@ -7,7 +7,6 @@ import {
   QTransferPtWithNok,
   QUpdatePtProfileTransfer,
 } from "app/graph.queries/patients/types";
-import { INotificationProps } from "components/types";
 import React, { useCallback, useEffect, useState } from "react";
 import { AppError, INotificationTypes, INotifyObjectProps } from "ui";
 import { IFormPatient, IPatient } from "ui/components/Patients/types";
@@ -22,8 +21,10 @@ import {
   IProfile,
 } from "ui/components/Person";
 import { createErrorHandler } from "./create.error.handler";
-import { actionCreatePatient } from "./create.patient";
-import { actionCreatePtWithPerson } from "./create.pt.wt.person";
+import { useCreatePatientAction } from "./create.patient";
+import { useCreatePatientWithMeta } from "./create.pt.wt.meta";
+import { useCreatePatientWithNok } from "./create.pt.wt.nok";
+import { useCreatePatientWithPerson } from "./create.pt.wt.person";
 
 export interface IExistingPersonState {
   person: IPerson;
@@ -37,11 +38,11 @@ export const usePatientActions = () => {
   const {
     getPatients,
     updatePatient,
-    createPatient,
-    createPtWithPerson,
-    createPatientWithMeta,
-    createPatientWithNok,
   } = usePatient();
+  const { createPatient } = useCreatePatientAction();
+  const { createPtWithPerson } = useCreatePatientWithPerson();
+  const {createPatientWithNok} = useCreatePatientWithNok();
+  const {createPatientWithMeta} = useCreatePatientWithMeta();
   const { getPersonsByID, getPersons, createPerson } = usePerson();
   const [ptQueryParams, setPtQueryParams] = useState<QPatientQueryParams>({
     skip: 0,
@@ -152,13 +153,7 @@ export const usePatientActions = () => {
     }
   ) => {
     try {
-      const newPt = await actionCreatePatient({
-        getPersons,
-        createPerson,
-        getPatients,
-        createPatient,
-        info: structuredClone(info),
-      });
+      const newPt = await createPatient(structuredClone(info));
       await getPatients();
       notify("success", {
         key: "create-pt-success",
@@ -196,12 +191,15 @@ export const usePatientActions = () => {
         next_of_kins: newPtFormData?.next_of_kins as QNextOfKins[],
       };
       try {
-        const newPatient = await actionCreatePtWithPerson({
-          getPersons,
-          createPtWithPerson,
-          info: updatedInfo,
-        });
-        return newPatient;
+        const newPt = await createPtWithPerson(updatedInfo);
+        const { data: updatedPtData } = await getPatients({});
+          const newPts = updatedPtData?.patients;
+          setPatients(newPts);
+          notify("success", {
+            key: "create-pt-success",
+            message: "Patient created!",
+            description: `patient with Patient ID ${newPt?.patient_id} created!`,
+          });
       } catch (e) {
         const error = e as AppError<IPerson>;
         if (error.cause?.code === 2) {
@@ -226,20 +224,16 @@ export const usePatientActions = () => {
       try {
         if (patientData?.person_id) {
           // run meta
-          const data: QTransferPtWithMeta = {
+          const newPt = await createPatientWithMeta({
             person_id: patientData?.person_id,
-            old_id: patientData?.old_id,
+            old_id: patientData?.old_id as string,
             next_of_kins: [
               {
                 relationship: newPtFormData?.next_of_kins?.[0].relationship,
                 person_id: person?.person_id,
               } as INextOfKin,
             ],
-          };
-          const { data: returnedData } = await createPatientWithMeta({
-            variables: data,
           });
-          const newPt = returnedData?.person;
           const { data: updatedPtData } = await getPatients({});
           const newPts = updatedPtData?.patients;
           setPatients(newPts);
@@ -249,19 +243,22 @@ export const usePatientActions = () => {
             description: `patient with Patient ID ${newPt?.patient_id} created!`,
           });
         } else {
-          const data: QTransferPtWithNok = {
-            profile: newPtFormData?.profile as Partial<IProfile>,
-            old_id: patientData?.old_id,
+          const newPt = await createPatientWithNok({
+            profile: newPtFormData?.profile as IFormPatient,
             next_of_kins: [
               {
                 relationship: newPtFormData?.next_of_kins?.[0].relationship,
                 person_id: person?.person_id,
               } as INextOfKin,
-            ],
-          };
-          return console.log(data);
-          createPatientWithNok({
-            variables: data,
+            ]
+          });
+          const { data: updatedPtData } = await getPatients({});
+          const newPts = updatedPtData?.patients;
+          setPatients(newPts);
+          notify("success", {
+            key: "create-pt-success",
+            message: "Patient created!",
+            description: `patient with Patient ID ${newPt?.patient_id} created!`,
           });
         }
       } catch (e) {
