@@ -32,8 +32,9 @@ export function IncomeCategory({ listProps }: IIncomeCategoryProps) {
         }}
         bordered
         {...deepListProps}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <List.Item
+            key={index}
             actions={[
               <EditOutlined
                 onClick={() => incomeCatForm?.setFieldsValue(item)}

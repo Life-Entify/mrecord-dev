@@ -114,31 +114,30 @@ export default function PatientComponent() {
               dialogType: PATIENT_DIALOG_TYPE.NEW_PATIENT,
             }),
           onUsePerson(person) {
-            console.log(existingPerson);
-            (async () => {
-              if (!person)
-                return openNotification("error", {
-                  key: "no-person-to-create-patient",
-                  message: "Program Error",
-                  description: "Person object is undefined",
-                });
-              if (existingPerson?.who === "patient") {
-                await createPtWithPerson(person, {
-                  notify: openNotification,
-                  onViewExistingPerson() {
-                    api.destroy();
-                    setState({
-                      dialogType: PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION,
-                      drawerTitle: "Existing Person",
-                    });
-                  },
-                });
-              } else {
-                await createPtWithNok(person, {
-                  notify: openNotification,
-                });
-              }
-            })();
+            if (!person)
+              return openNotification("error", {
+                key: "no-person-to-create-patient",
+                message: "Program Error",
+                description: "Person object is undefined",
+              });
+            if (existingPerson?.who === "patient") {
+              createPtWithPerson(person, {
+                notify: openNotification,
+                onViewExistingPerson() {
+                  api.destroy();
+                  setState({
+                    dialogType: PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION,
+                    drawerTitle: "Existing Person",
+                  });
+                },
+              }).catch((e) => {});
+            } else {
+              createPtWithNok(person, {
+                notify: openNotification,
+              }).then(() => {
+                setState({ openDrawer: false });
+              });
+            }
           },
         }}
         newPatientProps={{
@@ -170,9 +169,11 @@ export default function PatientComponent() {
                     });
                   },
                   onClose: () => api.destroy(),
-                }).then(() => {
-                  options?.resetForm?.();
-                });
+                })
+                  .then(() => {
+                    options?.resetForm?.();
+                  })
+                  .catch(() => {});
               }
             })();
           },

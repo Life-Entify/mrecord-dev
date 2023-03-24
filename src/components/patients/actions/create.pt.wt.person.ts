@@ -7,8 +7,7 @@ import {
 } from "app/graph.queries/patients/types";
 import { AppError } from "ui";
 import { patientFormRefactor } from "ui/components/Patients/common";
-import { IFormPatient, IPatient } from "ui/components/Patients/types";
-import { IFormNextOfKinData, INewPersonData } from "ui/components/Person";
+import { IPatient } from "ui/components/Patients/types";
 
 interface IActionCreatePatientProps
   extends Pick<IPatientGraphQlActions, "createPtWithPerson">,

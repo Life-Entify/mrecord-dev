@@ -73,8 +73,8 @@ export const graphCreatePtWithMeta = (
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation createPatient($oldId: String, $person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
-        patient : createPatient(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
+    mutation createPatientWithMD($oldId: String, $person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
+        patient : createPatientWithMD(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;

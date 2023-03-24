@@ -85,7 +85,7 @@ export function usePatient(): IPatientGraphQlActions {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
-      addresses: graphReturnedData.addresses
+      addresses: graphReturnedData.addresses,
     })
   );
   const [createPtWithPerson] = useMutation<
@@ -96,7 +96,7 @@ export function usePatient(): IPatientGraphQlActions {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
-      addresses: graphReturnedData.addresses
+      addresses: graphReturnedData.addresses,
     })
   );
   const [createPatientWithNok] = useMutation<
@@ -107,7 +107,7 @@ export function usePatient(): IPatientGraphQlActions {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
-      addresses: graphReturnedData.addresses
+      addresses: graphReturnedData.addresses,
     })
   );
   const [createPatientWithMeta] = useMutation<
@@ -118,7 +118,7 @@ export function usePatient(): IPatientGraphQlActions {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
-      addresses: graphReturnedData.addresses
+      addresses: graphReturnedData.addresses,
     })
   );
   const [getPatients] = useLazyQuery<

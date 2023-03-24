@@ -28,8 +28,9 @@ export function ExpenditureCategory({ listProps }: IExpenditureCategoryProps) {
         }}
         bordered
         {...deepListProps}
-        renderItem={(item) => (
+        renderItem={(item, index) => (
           <List.Item
+            key={index}
             actions={[
               <EditOutlined
                 onClick={() => onActionClick?.(LIST_ACTIONS.EDIT, item)}
@@ -53,7 +54,7 @@ export function ExpenditureCategory({ listProps }: IExpenditureCategoryProps) {
                   name: "income-new-form",
                   layout: "vertical",
                   initialValues: deepListProps?.dataSource?.[0],
-                  onFinish: onCreateItem
+                  onFinish: onCreateItem,
                 }}
                 items={[
                   ...categoryFormInputs,

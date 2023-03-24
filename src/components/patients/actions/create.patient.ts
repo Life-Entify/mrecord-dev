@@ -18,12 +18,25 @@ export async function actionCreatePatient({
   getPatients,
   createPatient,
   info,
-}: IActionCreatePatientProps): Promise<IPatient> {
+}: IActionCreatePatientProps): Promise<IPatient | undefined> {
   const { profile, next_of_kins } = info;
   const cNextOfKins = next_of_kins.map((nextOfKin) => {
     return patientFormRefactor(nextOfKin);
   });
   const cProfile = patientFormRefactor(profile as IFormPatient);
+  if (
+    cProfile.profile.phone_number === cNextOfKins?.[0]?.profile?.phone_number
+  ) {
+    throw new AppError(
+      "Phone numbers for patient and next of kin can't be the same",
+      {
+        cause: {
+          code: 0,
+          label: "Same Phone Number",
+        },
+      }
+    );
+  }
   const patient: QTransferPatient = {
     oldId: cProfile.oldId as string,
     profile: cProfile.profile,
@@ -144,12 +157,13 @@ export async function actionCreatePatient({
       }
     );
   }
+  const inputData = {
+    old_id: patient.oldId,
+    profile: patient.profile,
+    next_of_kins: patient.next_of_kins,
+  };
   const { data: ptData } = await createPatient({
-    variables: {
-      oldId: patient.oldId,
-      profile: patient.profile,
-      next_of_kins: patient.next_of_kins,
-    },
+    variables: inputData,
   });
   return ptData?.patient;
 }

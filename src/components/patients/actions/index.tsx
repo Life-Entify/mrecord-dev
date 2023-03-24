@@ -163,7 +163,7 @@ export const usePatientActions = () => {
       notify("success", {
         key: "create-pt-success",
         message: "Patient created!",
-        description: `patient with Patient ID ${newPt.patient_id} created!`,
+        description: `patient with Patient ID ${newPt?.patient_id} created!`,
       });
     } catch (e) {
       const error = e as AppError<IPerson>;
@@ -180,7 +180,7 @@ export const usePatientActions = () => {
     }
   };
   const createPtWPerson = useCallback(
-    (
+    async (
       person: IPerson,
       {
         notify,
@@ -190,69 +190,85 @@ export const usePatientActions = () => {
         onViewExistingPerson?: () => void;
       }
     ) => {
-      (async () => {
-        const updatedInfo = {
-          person_id: person.person_id,
-          old_id: newPtFormData?.profile?.old_id as string,
-          next_of_kins: newPtFormData?.next_of_kins as QNextOfKins[],
-        };
-        try {
-          const newPatient = await actionCreatePtWithPerson({
-            getPersons,
-            createPtWithPerson,
-            info: updatedInfo,
-          });
-          return newPatient;
-        } catch (e) {
-          const error = e as AppError<IPerson>;
-          if (error.cause?.code === 2) {
-            setPtData(updatedInfo);
-          }
-          createErrorHandler(
-            newPtFormData as INewPersonData<IFormPatient>,
-            error,
-            {
-              setExistingPerson,
-              notify,
-              onViewExistingPerson,
-            }
-          );
-          throw error;
+      const updatedInfo = {
+        person_id: person.person_id,
+        old_id: newPtFormData?.profile?.old_id as string,
+        next_of_kins: newPtFormData?.next_of_kins as QNextOfKins[],
+      };
+      try {
+        const newPatient = await actionCreatePtWithPerson({
+          getPersons,
+          createPtWithPerson,
+          info: updatedInfo,
+        });
+        return newPatient;
+      } catch (e) {
+        const error = e as AppError<IPerson>;
+        if (error.cause?.code === 2) {
+          setPtData(updatedInfo);
         }
-      })();
+        createErrorHandler(
+          newPtFormData as INewPersonData<IFormPatient>,
+          error,
+          {
+            setExistingPerson,
+            notify,
+            onViewExistingPerson,
+          }
+        );
+        throw error;
+      }
     },
     [JSON.stringify(newPtFormData)]
   );
   const createPtWNok = useCallback(
-    (person: IPerson, { notify }: { notify: INotify }) => {
-      if (patientData?.person_id) {
-        // run meta
-        const data: QTransferPtWithMeta = {
-          person_id: patientData?.person_id,
-          old_id: patientData?.old_id,
-          next_of_kins: [
-            {
-              relationship: newPtFormData?.next_of_kins?.[0].relationship,
-              person_id: person?.person_id,
-            } as INextOfKin,
-          ],
-        };
-        createPatientWithMeta({
-          variables: data,
-        });
-      } else {
-        const data: QTransferPtWithNok = {
-          profile: newPtFormData?.profile as Partial<IProfile>,
-          old_id: patientData?.old_id,
-          next_of_kins: [
-            {
-              relationship: newPtFormData?.next_of_kins?.[0].relationship,
-              person_id: person?.person_id,
-            } as INextOfKin,
-          ],
-        };
-        createPatientWithNok({
-          variables: data,
+    async (person: IPerson, { notify }: { notify: INotify }) => {
+      try {
+        if (patientData?.person_id) {
+          // run meta
+          const data: QTransferPtWithMeta = {
+            person_id: patientData?.person_id,
+            old_id: patientData?.old_id,
+            next_of_kins: [
+              {
+                relationship: newPtFormData?.next_of_kins?.[0].relationship,
+                person_id: person?.person_id,
+              } as INextOfKin,
+            ],
+          };
+          const { data: returnedData } = await createPatientWithMeta({
+            variables: data,
+          });
+          const newPt = returnedData?.person;
+          const { data: updatedPtData } = await getPatients({});
+          const newPts = updatedPtData?.patients;
+          setPatients(newPts);
+          notify("success", {
+            key: "create-pt-success",
+            message: "Patient created!",
+            description: `patient with Patient ID ${newPt?.patient_id} created!`,
+          });
+        } else {
+          const data: QTransferPtWithNok = {
+            profile: newPtFormData?.profile as Partial<IProfile>,
+            old_id: patientData?.old_id,
+            next_of_kins: [
+              {
+                relationship: newPtFormData?.next_of_kins?.[0].relationship,
+                person_id: person?.person_id,
+              } as INextOfKin,
+            ],
+          };
+          return console.log(data);
+          createPatientWithNok({
+            variables: data,
+          });
+        }
+      } catch (e) {
+        notify("error", {
+          key: "create-pt-nok-error",
+          message: "Create Patient Error",
+          description: (e as Error).message,
         });
       }
     },
@@ -271,7 +287,6 @@ export const usePatientActions = () => {
       setPatients(data?.patients);
     })();
   }, []);
-  console.log(newPtFormData);
   return {
     patients,
     patient,
