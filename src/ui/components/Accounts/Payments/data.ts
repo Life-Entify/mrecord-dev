@@ -18,7 +18,7 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   action: "Action",
   person_id: "Person (ID)",
   person: "Person",
-  staff_id: "Staff (ID)",
+  employee_id: "Staff (ID)",
   txIds: "Transaction ID(s)",
   txs: "Transactions",
   total_amount: "Total Amount",

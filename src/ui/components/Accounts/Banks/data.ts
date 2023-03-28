@@ -235,13 +235,13 @@ export const getBankTxTableColumns = (
     render: render?.("tx_type"),
   },
   {
-    key: "staff_id",
-    dataIndex: "staff_id",
+    key: "employee_id",
+    dataIndex: "employee_id",
     fixed: "left",
     title(_) {
       return "Staff ID";
     },
-    render: render?.("staff_id"),
+    render: render?.("employee_id"),
   },
   {
     key: "ref_id",
@@ -267,7 +267,7 @@ export const bankTxLabelMap: Record<keyof IBankTx, React.ReactNode> = {
   ref_id: "Tx Ref",
   description: "Account Description",
   bank_id: "Bank ID",
-  staff_id: "Staff ID",
+  employee_id: "Staff ID",
   tx_type: "Tx Type",
   amount: "Amount",
   created_at: "Date",

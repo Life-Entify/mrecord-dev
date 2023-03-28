@@ -37,12 +37,12 @@ export const getPaymentTableColumns = (
       render: render?.("tx_type"),
     },
     {
-      key: "staff_id",
-      dataIndex: "staff_id",
+      key: "employee_id",
+      dataIndex: "employee_id",
       title(_) {
         return "Received By";
       },
-      render: render?.("staff_id"),
+      render: render?.("employee_id"),
     },
     {
       key: "created_at",

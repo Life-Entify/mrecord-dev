@@ -17,6 +17,10 @@ interface INotificationProps {
   onClose?: () => void;
   duration?: number;
 }
+export type INotify = (
+  type: INotificationTypes,
+  props: INotifyObjectProps
+) => void;
 export interface INotifyObjectProps extends Omit<INotificationProps, "btn"> {
   btn?: ButtonProps[];
 }

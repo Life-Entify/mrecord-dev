@@ -8,7 +8,7 @@ import {
   Toolbar,
 } from "ui/common";
 import { AppDrawer } from "ui/common/views/AppDrawer/AppDrawer";
-import { getDepartmentTableColumns } from "./data";
+import { appDepartments, getDepartmentTableColumns } from "./data";
 import { INewDepartmentProps, NewDepartment } from "./NewDepartment";
 import { IDepartment } from "./types";
 
@@ -27,7 +27,9 @@ export interface IDepartmentProps {
     drawerType?: DEPARTMENT_DRAWER_TYPES;
   };
   newDepartmentProps?: Omit<INewDepartmentProps, "isEdit">;
-  editDepartmentProps?: Omit<INewDepartmentProps, "isEdit">;
+  editDepartmentProps?: Omit<INewDepartmentProps, "isEdit" | "onCreateItem"> & {
+    onUpdateItem?: (values: Partial<IDepartment>) => void;
+  };
   tableProps?: Omit<TableProps<IDepartment>, "columns"> & {
     deleteItem?: (dept: IDepartment) => void;
     editItem?: (dept: IDepartment) => void;
@@ -42,15 +44,20 @@ function DepartmentFunc({
   tableProps,
 }: IDepartmentProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
-  const { editItem, deleteItem, ...deepTableProps } = tableProps || {};
+  const { editItem, deleteItem, dataSource, ...deepTableProps } =
+    tableProps || {};
+  const { onUpdateItem, ...deepEditDepartmentProps } =
+    editDepartmentProps || {};
+  const appDeptKes = appDepartments.map((i) => i._id);
   return (
     <Root>
       {toolbarProps && <Toolbar {...toolbarProps} />}
       <TableContainer>
         <Table
           {...deepTableProps}
+          dataSource={[...appDepartments, ...(dataSource || [])]}
           columns={getDepartmentTableColumns((keyIndex) => (value, record) => {
-            if (keyIndex === "action") {
+            if (keyIndex === "action" && !appDeptKes.includes(record._id)) {
               return (
                 <Space>
                   <Tooltip title="Edit">
@@ -71,7 +78,11 @@ function DepartmentFunc({
           <NewDepartment {...newDepartmentProps} />
         )}
         {drawerType === DEPARTMENT_DRAWER_TYPES.EDIT && (
-          <NewDepartment {...editDepartmentProps} isEdit />
+          <NewDepartment
+            {...deepEditDepartmentProps}
+            isEdit
+            onCreateItem={onUpdateItem}
+          />
         )}
       </AppDrawer>
     </Root>

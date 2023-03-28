@@ -4,7 +4,7 @@ import {
   ICashBundle,
   IOrgBank,
   IPayment,
-  IStaff,
+  IEmployee,
   ITx,
   IPaymentCategory,
   IPaymentReceiver,
@@ -58,7 +58,7 @@ const payments: IPayment[] = [
     _id: "23",
     pay_type: "cash",
     person_id: "1",
-    staff_id: "2",
+    employee_id: "2",
     txIds: ["2"],
     tx_type: "expenditure",
     total_amount: 29000,
@@ -138,8 +138,8 @@ const login: ILogin = {
   password: "1234",
   department_id: "1",
 };
-const staff: IStaff = {
-  staff_id: "1",
+const staff: IEmployee = {
+  employee_id: "1",
   person: structuredClone(person) as IPerson,
   _id: "1",
   person_id: "1",
@@ -150,7 +150,7 @@ const staff: IStaff = {
 const bankTx: IBankTx = {
   _id: "129484",
   ref_id: "ref from bank",
-  staff_id: "3455sd",
+  employee_id: "3455sd",
   bank_id: "dfsfds",
   amount: 30000,
   description: "staff salary",
@@ -215,7 +215,7 @@ const paySlip: IPaySlip = {
   _id: "1",
   bonus_amount: 100000,
   deducted_amount: 20000,
-  staff_id: "1",
+  employee_id: "1",
   bonuses: [bonus],
 };
 const payroll: IPayroll = {

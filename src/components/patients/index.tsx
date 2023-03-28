@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Patients, PATIENT_DIALOG_TYPE } from "ui/components/Patients";
 import {
   INotificationTypes,
@@ -6,17 +6,11 @@ import {
   notification,
   notifyObject,
 } from "ui/common";
-import { INewPtNotificationProps } from "ui/components/Patients/NewPtNotification";
-import { IFormPatient } from "ui/components/Patients/types";
 import {
   IFamilyMemberDetails,
-  IFormNextOfKinData,
-  INewPersonData,
   INextOfKinDetails,
 } from "ui/components/Person";
 import { usePatientActions } from "./actions";
-import { patientToForm } from "ui/components/Patients/common";
-import { dummy } from "components/dummy";
 interface IPatientState {
   openDrawer: boolean;
   dialogType: PATIENT_DIALOG_TYPE;
@@ -42,10 +36,6 @@ export default function PatientComponent() {
   const setState = (state: Partial<IPatientState>) =>
     _setState((_state) => ({ ..._state, ...state }));
 
-  const [notifProps, setNotifProps] = useState<INewPtNotificationProps>({});
-
-  const [formData, setFormData] = useState<INewPersonData<IFormPatient>>();
-
   const [api, contextHolder] = notification.useNotification();
 
   const [familyState, setFamilyState] = useState<{
@@ -62,23 +52,12 @@ export default function PatientComponent() {
     });
   };
 
-  const [editProfileState, _setEditProfileState] = useState<{
-    fieldChanges?: Partial<IFormPatient>;
-  }>({ fieldChanges: {} });
-  const setEditProfileState = (state: { fieldChanges?: IFormPatient }) =>
-    _setEditProfileState((_state) => ({ ..._state, ...state }));
   const openNotification = (
     type: INotificationTypes,
     props: INotifyObjectProps
   ) => {
     api[type](notifyObject(props));
   };
-  useEffect(() => {
-    setState({
-      openDrawer: true,
-      dialogType: PATIENT_DIALOG_TYPE.NEW_PATIENT,
-    });
-  }, []);
   return (
     <>
       {contextHolder}
@@ -106,7 +85,7 @@ export default function PatientComponent() {
           person: existingPerson?.person,
           description: (
             <div style={{ marginBottom: 20 }}>
-              This profile was found do you want to use this instead?
+              This profile was found, do you want to use this instead?
             </div>
           ),
           onBack: () =>
@@ -130,26 +109,26 @@ export default function PatientComponent() {
                     drawerTitle: "Existing Person",
                   });
                 },
-              }).catch((e) => {});
+              }).then(() => closeDialog());
             } else {
               createPtWithNok(person, {
                 notify: openNotification,
               }).then(() => {
-                setState({ openDrawer: false });
+                closeDialog();
               });
             }
           },
         }}
         newPatientProps={{
-          values: {
-            profile: patientToForm(dummy.patients?.[0]) as IFormPatient,
-            next_of_kins: dummy.patients?.[0].person?.next_of_kins?.map(
-              (nok) => ({
-                relationship: nok.relationship,
-                ...patientToForm({ person: dummy.patients?.[0]?.person }),
-              })
-            ) as IFormNextOfKinData[],
-          },
+          // values: {
+          //   profile: patientToForm(dummy.patients?.[0]) as IFormPatient,
+          //   next_of_kins: dummy.patients?.[0].person?.next_of_kins?.map(
+          //     (nok) => ({
+          //       relationship: nok.relationship,
+          //       ...patientToForm({ person: dummy.patients?.[0]?.person }),
+          //     })
+          //   ) as IFormNextOfKinData[],
+          // },
           createPatient(info, error, options) {
             (async () => {
               if (error)
@@ -172,6 +151,7 @@ export default function PatientComponent() {
                 })
                   .then(() => {
                     options?.resetForm?.();
+                    closeDialog();
                   })
                   .catch(() => {});
               }

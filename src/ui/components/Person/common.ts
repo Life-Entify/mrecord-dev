@@ -56,7 +56,30 @@ export const actionRemoveNoks = (values: IFormNextOfKin) => {
   }
   return newValue;
 };
+export const personFormRefactor = <T extends IFormPerson | IFormPatient>(
+  target: IFormNextOfKinData | T
+): {
+  oldId?: string | null;
+  profile: Partial<IProfile>;
+  relationship?: string | null;
+} => {
+  let oldId;
+  let relationship;
 
+  if ((target as IFormPatient).old_id) {
+    oldId = (target as IFormPatient).old_id;
+    delete (target as IFormPatient).old_id;
+  }
+  if ((target as IFormNextOfKinData).relationship) {
+    relationship = (target as IFormNextOfKinData).relationship;
+    delete (target as IFormNextOfKinData).relationship;
+  }
+  return {
+    oldId,
+    profile: formToPerson("address1", target as IFormPerson),
+    relationship,
+  };
+};
 export function formToPerson(addressId: string, target: IFormPerson): IProfile {
   const address: Partial<IAddress> = {};
   const addressKeys: (keyof IAddress)[] = [

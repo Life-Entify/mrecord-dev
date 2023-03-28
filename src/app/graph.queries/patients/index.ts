@@ -37,8 +37,8 @@ export const graphCreatePatient = (
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation createPatient($oldId: String, $profile : ProfileInputType, $next_of_kins: [NextOfKinInputType]) {
-        patient : createPatient(oldId: $oldId, profile : $profile, next_of_kins: $next_of_kins) {
+    mutation createPatient($old_id: String, $profile : ProfileInputType, $next_of_kins: [NextOfKinInputType]) {
+        patient : createPatient(old_id: $old_id, profile : $profile, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;
@@ -49,8 +49,8 @@ export const graphCreatePtWithPerson = (
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation createPatient($oldId: String, $person_id : Int, $next_of_kins: [NextOfKinInputType]) {
-        patient : createPatient(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
+    mutation createPatientWithPerson($old_id: String, $person_id : Int, $next_of_kins: [NextOfKinInputType]) {
+        patient : createPatientWithPerson(old_id: $old_id, person_id : $person_id, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;
@@ -61,8 +61,8 @@ export const graphCreatePtWithNok = (
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation createPatient($oldId: String,  $profile : ProfileInputType, $next_of_kins: [NextOfKinMetaInputType]) {
-        patient : createPatient(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
+    mutation createPatientWithNok($old_id: String,  $profile : ProfileInputType, $next_of_kins: [NextOfKinMetaInputType]) {
+        patient : createPatientWithNok(old_id: $old_id, profile : $profile, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;
@@ -73,8 +73,8 @@ export const graphCreatePtWithMeta = (
 ) => {
   const query = patient ? queryStringBuilder(patient, nestedValues) : "_id";
   return gql`
-    mutation createPatientWithMD($oldId: String, $person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
-        patient : createPatientWithMD(oldId: $oldId, person_id : $person_id, next_of_kins: $next_of_kins) {
+    mutation createPatientWithMD($old_id: String, $person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
+        patient : createPatientWithMD(old_id: $old_id, person_id : $person_id, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;

@@ -3,6 +3,7 @@ export * from "./Layout";
 export * from "./Patients";
 export * from "./Accounts";
 export * from "./Settings";
-export * from "./Staff";
+export * from "./Employees";
+export * from "./Employees/Employee";
 export * from "./Appointments";
 export * from "./Departments";
