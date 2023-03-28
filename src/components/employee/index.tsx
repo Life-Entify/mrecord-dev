@@ -1,3 +1,4 @@
+import { useDepartmentAction } from "components/departments/actions";
 import { dummy } from "components/dummy";
 import React, { useState } from "react";
 import {
@@ -26,6 +27,7 @@ export default function StaffComponent() {
     createEmpWithPerson,
     createEmpWithNok,
   } = useEmployeeActions();
+  const { departments } = useDepartmentAction();
   const [state, _setState] = useState<Partial<IStaffState>>({
     openDrawer: false,
   });
@@ -133,7 +135,7 @@ export default function StaffComponent() {
           },
         }}
         tableProps={{
-          dataSource: dummy.staff,
+          dataSource: employees, // dummy.staff,
           rowSelection: {
             type: "radio",
             selectedRowKeys: [],
@@ -161,7 +163,7 @@ export default function StaffComponent() {
         }}
         staffViewProps={{
           staff: employee,
-          departments: dummy.departments,
+          departments: departments,
           infoBoardProps: {
             skipMap: [
               "person",

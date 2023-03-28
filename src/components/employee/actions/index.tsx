@@ -130,6 +130,11 @@ export const useEmployeeActions = () => {
     },
     [JSON.stringify(employee)]
   );
+  const getEmps = useCallback(async () => {
+    const { data } = await getEmployees();
+    const employees = data?.employees;
+    setEmployees(employees);
+  }, [!!getEmployees]);
 
   const createEmp = async (
     info: INewPersonData<IFormEmployee>,
@@ -145,7 +150,7 @@ export const useEmployeeActions = () => {
   ) => {
     try {
       const newEmp = await createEmployee(structuredClone(info));
-      await getEmployees();
+      await getEmps();
       notify("success", {
         key: "create-emp-success",
         message: "Employee created!",
@@ -182,9 +187,7 @@ export const useEmployeeActions = () => {
       };
       try {
         const newEmp = await createEmpWithPerson(updatedInfo);
-        const { data: updatedEmpData } = await getEmployees({});
-        const newEmps = updatedEmpData?.employees;
-        setEmployees(newEmps);
+        await getEmps();
         notify("success", {
           key: "create-emp-success",
           message: "Employee created!",
@@ -216,7 +219,6 @@ export const useEmployeeActions = () => {
           // run meta
           const newEmp = await createEmployeeWithMeta({
             person_id: employeeData?.person_id,
-            old_id: employeeData?.old_id as string,
             next_of_kins: [
               {
                 relationship: newEmpFormData?.next_of_kins?.[0].relationship,
@@ -224,9 +226,7 @@ export const useEmployeeActions = () => {
               } as INextOfKin,
             ],
           });
-          const { data: updatedEmpData } = await getEmployees({});
-          const newEmps = updatedEmpData?.employees;
-          setEmployees(newEmps);
+          await getEmps();
           notify("success", {
             key: "create-emp-success",
             message: "Employee created!",

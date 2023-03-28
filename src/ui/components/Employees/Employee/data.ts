@@ -10,6 +10,14 @@ const defaultRender = (keyIndex: string, record: IEmployee) => {
   type skipKey = keyof (IEmployee & IPerson & IProfile);
   const skips: skipKey[] = ["person", "addresses", "next_of_kins"];
   if (!skips.includes(keyIndex as skipKey)) {
+    if (keyIndex === "gender") {
+      switch (record.person?.profile.gender) {
+        case "m":
+          return "Male";
+        case "f":
+          return "Female";
+      }
+    }
     return (record[keyIndex as keyof IEmployee] ||
       record.person?.[keyIndex as keyof IPerson] ||
       record.person?.profile?.[keyIndex as keyof IProfile]) as React.ReactNode;
@@ -29,7 +37,7 @@ export const getStaffColumns = (
     key: "employee_id",
     fixed: "left",
     title(_: any) {
-      return "Staff ID";
+      return "Employee ID";
     },
     render(_, record, index) {
       if (render) {
@@ -111,10 +119,11 @@ export const staffDataMapping: Record<
   keyof (IEmployee & Omit<IPerson, "_id"> & IProfile),
   string
 > = {
-  employee_id: "Staff ID",
+  employee_id: "Employee ID",
   person: "Person",
   ...{ ...personDataMapping, _id: "Staff ID (Gen)" },
   departments: "Departments",
   department_ids: "Departments",
   logins: "",
+  status: "Status",
 };

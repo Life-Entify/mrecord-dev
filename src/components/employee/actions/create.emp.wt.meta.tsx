@@ -6,7 +6,6 @@ export function useCreateEmployeeWithMeta() {
   const { createEmployeeWithMeta } = useEmployee();
   const [processing, setProcessing] = useState<boolean>();
   const action = async (info: {
-    old_id: string;
     person_id: number;
     next_of_kins: INextOfKin[];
   }) => {

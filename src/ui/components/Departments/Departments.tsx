@@ -44,7 +44,7 @@ function DepartmentFunc({
   tableProps,
 }: IDepartmentProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
-  const { editItem, deleteItem, dataSource, ...deepTableProps } =
+  const { editItem, deleteItem, ...deepTableProps } =
     tableProps || {};
   const { onUpdateItem, ...deepEditDepartmentProps } =
     editDepartmentProps || {};
@@ -55,7 +55,6 @@ function DepartmentFunc({
       <TableContainer>
         <Table
           {...deepTableProps}
-          dataSource={[...appDepartments, ...(dataSource || [])]}
           columns={getDepartmentTableColumns((keyIndex) => (value, record) => {
             if (keyIndex === "action" && !appDeptKes.includes(record._id)) {
               return (

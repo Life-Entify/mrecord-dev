@@ -40,8 +40,8 @@ export const graphCreateEmployee = (
 ) => {
   const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
   return gql`
-    mutation createEmployee($old_id: String, $profile : ProfileInputType, $next_of_kins: [NextOfKinInputType]) {
-        Employee : createEmployee(old_id: $old_id, profile : $profile, next_of_kins: $next_of_kins) {
+    mutation createEmployee($profile : ProfileInputType, $next_of_kins: [NextOfKinInputType]) {
+        employee : createEmployee(profile : $profile, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;
@@ -52,8 +52,8 @@ export const graphCreateEmpWithPerson = (
 ) => {
   const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
   return gql`
-    mutation createEmployeeWithPerson($old_id: String, $person_id : Int, $next_of_kins: [NextOfKinInputType]) {
-        employee : createEmployeeWithPerson(old_id: $old_id, person_id : $person_id, next_of_kins: $next_of_kins) {
+    mutation createEmployeeWithPerson($person_id : Int, $next_of_kins: [NextOfKinInputType]) {
+        employee : createEmployeeWithPerson(person_id : $person_id, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;
@@ -64,8 +64,8 @@ export const graphCreateEmpWithNok = (
 ) => {
   const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
   return gql`
-    mutation createEmployeeWithNok($old_id: String,  $profile : ProfileInputType, $next_of_kins: [NextOfKinMetaInputType]) {
-        employee : createEmployeeWithNok(old_id: $old_id, profile : $profile, next_of_kins: $next_of_kins) {
+    mutation createEmployeeWithNok($profile : ProfileInputType, $next_of_kins: [NextOfKinMetaInputType]) {
+        employee : createEmployeeWithNok(profile : $profile, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;
@@ -76,8 +76,8 @@ export const graphCreateEmpWithMeta = (
 ) => {
   const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
   return gql`
-    mutation createEmployeeWithMD($old_id: String, $person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
-        employee : createEmployeeWithMD(old_id: $old_id, person_id : $person_id, next_of_kins: $next_of_kins) {
+    mutation createEmployeeWithMD($person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
+        employee : createEmployeeWithMD(person_id : $person_id, next_of_kins: $next_of_kins) {
             ${query}
         }
     }`;

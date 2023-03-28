@@ -1,7 +1,4 @@
 import {
-  FetchResult,
-  LazyQueryExecFunction,
-  MutationFunctionOptions,
   useLazyQuery,
   useMutation,
 } from "@apollo/client";
@@ -49,37 +46,8 @@ const graphReturnedData: IReturnedData = {
   addresses: ["_id", "street", "nstate", "town", "lga", "country"],
   next_of_kins: ["person_id", "relationship"],
 };
-export interface IEmployeeGraphQlActions {
-  createEmployee: (
-    options: MutationFunctionOptions<{ employee: IEmployee }, QTransferEmployee>
-  ) => Promise<FetchResult>;
-  createEmpWithPerson: (
-    options: MutationFunctionOptions<
-      { employee: IEmployee },
-      QTransferEmpWithPerson
-    >
-  ) => Promise<FetchResult>;
-  createEmployeeWithNok: (
-    options: MutationFunctionOptions<{ employee: IEmployee }, QTransferEmpWithNok>
-  ) => Promise<FetchResult>;
-  createEmployeeWithMeta: (
-    options: MutationFunctionOptions<{ employee: IEmployee }, QTransferEmpWithMeta>
-  ) => Promise<FetchResult>;
-  updateEmployee: (
-    options: MutationFunctionOptions<
-      { employee: IEmployee },
-      QUpdateEmpProfileTransfer
-    >
-  ) => Promise<FetchResult>;
-  getEmployees: LazyQueryExecFunction<
-    {
-      employees: IEmployee[];
-    },
-    QEmployeeQueryParams
-  >;
-  employees?: IEmployee[];
-}
-export function useEmployee(): IEmployeeGraphQlActions {
+
+export function useEmployee() {
   const [createEmployee] = useMutation<{ employee: IEmployee }, QTransferEmployee>(
     graphCreateEmployee(graphReturnedData.employee, {
       person: graphReturnedData.person,

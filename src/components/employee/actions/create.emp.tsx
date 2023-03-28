@@ -152,7 +152,6 @@ export const useCreateEmployeeAction = () => {
       );
     }
     const inputData = {
-      old_id: employee.oldId,
       profile: employee.profile,
       next_of_kins: employee.next_of_kins,
     };
