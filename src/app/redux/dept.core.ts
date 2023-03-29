@@ -1,16 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IDepartment } from "ui";
-import { appDepartments } from "ui/components/Departments/data";
 import { RootState } from "./store";
 
-const initialState: IDepartment[] = appDepartments;
+const initialState: IDepartment[] = [];
 
 const userSlice = createSlice({
   name: "departments",
   initialState,
   reducers: {
     setDepartments: (state, action: PayloadAction<IDepartment[]>) => {
-      state = [...appDepartments, ...action.payload];
+      state = action.payload;
       return state;
     },
   },

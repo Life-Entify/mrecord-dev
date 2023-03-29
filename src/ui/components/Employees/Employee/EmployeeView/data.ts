@@ -36,16 +36,6 @@ export const getLoginColumns = (
   ) => React.ReactNode | RenderedCell<ILogin>
 ): TableColumnType<ILogin>[] => [
   {
-    key: "_id",
-    fixed: "left",
-    title(_: any) {
-      return "ID";
-    },
-    render(value: ILogin) {
-      return String(value._id).padStart(6, "0");
-    },
-  },
-  {
     key: "department_id",
     fixed: "left",
     title: "Department",
@@ -53,6 +43,7 @@ export const getLoginColumns = (
       const dept = departments?.find(
         (item) => item._id === value.department_id
       );
+      // console.log(dept, value, departments);
       return dept?.name;
     },
   },

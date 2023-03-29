@@ -5,13 +5,15 @@ import { IInfoBoardProps, InfoBoard } from "ui/common";
 import { IDepartment } from "ui/components/Departments";
 import { IPerson, IProfile } from "ui/components/Person";
 import { staffDataMapping } from "../data";
-import { IEmployee } from "../../types";
+import { EMPLOYEE_STATUS, IEmployee } from "../../types";
 import { IStaffAccountProps, StaffAccount } from "./EmpAccount";
 import { IEmpDepartments, StaffDepartments } from "./EmpDepartments";
 
 const Root = styled.div``;
 const Title = styled.h3``;
-const Description = styled.div``;
+const Description = styled.div`
+  margin-bottom: 20px;
+`;
 const StyledTabs = styled(Tabs)`
   // margin-top: 50px;
   min-height: 200px;
@@ -27,8 +29,6 @@ const DeptContainer = styled.div`
 `;
 
 export interface IEmpViewProps {
-  title?: React.ReactNode;
-  description?: React.ReactNode;
   staff?: IEmployee;
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof (IEmployee & IPerson & IProfile)>,
@@ -38,11 +38,10 @@ export interface IEmpViewProps {
   staffAccountProps?: IStaffAccountProps;
   departments?: IDepartment[];
   removeDept?: (dept: IDepartment) => void;
+  onStatusChange?: (status: EMPLOYEE_STATUS) => void;
   staffDepartmentProps?: Omit<IEmpDepartments, "departments" | "staff">;
 }
 export function EmpView({
-  title,
-  description,
   staff,
   infoBoardProps,
   tabProps,
@@ -50,11 +49,20 @@ export function EmpView({
   departments,
   staffDepartmentProps,
   removeDept,
+  onStatusChange,
 }: IEmpViewProps) {
   const [showDetails, setShowDetail] = useState<boolean>();
+  const { last_name, first_name } = staff?.person?.profile || {};
+  const title = `${last_name} ${first_name}`.trim();
+  let description = "";
+  if (title) description = "Profile Details";
   return (
     <Root>
-      {title && <Title>{title}</Title>}
+      {title && (
+        <Title>
+          {title} ({staff?.status?.toUpperCase()})
+        </Title>
+      )}
       {description && <Description>{description}</Description>}
       <ButtonContainer>
         <Button onClick={() => setShowDetail(!showDetails)}>
@@ -62,10 +70,13 @@ export function EmpView({
         </Button>
         <Dropdown
           menu={{
+            onClick: ({ key }) => {
+              onStatusChange?.(key as EMPLOYEE_STATUS);
+            },
             items: [
-              { label: "Suspend", key: "suspended" },
-              { label: "Active", key: "active" },
-              { label: "Deactivate", key: "deactivated", disabled: true },
+              { label: "Suspend", key: EMPLOYEE_STATUS.suspended },
+              { label: "Active", key: EMPLOYEE_STATUS.active },
+              { label: "Deactivate", key: EMPLOYEE_STATUS.deactivated },
             ],
           }}
         >

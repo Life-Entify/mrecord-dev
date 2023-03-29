@@ -1,5 +1,11 @@
 import { IDepartment } from "../Departments";
-import { IFormPerson, IPerson, IProfile } from "../Person";
+import {
+  IAddress,
+  IFormPerson,
+  INextOfKin,
+  IPerson,
+  IProfile,
+} from "../Person";
 
 export enum EMPLOYEE_STATUS {
   active = "active",
@@ -8,7 +14,6 @@ export enum EMPLOYEE_STATUS {
 }
 
 export interface ILogin {
-  _id?: string;
   department_id: string;
   username: string;
   password: string;

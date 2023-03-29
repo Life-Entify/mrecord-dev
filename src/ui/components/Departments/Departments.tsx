@@ -8,7 +8,7 @@ import {
   Toolbar,
 } from "ui/common";
 import { AppDrawer } from "ui/common/views/AppDrawer/AppDrawer";
-import { appDepartments, getDepartmentTableColumns } from "./data";
+import { getDepartmentTableColumns } from "./data";
 import { INewDepartmentProps, NewDepartment } from "./NewDepartment";
 import { IDepartment } from "./types";
 
@@ -44,11 +44,10 @@ function DepartmentFunc({
   tableProps,
 }: IDepartmentProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
-  const { editItem, deleteItem, ...deepTableProps } =
-    tableProps || {};
+  const { editItem, deleteItem, ...deepTableProps } = tableProps || {};
   const { onUpdateItem, ...deepEditDepartmentProps } =
     editDepartmentProps || {};
-  const appDeptKes = appDepartments.map((i) => i._id);
+  const appDeptKes = ["Records", "HR", "Accounts"];
   return (
     <Root>
       {toolbarProps && <Toolbar {...toolbarProps} />}
@@ -56,7 +55,7 @@ function DepartmentFunc({
         <Table
           {...deepTableProps}
           columns={getDepartmentTableColumns((keyIndex) => (value, record) => {
-            if (keyIndex === "action" && !appDeptKes.includes(record._id)) {
+            if (keyIndex === "action" && !appDeptKes.includes(record.name)) {
               return (
                 <Space>
                   <Tooltip title="Edit">

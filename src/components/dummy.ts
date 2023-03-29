@@ -133,7 +133,6 @@ const patient: IPatient = {
   person: person,
 };
 const login: ILogin = {
-  _id: "1",
   username: "chokey2nv",
   password: "1234",
   department_id: "1",

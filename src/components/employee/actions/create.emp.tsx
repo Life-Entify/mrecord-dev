@@ -32,7 +32,6 @@ export const useCreateEmployeeAction = () => {
       );
     }
     const employee: QTransferEmployee = {
-      oldId: cProfile.oldId as string,
       profile: cProfile.profile,
       next_of_kins: cNextOfKins.map((i) => ({
         next_of_kin: i.profile,

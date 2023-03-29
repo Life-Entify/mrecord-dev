@@ -1,6 +1,10 @@
-import { IEmployee } from "ui";
-import { INextOfKin, IProfile } from "ui/components/Person";
-import { QNextOfKins } from "../patients/types";
+import { IEmployee, ILogin } from "ui";
+import { IAddress, INextOfKin, IPerson, IProfile } from "ui/components/Person";
+import {
+  IQueryArray,
+  NestedPatientObject,
+  QNextOfKins,
+} from "../patients/types";
 import { QKeywordPerson } from "../persons/types";
 
 export interface QUpdateEmpProfileTransfer {
@@ -10,7 +14,6 @@ export interface QUpdateEmpProfileTransfer {
   profile?: Partial<IProfile>;
 }
 export interface QTransferEmployee {
-  oldId?: string;
   profile: Partial<IProfile>;
   next_of_kins: QNextOfKins[];
 }
@@ -34,4 +37,12 @@ export interface QEmployeeQueryParams {
   keyword?: QKeywordEmployee;
   limit?: number;
   skip?: number;
+}
+export type IEmployeeQueryArray = IQueryArray | keyof ILogin;
+
+export interface IEmployeeNestedQueryObject extends NestedPatientObject {
+  logins: (keyof ILogin)[];
+}
+export interface IEmployeeQueryReturnData extends IEmployeeNestedQueryObject {
+  employee: (keyof IEmployee)[];
 }

@@ -45,11 +45,11 @@ export interface QPatientQueryParams {
   skip?: number;
 }
 
-export type IQueryArray =
-  | (keyof IAddress)[]
-  | (keyof IProfile)[]
-  | (keyof IPerson)[]
-  | (keyof INextOfKin)[];
+export type IQueryArray = (keyof (IAddress & IProfile & IPerson & INextOfKin))[]
+  // | (keyof IAddress)[]
+  // | (keyof IProfile)[]
+  // | (keyof IPerson)[]
+  // | (keyof INextOfKin)[];
 export interface NestedPatientObject {
   addresses?: (keyof IAddress)[];
   profile?: (keyof IProfile)[];

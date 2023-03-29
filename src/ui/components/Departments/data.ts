@@ -1,27 +1,7 @@
 import { FORM_FIELD_TYPES, IFormItems, TableColumnType } from "ui/common";
-import { APPLICATIONS, IDepartment } from "./types";
+import { IDepartment } from "./types";
 import { RenderedCell } from "rc-table/lib/interface";
 
-export const appDepartments: IDepartment[] = [
-  {
-    _id: "1",
-    name: "Records",
-    description: "Medical records department",
-    app: APPLICATIONS.records,
-  },
-  {
-    _id: "2",
-    name: "Accounts",
-    description: "Account Department for finance functions",
-    app: APPLICATIONS.accounts,
-  },
-  {
-    _id: "3",
-    name: "HR",
-    description: "Human resource management department",
-    app: APPLICATIONS.accounts,
-  },
-];
 export const departmentForm: IFormItems[] = [
   {
     fieldType: FORM_FIELD_TYPES.TEXT,

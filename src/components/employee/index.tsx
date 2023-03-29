@@ -22,7 +22,9 @@ export default function StaffComponent() {
     employee,
     existingPerson,
     setEmployee,
-    updateProfile,
+    updateEmployee,
+    addEmpDepartment,
+    deleteEmpDepartment,
     createEmployee,
     createEmpWithPerson,
     createEmpWithNok,
@@ -164,6 +166,9 @@ export default function StaffComponent() {
         staffViewProps={{
           staff: employee,
           departments: departments,
+          onStatusChange(status) {
+            updateEmployee({ status }, { notify: openNotification });
+          },
           infoBoardProps: {
             skipMap: [
               "person",
@@ -172,7 +177,48 @@ export default function StaffComponent() {
               "next_of_kins_details",
             ],
           },
-          staffDepartmentProps: {},
+          staffDepartmentProps: {
+            onAddDepartment(dept, login) {
+              if (dept?._id) {
+                if (login) login.department_id = dept._id;
+                addEmpDepartment(dept._id, login, { notify: openNotification });
+              }
+            },
+            onEditLogin(dept, login) {
+              if (dept?._id) {
+                login.department_id = dept._id;
+                updateEmployee(
+                  { logins: [login] },
+                  { notify: openNotification }
+                );
+              }
+            },
+            onRemoveDepartment(dept) {
+              openNotification("warning", {
+                key: "delete-emp-dept-warning",
+                message: "Delete Warning",
+                description: `Sure you want to remove ${employee?.person?.profile?.last_name} from ${dept?.name}?`,
+                btn: [
+                  {
+                    children: "Cancel",
+                    type: "primary",
+                    onClick: () => api.destroy("delete-emp-dept-warning"),
+                  },
+                  {
+                    children: "Proceed",
+                    onClick: () => {
+                      if (dept?._id) {
+                        api.destroy("delete-emp-dept-warning");
+                        deleteEmpDepartment(dept._id, {
+                          notify: openNotification,
+                        });
+                      }
+                    },
+                  },
+                ],
+              });
+            },
+          },
           staffAccountProps: {
             showNewBankForm() {
               setState({

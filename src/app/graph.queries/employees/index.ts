@@ -1,20 +1,19 @@
 import { gql } from "@apollo/client";
 import { IEmployee } from "ui";
-import {
-  IQueryArray,
-  NestedPatientObject as NestedEmployeeObject,
-} from "../patients/types";
+import { IEmployeeNestedQueryObject, IEmployeeQueryArray } from "./types";
 
 function queryStringBuilder(
-  query: (keyof IEmployee)[] | IQueryArray,
-  nestedValues?: NestedEmployeeObject
+  query: (keyof IEmployee)[] | IEmployeeQueryArray,
+  nestedValues?: IEmployeeNestedQueryObject
 ) {
   let queryString = "";
   for (let i = 0; i < query.length; i++) {
     const element = query[i];
-    if (nestedValues?.[element as keyof NestedEmployeeObject]) {
+    if (nestedValues?.[element as keyof IEmployeeNestedQueryObject]) {
       queryString += `${element} { ${queryStringBuilder(
-        nestedValues[element as keyof NestedEmployeeObject] as IQueryArray,
+        nestedValues[
+          element as keyof IEmployeeNestedQueryObject
+        ] as IEmployeeQueryArray,
         nestedValues
       )} }`;
     } else queryString += `${element} `;
@@ -22,23 +21,47 @@ function queryStringBuilder(
   return queryString;
 }
 
-export const graphUpdateEmployee = (
-  Employee?: (keyof IEmployee)[],
-  nestedValues?: NestedEmployeeObject
+export const graphAddEmpDepartment = (
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
 ) => {
-  const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
   return gql`
-    mutation updateEmployee($_id: String, $Employee: EmployeeInputType, $person_xid : String, $profile: ProfileInputType) {
-        Employee : updateEmployee(_id: $_id, Employee: $Employee, person_xid : $person_xid, profile: $profile) {
-            ${query}
+    mutation addEmpDepartment($_id: String, $department_id: String, $login: LoginInputType) {
+        employee : addEmpDepartment(_id: $_id, department_id: $department_id, login: $login ) {
+          ${query}
+        }
+    }`;
+};
+export const graphDeleteEmpDepartment = (
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
+) => {
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
+  return gql`
+    mutation deleteEmpDepartment($_id: String, $department_id: String) {
+        employee : deleteEmpDepartment(_id: $_id, department_id: $department_id ) {
+          ${query}
+        }
+    }`;
+};
+export const graphUpdateEmployee = (
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
+) => {
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
+  return gql`
+    mutation updateEmployee($_id: String, $employee: EmployeeInputType, $person_xid : String, $profile: ProfileInputType) {
+        employee : updateEmployee(_id: $_id, employee: $employee, person_xid : $person_xid, profile: $profile) {
+          ${query}
         }
     }`;
 };
 export const graphCreateEmployee = (
-  Employee?: (keyof IEmployee)[],
-  nestedValues?: NestedEmployeeObject
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
 ) => {
-  const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
   return gql`
     mutation createEmployee($profile : ProfileInputType, $next_of_kins: [NextOfKinInputType]) {
         employee : createEmployee(profile : $profile, next_of_kins: $next_of_kins) {
@@ -47,10 +70,10 @@ export const graphCreateEmployee = (
     }`;
 };
 export const graphCreateEmpWithPerson = (
-  Employee?: (keyof IEmployee)[],
-  nestedValues?: NestedEmployeeObject
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
 ) => {
-  const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
   return gql`
     mutation createEmployeeWithPerson($person_id : Int, $next_of_kins: [NextOfKinInputType]) {
         employee : createEmployeeWithPerson(person_id : $person_id, next_of_kins: $next_of_kins) {
@@ -59,10 +82,10 @@ export const graphCreateEmpWithPerson = (
     }`;
 };
 export const graphCreateEmpWithNok = (
-  Employee?: (keyof IEmployee)[],
-  nestedValues?: NestedEmployeeObject
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
 ) => {
-  const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
   return gql`
     mutation createEmployeeWithNok($profile : ProfileInputType, $next_of_kins: [NextOfKinMetaInputType]) {
         employee : createEmployeeWithNok(profile : $profile, next_of_kins: $next_of_kins) {
@@ -71,10 +94,10 @@ export const graphCreateEmpWithNok = (
     }`;
 };
 export const graphCreateEmpWithMeta = (
-  Employee?: (keyof IEmployee)[],
-  nestedValues?: NestedEmployeeObject
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
 ) => {
-  const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
   return gql`
     mutation createEmployeeWithMD($person_id : Int, $next_of_kins: [NextOfKinMetaInputType]) {
         employee : createEmployeeWithMD(person_id : $person_id, next_of_kins: $next_of_kins) {
@@ -83,10 +106,10 @@ export const graphCreateEmpWithMeta = (
     }`;
 };
 export const graphGetEmployees = (
-  Employee?: (keyof IEmployee)[],
-  nestedValues?: NestedEmployeeObject
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
 ) => {
-  const query = Employee ? queryStringBuilder(Employee, nestedValues) : "_id";
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
   return gql`
     query getEmployees($keyword: EmpKeywordInputType, $limit: Int, $skip: Int) {
       employees: getEmployees(keyword: $keyword, limit: $limit, skip: $skip) {

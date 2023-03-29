@@ -8,6 +8,7 @@ import {
   theme,
   Tooltip,
 } from "antd";
+import FormItemLabel from "antd/es/form/FormItemLabel";
 import React, { useState } from "react";
 import styled from "styled-components";
 import {
@@ -22,6 +23,10 @@ import { getLoginColumns, loginForm } from "./data";
 
 const Root = styled.div``;
 const Title = styled.h3``;
+const Description = styled.div`
+  color: gray;
+  line-height: 2em;
+`;
 const TableContainer = styled.div`
   margin: 20px 0px;
 `;
@@ -32,7 +37,7 @@ export interface IEmpDepartments {
   tableProps?: TableProps<ILogin>;
   onAddDepartment?: (dept: IDepartment, login?: ILogin) => void;
   onRemoveDepartment?: (dept: IDepartment) => void;
-  onEditLogin?: (login: ILogin) => void;
+  onEditLogin?: (dept: IDepartment, login: ILogin) => void;
 }
 
 function StaffDepartmentFunc({
@@ -56,57 +61,66 @@ function StaffDepartmentFunc({
   return (
     <Root>
       {dept?.app && (
-        <Form
-          formRef={formRef}
-          formProps={{
-            style: {
-              background: colorBgLayout,
-              padding: 20,
-              borderRadius: 6,
-              marginBottom: 20,
-            },
-            title: "Department Login",
-            name: "new-department-form",
-            layout: "horizontal",
-            labelCol: { span: 10 },
-            wrapperCol: { span: 14 },
-            initialValues: login,
-            onFinish(values) {
-              if (isEdit) {
-                onEditLogin?.({ ...login, ...values });
-              } else onAddDepartment?.(dept, values);
-            },
-          }}
-          items={[
-            ...loginForm,
-            {
-              fieldType: FORM_FIELD_TYPES.FIELDS,
-              itemProps: {
-                wrapperCol: { span: 14, offset: 10 },
+        <>
+          <Title>Login for {dept.name}</Title>
+          <Description>
+            To update another login info, close this panel first.
+          </Description>
+          <Form
+            formRef={formRef}
+            formProps={{
+              style: {
+                background: colorBgLayout,
+                padding: 20,
+                borderRadius: 6,
+                marginBottom: 20,
               },
-              fieldProps: [
-                {
-                  fieldType: FORM_FIELD_TYPES.BUTTON,
-                  fieldProps: {
-                    style: { marginRight: 20 },
-                    children: "Cancel",
-                    onClick: () => {
-                      setDept(undefined);
+              title: "Department Login",
+              name: "new-department-form",
+              layout: "horizontal",
+              labelCol: { span: 10 },
+              wrapperCol: { span: 14 },
+              initialValues: { ...login, password: "" },
+              onFinish(values) {
+                if (isEdit) {
+                  onEditLogin?.(dept, values);
+                } else {
+                  onAddDepartment?.(dept, values);
+                }
+                setDept(undefined);
+              },
+            }}
+            items={[
+              ...loginForm,
+              {
+                fieldType: FORM_FIELD_TYPES.FIELDS,
+                itemProps: {
+                  wrapperCol: { span: 14, offset: 10 },
+                },
+                fieldProps: [
+                  {
+                    fieldType: FORM_FIELD_TYPES.BUTTON,
+                    fieldProps: {
+                      style: { marginRight: 20 },
+                      children: "Cancel",
+                      onClick: () => {
+                        setDept(undefined);
+                      },
                     },
                   },
-                },
-                {
-                  fieldType: FORM_FIELD_TYPES.BUTTON,
-                  fieldProps: {
-                    type: "primary",
-                    htmlType: "submit",
-                    children: (isEdit ? "Update " : "Create ") + "Login",
+                  {
+                    fieldType: FORM_FIELD_TYPES.BUTTON,
+                    fieldProps: {
+                      type: "primary",
+                      htmlType: "submit",
+                      children: (isEdit ? "Update " : "Create ") + "Login",
+                    },
                   },
-                },
-              ],
-            },
-          ]}
-        />
+                ],
+              },
+            ]}
+          />
+        </>
       )}
       {newDepartments && newDepartments.length > 0 && (
         <Dropdown
@@ -120,6 +134,7 @@ function StaffDepartmentFunc({
               if (dept) {
                 if (dept?.app) {
                   setDept(dept);
+                  setEdit(false);
                 } else {
                   onAddDepartment?.(dept);
                 }

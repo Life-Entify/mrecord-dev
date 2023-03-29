@@ -5,7 +5,13 @@ import {
   QUpdateEmpProfileTransfer,
 } from "app/graph.queries/employees/types";
 import React, { useCallback, useEffect, useState } from "react";
-import { AppError, INotificationTypes, INotify, INotifyObjectProps } from "ui";
+import {
+  AppError,
+  ILogin,
+  INotificationTypes,
+  INotify,
+  INotifyObjectProps,
+} from "ui";
 import { IFormEmployee, IEmployee } from "ui";
 import {
   formToPerson,
@@ -27,12 +33,17 @@ export interface IExistingPersonState {
 }
 
 export const useEmployeeActions = () => {
-  const { getEmployees, updateEmployee } = useEmployee();
+  const {
+    getEmployees,
+    updateEmployee,
+    addEmpDepartment,
+    deleteEmpDepartment,
+  } = useEmployee();
   const { createEmployee } = useCreateEmployeeAction();
   const { createEmpWithPerson } = useCreateEmployeeWithPerson();
   const { createEmployeeWithNok } = useCreateEmployeeWithNok();
   const { createEmployeeWithMeta } = useCreateEmployeeWithMeta();
-  const { getPersonsByID, getPersons, createPerson } = usePerson();
+  const { getPersonsByID } = usePerson();
   const [empQueryParams, setEmpQueryParams] = useState<QEmployeeQueryParams>({
     skip: 0,
     limit: 100,
@@ -88,7 +99,106 @@ export const useEmployeeActions = () => {
       );
     }
   };
-
+  const updateEmp = useCallback(
+    async (emp: Partial<IEmployee>, options?: { notify: INotify }) => {
+      try {
+        if (!employee) {
+          options?.notify?.("error", {
+            key: "nil-emp-error",
+            message: "Error",
+            description: "Nil Employee",
+          });
+        }
+        const { data } = await updateEmployee({
+          variables: {
+            _id: employee?._id as string,
+            employee: emp,
+          },
+        });
+        const newEmp = data?.employee;
+        setEmployee(newEmp);
+        options?.notify?.("success", {
+          key: "update-emp-success",
+          message: "Success",
+          description: "Employee status updated",
+        });
+      } catch (e) {
+        options?.notify?.("error", {
+          key: "update-emp-error",
+          message: "Error",
+          description: (e as Error).message,
+        });
+      }
+    },
+    [!!updateEmployee, JSON.stringify(employee)]
+  );
+  const deleteEmpDept = useCallback(
+    async (deptId: string, options?: { notify: INotify }) => {
+      try {
+        if (!employee) {
+          options?.notify?.("error", {
+            key: "nil-emp-error",
+            message: "Error",
+            description: "Nil Employee",
+          });
+        }
+        const { data } = await deleteEmpDepartment({
+          variables: {
+            _id: employee?._id as string,
+            department_id: deptId,
+          },
+        });
+        const newEmp = data?.employee;
+        setEmployee(newEmp);
+        options?.notify?.("success", {
+          key: "delete-emp-dept-success",
+          message: "Success",
+          description: "Employee status updated",
+        });
+      } catch (e) {
+        options?.notify?.("error", {
+          key: "delete-emp-dept-error",
+          message: "Error",
+          description: (e as Error).message,
+        });
+      }
+    },
+    [!!updateEmployee, JSON.stringify(employee)]
+  );
+  const addEmpDept = useCallback(
+    async (deptId: string, login?: ILogin, options?: { notify: INotify }) => {
+      try {
+        if (!employee) {
+          options?.notify?.("error", {
+            key: "nil-emp-error",
+            message: "Error",
+            description: "Nil Employee",
+          });
+        }
+        const { data } = await addEmpDepartment({
+          variables: {
+            _id: employee?._id as string,
+            department_id: deptId,
+            login,
+          },
+        });
+        const newEmp = data?.employee;
+        setEmployee(newEmp);
+        options?.notify?.("success", {
+          key: "update-emp-success",
+          message: "Success",
+          description: "Employee status updated",
+        });
+      } catch (e) {
+        options?.notify?.("error", {
+          key: "update-emp-error",
+          message: "Error",
+          description: (e as Error).message,
+        });
+      }
+    },
+    [!!updateEmployee, JSON.stringify(employee)]
+  );
   const updateProfile = useCallback(
     async (
       formEmployee: Partial<IFormEmployee>,
@@ -280,6 +390,9 @@ export const useEmployeeActions = () => {
     family,
     existingPerson,
     newEmpFormData,
+    updateEmployee: updateEmp,
+    deleteEmpDepartment: deleteEmpDept,
+    addEmpDepartment: addEmpDept,
     setEmployee: setEmployeeAndGetFamily,
     updateProfile,
     createEmployee: createEmp,

@@ -1,7 +1,4 @@
-import {
-  useLazyQuery,
-  useMutation,
-} from "@apollo/client";
+import { useLazyQuery, useMutation } from "@apollo/client";
 import {
   graphCreateEmployee,
   graphCreateEmpWithPerson,
@@ -9,8 +6,11 @@ import {
   graphCreateEmpWithMeta,
   graphGetEmployees,
   graphUpdateEmployee,
+  graphDeleteEmpDepartment,
+  graphAddEmpDepartment,
 } from "app/graph.queries/employees";
 import {
+  IEmployeeQueryReturnData,
   QEmployeeQueryParams,
   QTransferEmployee,
   QTransferEmpWithMeta,
@@ -19,17 +19,16 @@ import {
   QUpdateEmpProfileTransfer,
 } from "app/graph.queries/employees/types";
 import React from "react";
-import { IEmployee } from "ui";
-import { IAddress, INextOfKin, IPerson, IProfile } from "ui/components/Person";
-interface IReturnedData {
-  employee: (keyof IEmployee)[];
-  person: (keyof IPerson)[];
-  profile: (keyof IProfile)[];
-  addresses: (keyof IAddress)[];
-  next_of_kins: (keyof INextOfKin)[];
-}
-const graphReturnedData: IReturnedData = {
-  employee: ["_id", "employee_id", "person"],
+import { IEmployee, ILogin } from "ui";
+const graphReturnedData: IEmployeeQueryReturnData = {
+  employee: [
+    "_id",
+    "employee_id",
+    "person",
+    "department_ids",
+    "status",
+    "logins",
+  ],
   person: ["_id", "person_id", "profile", "next_of_kins"],
   profile: [
     "last_name",
@@ -45,15 +44,44 @@ const graphReturnedData: IReturnedData = {
   ],
   addresses: ["_id", "street", "nstate", "town", "lga", "country"],
   next_of_kins: ["person_id", "relationship"],
+  logins: ["department_id", "password", "username"],
 };
 
 export function useEmployee() {
-  const [createEmployee] = useMutation<{ employee: IEmployee }, QTransferEmployee>(
+  const [addEmpDepartment] = useMutation<
+    { employee: IEmployee },
+    { _id: string; department_id: string; login?: ILogin }
+  >(
+    graphAddEmpDepartment(graphReturnedData.employee, {
+      person: graphReturnedData.person,
+      profile: graphReturnedData.profile,
+      next_of_kins: graphReturnedData.next_of_kins,
+      addresses: graphReturnedData.addresses,
+      logins: graphReturnedData.logins,
+    })
+  );
+  const [deleteEmpDepartment] = useMutation<
+    { employee: IEmployee },
+    { _id: string; department_id: string }
+  >(
+    graphDeleteEmpDepartment(graphReturnedData.employee, {
+      person: graphReturnedData.person,
+      profile: graphReturnedData.profile,
+      next_of_kins: graphReturnedData.next_of_kins,
+      addresses: graphReturnedData.addresses,
+      logins: graphReturnedData.logins,
+    })
+  );
+  const [createEmployee] = useMutation<
+    { employee: IEmployee },
+    QTransferEmployee
+  >(
     graphCreateEmployee(graphReturnedData.employee, {
       person: graphReturnedData.person,
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
       addresses: graphReturnedData.addresses,
+      logins: graphReturnedData.logins,
     })
   );
   const [createEmpWithPerson] = useMutation<
@@ -65,6 +93,7 @@ export function useEmployee() {
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
       addresses: graphReturnedData.addresses,
+      logins: graphReturnedData.logins,
     })
   );
   const [createEmployeeWithNok] = useMutation<
@@ -76,6 +105,7 @@ export function useEmployee() {
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
       addresses: graphReturnedData.addresses,
+      logins: graphReturnedData.logins,
     })
   );
   const [createEmployeeWithMeta] = useMutation<
@@ -87,6 +117,7 @@ export function useEmployee() {
       profile: graphReturnedData.profile,
       next_of_kins: graphReturnedData.next_of_kins,
       addresses: graphReturnedData.addresses,
+      logins: graphReturnedData.logins,
     })
   );
   const [getEmployees] = useLazyQuery<
@@ -98,6 +129,7 @@ export function useEmployee() {
       profile: graphReturnedData.profile,
       addresses: graphReturnedData.addresses,
       next_of_kins: graphReturnedData.next_of_kins,
+      logins: graphReturnedData.logins,
     }),
     {
       fetchPolicy: "network-only",
@@ -106,9 +138,19 @@ export function useEmployee() {
   const [updateEmployee] = useMutation<
     { employee: IEmployee },
     QUpdateEmpProfileTransfer
-  >(graphUpdateEmployee(["_id"]));
+  >(
+    graphUpdateEmployee(graphReturnedData.employee, {
+      person: graphReturnedData.person,
+      profile: graphReturnedData.profile,
+      addresses: graphReturnedData.addresses,
+      next_of_kins: graphReturnedData.next_of_kins,
+      logins: graphReturnedData.logins,
+    })
+  );
 
   return {
+    addEmpDepartment,
+    deleteEmpDepartment,
     createEmployee,
     createEmpWithPerson,
     createEmployeeWithNok,
