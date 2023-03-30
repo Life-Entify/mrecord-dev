@@ -1,16 +1,27 @@
 import { FormInstance } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES, IFormItems } from "ui/common";
+import { IBank } from "../types";
 
 const Root = styled.div``;
 
-export interface INewBankProps {
-  onCreateItem?: React.MouseEventHandler<HTMLDivElement>;
+export interface INewBankProps<IBankType extends IBank> {
+  onCreateItem?: (bank: IBankType) => void;
   inputFields: IFormItems[];
+  isEdit?: boolean;
+  onUpdateBank?: (bank: IBankType) => void;
+  bank?: IBankType;
 }
 
-export function NewBank({ onCreateItem, inputFields }: INewBankProps) {
+export function NewBank<IBankType extends IBank>({
+  onCreateItem,
+  inputFields,
+  isEdit,
+  onUpdateBank,
+  bank,
+}: INewBankProps<IBankType>) {
+  const [bankChanges, setChanges] = useState<IBankType>();
   const formRef = React.useRef<FormInstance>(null);
   return (
     <Root>
@@ -22,7 +33,15 @@ export function NewBank({ onCreateItem, inputFields }: INewBankProps) {
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
-          onFinish: onCreateItem
+          initialValues: bank,
+          onValuesChange(changedValues) {
+            setChanges((state) => ({ ...state, ...changedValues }));
+          },
+          onFinish(values) {
+            isEdit
+              ? onUpdateBank?.(bankChanges as IBankType)
+              : onCreateItem?.({ ...values, active: true });
+          },
         }}
         items={[
           ...inputFields,
@@ -37,7 +56,7 @@ export function NewBank({ onCreateItem, inputFields }: INewBankProps) {
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Bank",
+                  children: `${isEdit ? "Update " : "Create "} Bank`,
                 },
               },
             ],

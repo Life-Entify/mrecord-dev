@@ -19,6 +19,7 @@ import { IAppointment } from "ui/components/Appointments/types";
 import { IPatient } from "ui/components/Patients/types";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
+import { BOOLEAN_STRING } from "ui/components/types";
 const sampleBank: IBank = {
   _id: "1",
   name: "St. Mary",
@@ -26,6 +27,8 @@ const sampleBank: IBank = {
   description: "Our main bank",
   number: 8989900000,
   branch: "Owerri",
+  is_admin: BOOLEAN_STRING.yes,
+  active: BOOLEAN_STRING.yes,
 };
 const category: IPaymentCategory[] = [
   {

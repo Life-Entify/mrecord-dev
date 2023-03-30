@@ -9,7 +9,7 @@ import {
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common";
-import { bankInputForm, INewBankProps, NewBank } from "../../Accounts";
+import { bankInputForm, IBank, INewBankProps, NewBank } from "../../Accounts";
 import {
   ExistingPersonDisplay,
   IExistingPersonDisplayProps,
@@ -41,7 +41,7 @@ export interface IEmployeeProps {
     onBack?: React.MouseEventHandler;
   };
   staffViewProps?: IEmpViewProps;
-  newBankProps?: Omit<INewBankProps, "inputFields"> & {
+  newBankProps?: Omit<INewBankProps<IBank>, "inputFields"> & {
     onBack?: React.MouseEventHandler;
   };
 }

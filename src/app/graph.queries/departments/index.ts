@@ -14,7 +14,7 @@ export const graphUpdateDepartment = (department?: (keyof IDepartment)[]) => {
   const query = department ? department.join(" ") : "_id";
   return gql`
     mutation updateDepartment($_id: String, $department: DepartmentInputType) {
-        Department : updateDepartment(_id: $_id, department: $department) {
+        department : updateDepartment(_id: $_id, department: $department) {
             ${query}
         }
     }`;

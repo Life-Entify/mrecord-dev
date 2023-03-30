@@ -9,6 +9,7 @@ import {
   IToolbarProps,
   Toolbar,
 } from "ui/common";
+import { BOOLEAN_STRING } from "ui/components/types";
 import { BankTxType, IOrgBank, IBankTx } from "../types";
 import { bankLabelMap, getBankTxTableColumns } from "./data";
 
@@ -34,7 +35,9 @@ export function BankView({
   toolbarProps,
   tableProps,
 }: IBankViewProps) {
-  const [state, _setState] = useState<Partial<IBankViewState>>({});
+  const [state, _setState] = useState<Partial<IBankViewState>>({
+    showDetail: true,
+  });
   const setState = (_state: Partial<IBankViewState>) =>
     _setState((state) => ({ ...state, ..._state }));
   const { onNewTransaction, ...deepToolbarProps } = toolbarProps || {};
@@ -51,7 +54,9 @@ export function BankView({
         <>
           <InfoBoard<keyof IOrgBank>
             {...infoBoardProps}
-            title={bank?.bank}
+            title={`${bank?.bank} ${
+              bank?.active === BOOLEAN_STRING.no ? "(Deactivated)" : ""
+            }`}
             data={bank}
             dataMap={bankLabelMap}
             skipMap={["_id"]}

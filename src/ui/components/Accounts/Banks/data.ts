@@ -36,6 +36,14 @@ export const bankInputForm: IFormItems[] = [
   {
     fieldType: FORM_FIELD_TYPES.TEXT,
     itemProps: {
+      name: "bank",
+      label: "Bank Name",
+      rules: [{ required: true }],
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.TEXT,
+    itemProps: {
       name: "name",
       label: "Account Name",
       rules: [{ required: true }],
@@ -155,11 +163,23 @@ export const getBankTableColumns = (
   ) => React.ReactNode | RenderedCell<IOrgBank>
 ): TableColumnType<IOrgBank>[] => [
   {
+    key: "_id",
+    dataIndex: "_id",
+    fixed: "left",
+    title(props) {
+      return "ID";
+    },
+    render(value, record, index) {
+      value = String(value).substring(value.length - 4);
+      return render?.("_id")(value, record, index) || value;
+    },
+  },
+  {
     key: "bank",
     dataIndex: "bank",
     fixed: "left",
     title(props) {
-      return "Bank Name";
+      return "Bank";
     },
     render: render?.("bank"),
   },
@@ -168,14 +188,14 @@ export const getBankTableColumns = (
     dataIndex: "name",
     fixed: "left",
     title(_) {
-      return "Account Name";
+      return "Name";
     },
     render: render?.("name"),
   },
   {
     key: "number",
     dataIndex: "number",
-    title: "Account Number",
+    title: "Number",
     render: render?.("number"),
   },
   {
@@ -187,7 +207,7 @@ export const getBankTableColumns = (
   {
     key: "balance",
     dataIndex: "balance",
-    title: "Account Balance",
+    title: "Balance",
     render: render?.("balance"),
   },
   {
@@ -206,6 +226,8 @@ export const bankLabelMap: Record<keyof IOrgBank, string> = {
   branch: "Bank Branch",
   bank: "Bank Name",
   _id: "ID",
+  is_admin: "Admin Bank",
+  active: "Status",
 };
 export const getBankTxTableColumns = (
   render?: (

@@ -1,6 +1,7 @@
 import React from "react";
 import { IPerson } from "../Person";
 import { IEmployee } from "../Employees/Employee";
+import { BOOLEAN_STRING } from "../types";
 
 export interface IPaymentCategory {
   _id: string;
@@ -23,6 +24,8 @@ export interface IBank {
   number: number;
   branch: string;
   description: string;
+  is_admin: BOOLEAN_STRING;
+  active: BOOLEAN_STRING;
 }
 
 export enum TxType {
