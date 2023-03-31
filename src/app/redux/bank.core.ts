@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IBank } from "ui";
+import { IOrgBank } from "ui";
 import { RootState } from "./store";
 
-const initialState: IBank[] = [];
+const initialState: IOrgBank[] = [];
 
 const userSlice = createSlice({
   name: "banks",
   initialState,
   reducers: {
-    setBanks: (state, action: PayloadAction<IBank[]>) => {
+    setBanks: (state, action: PayloadAction<IOrgBank[]>) => {
       state = action.payload;
       return state;
     },

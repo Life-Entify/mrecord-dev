@@ -25,6 +25,8 @@ export interface IBankViewProps {
     onNewTransaction?: (key: BankTxType) => void;
   };
   tableProps?: Omit<TableProps<IBankTx>, "columns">;
+  onDeleteBankTx?: (bankTx: IBankTx) => void;
+  onEditBankTx?: (bankTx: IBankTx) => void;
 }
 interface IBankViewState {
   showDetail: boolean;
@@ -34,6 +36,8 @@ export function BankView({
   infoBoardProps,
   toolbarProps,
   tableProps,
+  onDeleteBankTx,
+  onEditBankTx,
 }: IBankViewProps) {
   const [state, _setState] = useState<Partial<IBankViewState>>({
     showDetail: true,
@@ -91,6 +95,8 @@ export function BankView({
       <Table
         {...tableProps}
         columns={getBankTxTableColumns((dataIndex) => (value, record) => {
+          //@ts-ignore
+          delete record.__typename;
           if (dataIndex === "action") {
             return (
               <Space>
@@ -98,19 +104,13 @@ export function BankView({
                   <EditOutlined
                     style={{ marginRight: 10 }}
                     size={12}
-                    onClick={
-                      () => {}
-                      // onFundEdit?.(record, BANK_EDIT_ACTIONS.ADD)
-                    }
+                    onClick={() => onEditBankTx?.(record)}
                   />
                 </Tooltip>
                 <Tooltip title="Delete transaction">
                   <DeleteOutlined
                     size={12}
-                    onClick={
-                      () => {}
-                      // onFundEdit?.(record, BANK_EDIT_ACTIONS.DEDUCT)
-                    }
+                    onClick={() => onDeleteBankTx?.(record)}
                   />
                 </Tooltip>
               </Space>

@@ -97,16 +97,14 @@ export enum BankTxType {
 }
 export interface IBankTx {
   _id: string;
-  tx_type: string; // BankTxType;
+  tx_type: BankTxType; // BankTxType;
   employee_id: string;
-  staff?: Partial<IEmployee>;
+  employee?: Partial<IEmployee>;
   bank_id: string;
   bank?: Partial<IOrgBank>;
   amount: number;
   description: string;
-  ref_id: string;
-  payment_id: string;
-  payment?: Partial<IPayment>;
+  payment_type: keyof typeof PaymentType;
   created_at: string;
 }
 export interface ICashBundle {

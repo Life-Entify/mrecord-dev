@@ -1,25 +1,40 @@
 import { FormInstance } from "antd";
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IPaymentCategory } from "../../types";
-import { bankTxInputForm } from "../data";
+import { bankTxInputForm } from "./data";
+import { IBankTx, IOrgBank } from "../types";
+import { Moment } from "moment";
 
 const Root = styled.div``;
 const FormTitle = styled.h3``;
 
+export interface IBankTxMoment extends Omit<IBankTx, "created_at"> {
+  created_at?: Moment;
+}
 export interface INewBankDepositTxProps {
   title?: React.ReactNode;
-  category?: IPaymentCategory[];
-  onCreateItem?: React.MouseEventHandler
+  banks?: IOrgBank[];
+  bankTx?: IBankTxMoment;
+  onCreateItem?: (
+    bankTx: IBankTx,
+    formRef: React.RefObject<FormInstance<IBankTxMoment>>
+  ) => void;
 }
 
-export function NewBankDepositTx({
+export function NewBankTx({
   title,
-  category = [],
-  onCreateItem
+  banks = [],
+  bankTx,
+  onCreateItem,
 }: INewBankDepositTxProps) {
-  const formRef = React.useRef<FormInstance>(null);
+  const formRef =
+    React.useRef<
+      FormInstance<Omit<IBankTx, "created_at"> & { created_at: Moment }>
+    >(null);
+  useEffect(() => {
+    if (bankTx) formRef.current?.setFieldsValue(bankTx);
+  }, [JSON.stringify(bankTx)]);
   return (
     <Root>
       <FormTitle>{title}</FormTitle>
@@ -31,24 +46,13 @@ export function NewBankDepositTx({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
-          onFinish: onCreateItem
+          initialValues: bankTx,
+          onFinish(values) {
+            onCreateItem?.(values, formRef);
+          },
         }}
         items={[
-          ...bankTxInputForm,
-          {
-            fieldType: FORM_FIELD_TYPES.SELECT,
-            itemProps: {
-              label: "Category",
-              name: "category_id",
-              rules: [{ required: true }],
-            },
-            fieldProps: {
-              options: category.map((cat) => ({
-                value: cat._id,
-                label: cat.title as string,
-              })),
-            },
-          },
+          ...bankTxInputForm(banks),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {
@@ -60,7 +64,7 @@ export function NewBankDepositTx({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Transaction"
+                  children: "Create Transaction",
                 },
               },
             ],

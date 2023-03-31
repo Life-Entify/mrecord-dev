@@ -87,7 +87,21 @@ export const orgBankInputForm: IFormItems[] = [
     },
   },
 ];
-export const bankTxInputForm: IFormItems[] = [
+export const bankTxInputForm = (banks?: IOrgBank[]): IFormItems[] => [
+  {
+    fieldType: FORM_FIELD_TYPES.SELECT,
+    itemProps: {
+      name: "bank_id",
+      label: "Bank",
+      rules: [{ required: true }],
+    },
+    fieldProps: {
+      options: banks?.map((bank) => ({
+        value: bank._id,
+        label: bank.bank as string,
+      })),
+    },
+  },
   {
     fieldType: FORM_FIELD_TYPES.SELECT,
     itemProps: {
@@ -121,14 +135,6 @@ export const bankTxInputForm: IFormItems[] = [
     },
     fieldProps: {
       type: "number",
-    },
-  },
-  {
-    fieldType: FORM_FIELD_TYPES.TEXT,
-    itemProps: {
-      name: "ref_id",
-      label: "Ref ID",
-      rules: [{ required: true }],
     },
   },
   {
@@ -266,10 +272,10 @@ export const getBankTxTableColumns = (
     render: render?.("employee_id"),
   },
   {
-    key: "ref_id",
-    dataIndex: "ref_id",
-    title: "Tx Ref",
-    render: render?.("ref_id"),
+    key: "description",
+    dataIndex: "description",
+    title: "Description",
+    render: render?.("description"),
   },
   {
     key: "amount",
@@ -286,15 +292,13 @@ export const getBankTxTableColumns = (
 ];
 export const bankTxLabelMap: Record<keyof IBankTx, React.ReactNode> = {
   _id: "Tx ID",
-  ref_id: "Tx Ref",
   description: "Account Description",
   bank_id: "Bank ID",
   employee_id: "Staff ID",
   tx_type: "Tx Type",
   amount: "Amount",
   created_at: "Date",
-  payment_id: "Payment ID",
-  bank: "",
-  staff: "",
-  payment: "",
+  payment_type: "",
+  bank: "Bank",
+  employee: "Employee",
 };

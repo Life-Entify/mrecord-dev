@@ -14,6 +14,7 @@ import {
   IDepartment,
   APPLICATIONS,
   ILogin,
+  BankTxType,
 } from "ui";
 import { IAppointment } from "ui/components/Appointments/types";
 import { IPatient } from "ui/components/Patients/types";
@@ -151,14 +152,13 @@ const staff: IEmployee = {
 };
 const bankTx: IBankTx = {
   _id: "129484",
-  ref_id: "ref from bank",
   employee_id: "3455sd",
   bank_id: "dfsfds",
   amount: 30000,
   description: "staff salary",
   created_at: "2023-02-25",
-  tx_type: "expenditure",
-  payment_id: "",
+  tx_type: BankTxType.DEPOSIT,
+  payment_type: "cash"
 };
 
 const orgBank: IOrgBank = {

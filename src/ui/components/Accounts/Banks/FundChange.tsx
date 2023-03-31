@@ -2,33 +2,34 @@ import { Divider, FormInstance } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
-import { BankTxType, IOrgBank } from "../types";
+import { BankTxType, IBankTx, IOrgBank } from "../types";
 import { bankLabelMap } from "./data";
-import { INewBankDepositTxProps, NewBankDepositTx } from "./NewBankTx";
-import {
-  INewBankWithdrawalTxProps,
-  NewBankWithdrawalTx,
-} from "./NewBankTx/Withdrawal";
+import { IBankTxMoment, NewBankTx } from "./NewBankTx";
 
 const Root = styled.div``;
 
 export interface IBankFundChangeProps {
+  banks?: IOrgBank[];
   bank?: IOrgBank;
-  bankAction?: BankTxType;
+  bankTx?: IBankTxMoment;
+  bankTxType?: BankTxType;
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
   >;
-  newDepositTxProps?: INewBankDepositTxProps;
-  newWithdrawalTxProps?: INewBankWithdrawalTxProps;
+  onCreateBankTx?: (
+    bankTx: IBankTx,
+    formRef: React.RefObject<FormInstance<IBankTxMoment>>
+  ) => void;
 }
 
 export function BankFundChange({
+  banks,
   bank,
-  bankAction,
+  bankTx,
+  bankTxType,
   infoBoardProps,
-  newDepositTxProps,
-  newWithdrawalTxProps,
+  onCreateBankTx,
 }: IBankFundChangeProps) {
   return (
     <Root>
@@ -40,12 +41,12 @@ export function BankFundChange({
         skipMap={["_id"]}
       />
       <Divider style={{ marginTop: 50 }} />
-
-      {bankAction === BankTxType.DEPOSIT ? (
-        <NewBankDepositTx {...newDepositTxProps} />
-      ) : (
-        <NewBankWithdrawalTx {...newWithdrawalTxProps} />
-      )}
+      <NewBankTx
+        banks={banks}
+        bankTx={bankTx}
+        title={bankTxType === BankTxType.DEPOSIT ? "Deposit" : "Withdrawal"}
+        onCreateItem={onCreateBankTx}
+      />
     </Root>
   );
 }

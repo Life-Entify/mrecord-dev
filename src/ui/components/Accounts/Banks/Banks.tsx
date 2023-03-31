@@ -16,11 +16,6 @@ import { INewBankProps, NewBank } from "./NewBank";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { BankFundChange, IBankFundChangeProps } from "./FundChange";
 import { BankView, IBankViewProps } from "./BankView";
-import { INewBankDepositTxProps, NewBankDepositTx } from "./NewBankTx";
-import {
-  INewBankWithdrawalTxProps,
-  NewBankWithdrawalTx,
-} from "./NewBankTx/Withdrawal";
 import { BOOLEAN_STRING } from "ui/components/types";
 
 const TableContainer = styled.div`
@@ -51,10 +46,6 @@ export interface IBanksProps {
     onDisplayEdit?: () => void;
     onChangeBankStatus?: (active: BOOLEAN_STRING) => void;
   };
-  newBankTxProps?: {
-    depositProps?: INewBankDepositTxProps;
-    withdrawalProps?: INewBankWithdrawalTxProps;
-  };
 }
 
 export function Banks({
@@ -64,7 +55,6 @@ export function Banks({
   tableProps,
   fundChangeProps,
   bankViewProps,
-  newBankTxProps,
   banks,
 }: IBanksProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
@@ -167,12 +157,6 @@ export function Banks({
               },
             }}
           />
-        )}
-        {drawerType === BANK_DIALOG_TYPE.NEW_BANK_TX_DEPOSIT && (
-          <NewBankDepositTx {...newBankTxProps?.depositProps} />
-        )}
-        {drawerType === BANK_DIALOG_TYPE.NEW_BANK_TX_WITHDRAWAL && (
-          <NewBankWithdrawalTx {...newBankTxProps?.withdrawalProps} />
         )}
       </Drawer>
     </div>

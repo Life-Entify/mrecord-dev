@@ -1,7 +1,4 @@
 import {
-  FetchResult,
-  LazyQueryExecFunction,
-  MutationFunctionOptions,
   useLazyQuery,
   useMutation,
 } from "@apollo/client";

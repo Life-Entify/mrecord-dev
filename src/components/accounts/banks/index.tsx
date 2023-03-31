@@ -1,3 +1,4 @@
+import moment from "moment";
 import React, { useState } from "react";
 import {
   Banks,
@@ -9,8 +10,7 @@ import {
   notification,
 } from "ui";
 import { BOOLEAN_STRING } from "ui/components/types";
-import { dummy } from "../../dummy";
-import { useBankAction } from "./actions";
+import { useBankAction, useBankTxAction } from "./actions";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -22,6 +22,8 @@ interface IBankState {
 }
 export default function PaymentComponent() {
   const { banks, bank, setBank, createBank, updateBank } = useBankAction();
+  const { bankTxs, getBankTxs, createBankTx, setBankTx, bankTx } =
+    useBankTxAction();
   const [api, contextHolder] = notification.useNotification();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
@@ -29,9 +31,7 @@ export default function PaymentComponent() {
   const setState = (state: Partial<IPaymentState>) =>
     _setState((_state) => ({ ..._state, ...state }));
 
-  const [bankState, _setBankState] = useState<Partial<IBankState>>({});
-  const setBankState = (state: Partial<IBankState>) =>
-    _setBankState((_state) => ({ ..._state, ...state }));
+  const [bankTxType, setBankTxType] = useState<BankTxType>();
 
   const closeDialog = () =>
     setState({
@@ -76,6 +76,7 @@ export default function PaymentComponent() {
                 dialogType: BANK_DIALOG_TYPE.VIEW_BANK,
                 drawerTitle: "Bank Transactions",
               });
+              getBankTxs(record, { notify: openNotification });
               setBank(record);
             },
             selectedRowKeys: [],
@@ -91,22 +92,46 @@ export default function PaymentComponent() {
                   : "Withdraw funds from"
               } ${record.bank}`,
             });
-            setBankState({ bank: record, bankAction: action });
+            setBankTxType(action);
+            setBank(record);
+            setBankTx(undefined);
           },
         }}
         fundChangeProps={{
-          bank: bankState.bank,
-          bankAction: bankState.bankAction,
-          newDepositTxProps: {
-            category: dummy.category,
-            title: <center>Deposit</center>,
-          },
-          newWithdrawalTxProps: {
-            category: dummy.category,
-            title: <center>Withdrawal</center>,
+          bank,
+          banks,
+          bankTxType,
+          bankTx: bankTx
+            ? { ...bankTx, created_at: moment(new Date(bankTx?.created_at)) }
+            : undefined,
+          onCreateBankTx(bankTx, formRef) {
+            bankTx.tx_type = bankTxType as BankTxType;
+            if (bank) {
+              createBankTx(bank, bankTx, { notify: openNotification }).then(
+                () => {
+                  formRef.current?.resetFields();
+                  setState({
+                    dialogType: BANK_DIALOG_TYPE.VIEW_BANK,
+                    drawerTitle: "Bank Transactions",
+                  });
+                }
+              );
+            }
           },
         }}
         bankViewProps={{
+          onEditBankTx(bankTx) {
+            setState({
+              dialogType: BANK_DIALOG_TYPE.FUND_CHANGE,
+              drawerTitle: "Edit Bank Transaction",
+            });
+            setBankTxType(bankTx.tx_type);
+            setBankTx(bankTx);
+            setBank(bank);
+          },
+          onDeleteBankTx(bankTx) {
+            console.log(bankTx);
+          },
           onChangeBankStatus(active) {
             updateBank({ active }, { notify: openNotification });
           },
@@ -127,30 +152,22 @@ export default function PaymentComponent() {
             onNewTransaction(key) {
               const isDeposit = key === BankTxType.DEPOSIT;
               setState({
-                dialogType: isDeposit
-                  ? BANK_DIALOG_TYPE.NEW_BANK_TX_DEPOSIT
-                  : BANK_DIALOG_TYPE.NEW_BANK_TX_WITHDRAWAL,
-                drawerTitle: `${bankState.bank?.bank} ${
+                dialogType: BANK_DIALOG_TYPE.FUND_CHANGE,
+                drawerTitle: `${bank?.bank} ${
                   isDeposit ? "Deposit" : "Withdrawal"
                 }`,
               });
+              setBankTxType(key);
+              setBank(bank);
             },
             dateRangePickerProps: {},
           },
           tableProps: {
-            dataSource: dummy.bankTx,
-          },
-        }}
-        newBankTxProps={{
-          depositProps: {
-            category: dummy.category,
-          },
-          withdrawalProps: {
-            category: dummy.category,
+            dataSource: bankTxs,
           },
         }}
         newBankProps={{
-          bank: bank as IOrgBank,
+          bank: bank,
           onUpdateBank(bank) {
             updateBank(bank, { notify: openNotification });
             closeDialog();
