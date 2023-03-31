@@ -8,8 +8,10 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 import { Provider } from "ui";
+import { Provider as ReduxProvider } from "react-redux";
 import { AppInitAdapter } from "./app/init";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
+import store from "app/redux/store";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -23,16 +25,18 @@ const client = new ApolloClient({
 root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <AppInitAdapter>
-        <Provider
-          appTheme={{
-            // colorPrimary: "red",
-            infoBoardBg: "#f6f6f6",
-          }}
-        >
-          <App />
-        </Provider>
-      </AppInitAdapter>
+      <ReduxProvider store={store}>
+        <AppInitAdapter>
+          <Provider
+            appTheme={{
+              // colorPrimary: "red",
+              infoBoardBg: "#f6f6f6",
+            }}
+          >
+            <App />
+          </Provider>
+        </AppInitAdapter>
+      </ReduxProvider>
     </ApolloProvider>
   </React.StrictMode>
 );

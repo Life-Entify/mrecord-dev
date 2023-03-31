@@ -3,12 +3,13 @@ import React from "react";
 import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
 import {
+  IAddress,
   IFamilyMemberDetails,
   INextOfKinDetails,
   IPerson,
   IProfile,
 } from "ui/components/Person";
-import { spreadPersonData } from "ui/components/Person/common";
+import { fullAddress, spreadPersonData } from "ui/components/Person/common";
 import { personDataMapping } from "ui/components/Person/data";
 
 const Root = styled.div`
@@ -48,6 +49,12 @@ export function PatientFamily({
                   <InfoBoard
                     data={spreadPersonData(person)}
                     {...infoBoardProps}
+                    replaceMap={(value, key, data) => {
+                      if (key === "addresses") {
+                        return fullAddress((value as IAddress[])?.[0]);
+                      }
+                      return value;
+                    }}
                     dataMap={personDataMapping}
                     skipMap={[
                       "addresses",

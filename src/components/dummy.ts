@@ -4,7 +4,7 @@ import {
   ICashBundle,
   IOrgBank,
   IPayment,
-  IStaff,
+  IEmployee,
   ITx,
   IPaymentCategory,
   IPaymentReceiver,
@@ -14,11 +14,13 @@ import {
   IDepartment,
   APPLICATIONS,
   ILogin,
+  BankTxType,
 } from "ui";
 import { IAppointment } from "ui/components/Appointments/types";
 import { IPatient } from "ui/components/Patients/types";
 import { IPerson } from "ui/components/Person";
 import { IOrganization, ISetting } from "ui/components/Settings";
+import { BOOLEAN_STRING } from "ui/components/types";
 const sampleBank: IBank = {
   _id: "1",
   name: "St. Mary",
@@ -26,6 +28,8 @@ const sampleBank: IBank = {
   description: "Our main bank",
   number: 8989900000,
   branch: "Owerri",
+  is_admin: BOOLEAN_STRING.yes,
+  active: BOOLEAN_STRING.yes,
 };
 const category: IPaymentCategory[] = [
   {
@@ -58,7 +62,7 @@ const payments: IPayment[] = [
     _id: "23",
     pay_type: "cash",
     person_id: "1",
-    staff_id: "2",
+    employee_id: "2",
     txIds: ["2"],
     tx_type: "expenditure",
     total_amount: 29000,
@@ -95,8 +99,13 @@ const cashBundles: ICashBundle[] = [
 ];
 const person: IPerson = {
   _id: "1",
-  person_id: "1",
-  next_of_kins: [],
+  person_id: 1,
+  next_of_kins: [
+    {
+      relationship: "father",
+      person_id: 1,
+    },
+  ],
   profile: {
     last_name: "Agu",
     first_name: "chijioke",
@@ -104,9 +113,9 @@ const person: IPerson = {
     dob: "1988/08/11",
     occupation: "physiotherapist",
     national_identity: "234",
-    phone_number: "08064757757",
+    phone_number: "+2348064668635",
     gender: "m",
-    email: "chokey2nv@yahoo.com",
+    email: "chokey2nv@gmail.com",
     addresses: [
       {
         _id: "address1",
@@ -128,13 +137,12 @@ const patient: IPatient = {
   person: person,
 };
 const login: ILogin = {
-  _id: "1",
   username: "chokey2nv",
   password: "1234",
   department_id: "1",
 };
-const staff: IStaff = {
-  staff_id: "1",
+const staff: IEmployee = {
+  employee_id: "1",
   person: structuredClone(person) as IPerson,
   _id: "1",
   person_id: "1",
@@ -144,14 +152,13 @@ const staff: IStaff = {
 };
 const bankTx: IBankTx = {
   _id: "129484",
-  ref_id: "ref from bank",
-  staff_id: "3455sd",
+  employee_id: "3455sd",
   bank_id: "dfsfds",
   amount: 30000,
   description: "staff salary",
   created_at: "2023-02-25",
-  tx_type: "expenditure",
-  payment_id: "",
+  tx_type: BankTxType.DEPOSIT,
+  payment_type: "cash"
 };
 
 const orgBank: IOrgBank = {
@@ -210,7 +217,7 @@ const paySlip: IPaySlip = {
   _id: "1",
   bonus_amount: 100000,
   deducted_amount: 20000,
-  staff_id: "1",
+  employee_id: "1",
   bonuses: [bonus],
 };
 const payroll: IPayroll = {

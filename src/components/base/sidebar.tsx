@@ -1,11 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Sidebar,
-  getSidebarItem as getItem,
-  MoneyCollectOutlined,
-  GroupOutlined,
-} from "ui";
+import { Sidebar, getSidebarItem as getItem, MoneyCollectOutlined } from "ui";
 import {
   HomeOutlined,
   UserOutlined,

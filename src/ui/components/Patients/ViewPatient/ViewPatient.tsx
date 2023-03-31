@@ -40,6 +40,7 @@ export function ViewPatient({
         {...{
           ...infoBoardProps,
           descriptionProps: {
+            title: "Bio Information",
             extra: (
               <Space>
                 <Button onClick={() => onShowEditPage?.(patient)}>Edit</Button>

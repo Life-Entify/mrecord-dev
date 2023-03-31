@@ -5,22 +5,32 @@ import { QKeywordPerson } from "../persons/types";
 export interface QUpdatePtProfileTransfer {
   _id?: string;
   patient?: Partial<IPatient>;
-  person_id?: string;
+  person_xid?: string;
   profile?: Partial<IProfile>;
 }
-export interface QTransferPatientMD {
-  oldId?: string | null;
-  person_id: string;
+export interface QTransferPatient {
+  oldId?: string;
+  profile: Partial<IProfile>;
+  next_of_kins: QNextOfKins[];
+}
+export interface QTransferPtWithPerson {
+  old_id?: string;
+  person_id: number;
+  next_of_kins: QNextOfKins[];
+}
+export interface QTransferPtWithNok {
+  old_id?: string;
+  profile: Partial<IProfile>;
+  next_of_kins: INextOfKin[];
+}
+export interface QTransferPtWithMeta {
+  old_id?: string;
+  person_id: number;
   next_of_kins: INextOfKin[];
 }
 export interface QNextOfKins {
   relationship: string;
   next_of_kin: Partial<IProfile>;
-}
-export interface QTransferPatient {
-  oldId?: string | null;
-  profile: Partial<IProfile>;
-  next_of_kins: QNextOfKins[];
 }
 
 export type QKeywordPatient = {
@@ -35,11 +45,11 @@ export interface QPatientQueryParams {
   skip?: number;
 }
 
-export type IQueryArray =
-  | (keyof IAddress)[]
-  | (keyof IProfile)[]
-  | (keyof IPerson)[]
-  | (keyof INextOfKin)[];
+export type IQueryArray = (keyof (IAddress & IProfile & IPerson & INextOfKin))[]
+  // | (keyof IAddress)[]
+  // | (keyof IProfile)[]
+  // | (keyof IPerson)[]
+  // | (keyof INextOfKin)[];
 export interface NestedPatientObject {
   addresses?: (keyof IAddress)[];
   profile?: (keyof IProfile)[];

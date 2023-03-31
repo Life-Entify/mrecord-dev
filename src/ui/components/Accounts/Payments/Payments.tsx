@@ -36,7 +36,7 @@ export interface IPaymentsProps {
   drawerProps?: DrawerProps & { drawerType?: PAYMENT_DIALOG_TYPE };
   paymentCategoryProps?: IPaymentCategoryProps;
   newPaymentProps?: INewPaymentProps;
-  newPaymentCatProps?: INewPaymentCatProps;
+  addPaymentCatProps?: INewPaymentCatProps;
   paymentTableProps?: IPaymentTableProps;
   paymentTxsProps?: IPaymentTxProps;
   paymentReceiptProps?: IPaymentReceiptProps & {
@@ -53,7 +53,7 @@ export function Payments({
   toolbarProps,
   paymentCategoryProps,
   newPaymentProps,
-  newPaymentCatProps,
+  addPaymentCatProps,
   paymentTableProps,
   paymentTxsProps,
   paymentReceiptProps,
@@ -111,7 +111,7 @@ export function Payments({
             <NewPayment {...newPaymentProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT && (
-            <NewPaymentCat {...newPaymentCatProps} />
+            <NewPaymentCat {...addPaymentCatProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.PAYMENT_TXS && (
             <PaymentTxs {...paymentTxsProps} />

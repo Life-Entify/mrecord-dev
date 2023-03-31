@@ -2,17 +2,24 @@ import { FormInstance } from "antd";
 import React, { useCallback, useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES, IFormItems } from "ui/common/views";
-import { actionRemoveNoks, IFormNextOfKinData } from "./common";
+import { actionAddNoks, actionRemoveNoks } from "./common";
 import { nextOfKinForm } from "./data";
-import { IFormNextOfKin, IFormPerson } from "./types";
+import {
+  IFormNextOfKin,
+  IFormNextOfKinData,
+  IFormPerson,
+  INextOfKin,
+} from "./types";
 
 const Root = styled.div``;
 const FormTitle = styled.h3`
   text-align: center;
 `;
 export interface INewPersonData<T extends IFormPerson> {
-  profile: T;
-  next_of_kins: IFormNextOfKinData[];
+  profile?: T;
+  person_id?: number;
+  old_id?: string;
+  next_of_kins: IFormNextOfKinData[] | INextOfKin[];
 }
 export interface INewPersonProps<T extends IFormPerson> {
   createPerson?: (
@@ -48,7 +55,9 @@ export function NewPerson<T extends IFormPerson>({
         setPatient(values as T);
         setPage(PAGE.NEXT_OF_KIN);
       } else {
-        const nextOfKin: IFormNextOfKin[] = [values as IFormNextOfKin];
+        const nextOfKin: IFormPerson[] = [
+          actionRemoveNoks(values as IFormNextOfKin) as IFormPerson,
+        ];
         if (!person) {
           createPerson &&
             createPerson(
@@ -63,7 +72,7 @@ export function NewPerson<T extends IFormPerson>({
           createPerson(
             {
               profile: person,
-              next_of_kins: [actionRemoveNoks(structuredClone(nextOfKin))],
+              next_of_kins: nextOfKin,
             },
             undefined,
             { resetForm }
@@ -85,10 +94,10 @@ export function NewPerson<T extends IFormPerson>({
           wrapperCol: { span: 14 },
           layout: "horizontal",
           onFinish,
-          initialValues:
-            pageIndex === PAGE.PERSON
-              ? values?.profile
-              : values?.next_of_kins?.[0],
+          initialValues: {
+            ...values?.profile,
+            ...actionAddNoks(values?.next_of_kins?.[0] as IFormNextOfKinData),
+          },
         }}
         items={
           pageIndex === PAGE.PERSON

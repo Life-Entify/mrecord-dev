@@ -36,7 +36,7 @@ function ReceiverFn({ receivers }: IReceiverProps) {
           gutter: 6,
         }}
         header={
-          <List.Item>
+          <List.Item key="header-item">
             <div>
               <strong>Income:</strong> {Number(income).toLocaleString()}
             </div>
@@ -47,7 +47,7 @@ function ReceiverFn({ receivers }: IReceiverProps) {
           </List.Item>
         }
         dataSource={receivers}
-        renderItem={(staff) => {
+        renderItem={(staff, index) => {
           const { person, type_count } = staff || {};
           const { last_name, first_name } = person?.profile || {};
           type incomeAction = keyof typeof IIncomeActions;
@@ -77,7 +77,7 @@ function ReceiverFn({ receivers }: IReceiverProps) {
             (transfer?.expenditure || 0) +
             (cheque?.expenditure || 0);
           return (
-            <List.Item>
+            <List.Item key={index}>
               <Card
                 style={{ background: "#e4e4e4" }}
                 title={(last_name || "") + " " + (first_name || "")}

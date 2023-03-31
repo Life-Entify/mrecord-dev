@@ -1,6 +1,6 @@
-import { Layout, theme } from 'antd';
-import React from 'react';
-import styled from 'styled-components';
+import { Layout, theme } from "antd";
+import React from "react";
+import styled from "styled-components";
 
 const { Header: AntHeader } = Layout;
 
@@ -13,11 +13,11 @@ const StyledHeader = styled(AntHeader)`
 `;
 export interface IHeaderProps {
   title?: React.ReactNode;
-  RightComonent?: React.FC;
+  RightComponent?: React.FC;
 }
-export const Header: React.FC<IHeaderProps> = function({
+export const Header: React.FC<IHeaderProps> = function ({
   title,
-  RightComonent,
+  RightComponent,
 }) {
   const {
     token: { colorBgTextActive },
@@ -25,7 +25,7 @@ export const Header: React.FC<IHeaderProps> = function({
   return (
     <StyledHeader style={{ color: colorBgTextActive }}>
       <div>{title}</div>
-      {RightComonent && <RightComonent />}
+      {RightComponent && <RightComponent />}
     </StyledHeader>
   );
 };

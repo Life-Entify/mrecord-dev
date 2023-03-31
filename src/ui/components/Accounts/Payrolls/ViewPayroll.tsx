@@ -1,7 +1,7 @@
 import { Button, Table, TableProps } from "antd";
 import React, { useMemo } from "react";
 import styled from "styled-components";
-import { IStaff } from "ui/components/Staff";
+import { IEmployee } from "ui/components/Employees/Employee";
 import { IPayroll, IPaySlip } from "../types";
 import { getPaySlipTableColumns } from "./data";
 
@@ -14,7 +14,7 @@ const Container = styled.div`
 
 export interface IViewPayrollProps {
   payroll?: IPayroll;
-  staffs?: IStaff[];
+  staffs?: IEmployee[];
   paySlipTableProps?: Omit<TableProps<IPaySlip>, "columns" | "dataSource"> & {
     removeColumns?: (keyof IPaySlip)[];
   };
@@ -35,7 +35,7 @@ function ViewPayrollFunc({
         const slip = paySlips[i];
         if (staffs) {
           const staff = staffs.find(
-            (staff) => staff.staff_id === slip.staff_id
+            (staff) => staff.employee_id === slip.employee_id
           );
           paySlips[i].staff = staff;
         }

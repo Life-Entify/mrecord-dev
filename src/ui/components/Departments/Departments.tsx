@@ -27,7 +27,9 @@ export interface IDepartmentProps {
     drawerType?: DEPARTMENT_DRAWER_TYPES;
   };
   newDepartmentProps?: Omit<INewDepartmentProps, "isEdit">;
-  editDepartmentProps?: Omit<INewDepartmentProps, "isEdit">;
+  editDepartmentProps?: Omit<INewDepartmentProps, "isEdit" | "onCreateItem"> & {
+    onUpdateItem?: (values: Partial<IDepartment>) => void;
+  };
   tableProps?: Omit<TableProps<IDepartment>, "columns"> & {
     deleteItem?: (dept: IDepartment) => void;
     editItem?: (dept: IDepartment) => void;
@@ -43,6 +45,9 @@ function DepartmentFunc({
 }: IDepartmentProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { editItem, deleteItem, ...deepTableProps } = tableProps || {};
+  const { onUpdateItem, ...deepEditDepartmentProps } =
+    editDepartmentProps || {};
+  const appDeptKes = ["Records", "HR", "Accounts"];
   return (
     <Root>
       {toolbarProps && <Toolbar {...toolbarProps} />}
@@ -50,7 +55,7 @@ function DepartmentFunc({
         <Table
           {...deepTableProps}
           columns={getDepartmentTableColumns((keyIndex) => (value, record) => {
-            if (keyIndex === "action") {
+            if (keyIndex === "action" && !appDeptKes.includes(record.name)) {
               return (
                 <Space>
                   <Tooltip title="Edit">
@@ -71,7 +76,11 @@ function DepartmentFunc({
           <NewDepartment {...newDepartmentProps} />
         )}
         {drawerType === DEPARTMENT_DRAWER_TYPES.EDIT && (
-          <NewDepartment {...editDepartmentProps} isEdit />
+          <NewDepartment
+            {...deepEditDepartmentProps}
+            isEdit
+            onCreateItem={onUpdateItem}
+          />
         )}
       </AppDrawer>
     </Root>

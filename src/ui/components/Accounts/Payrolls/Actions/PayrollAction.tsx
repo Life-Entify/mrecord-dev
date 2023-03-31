@@ -1,13 +1,13 @@
 import { Button, List, Tag } from "antd";
 import React from "react";
 import styled from "styled-components";
-import { IStaff } from "ui/components/Staff";
+import { IEmployee } from "ui/components/Employees/Employee";
 import { IPayrollAction } from "../../types";
 
 const Root = styled.div``;
 
 export interface IPayrollDeductionProps {
-  staffs?: IStaff[]; // I want to use this to display the names of staff involved if it is not for all
+  staffs?: IEmployee[]; // I want to use this to display the names of staff involved if it is not for all
   actions?: IPayrollAction[];
 }
 

@@ -1,8 +1,9 @@
 import { FormInstance } from "antd";
+import moment from "moment";
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common/views";
-import { spreadPatientData } from "./common";
+import { patientToForm, spreadPatientData } from "./common";
 import { patientForm } from "./data";
 import { IFormPatient, IPatient } from "./types";
 
@@ -13,7 +14,7 @@ const FormTitle = styled.h3`
 
 export interface EditProfileFormProps {
   updateProfile?: (
-    info?: IFormPatient,
+    info?: Partial<IFormPatient>,
     error?: Error,
     options?: {
       resetForm: () => void;
@@ -31,9 +32,22 @@ export function EditProfileForm({
   };
   const onFinish = useCallback(
     (values: IFormPatient) => {
-      updateProfile && updateProfile(values, undefined, { resetForm });
+      const initState = patientToForm(patient as IPatient);
+      const changes: Partial<IFormPatient> = {};
+      for (const name in values) {
+        if (Object.prototype.hasOwnProperty.call(values, name)) {
+          const value = values[name as keyof IFormPatient];
+          if (initState[name as keyof IFormPatient] !== value) {
+            changes[name as keyof IFormPatient] = value;
+          }
+        }
+      }
+      if (changes?.dob) {
+        values.dob = moment(values.dob).format("DD/MM/YYYY");
+      }
+      updateProfile?.(changes, undefined, { resetForm });
     },
-    [!!updateProfile]
+    [!!updateProfile, JSON.stringify(patient)]
   );
   return (
     <Root>
@@ -46,7 +60,7 @@ export function EditProfileForm({
           layout: "horizontal",
           onFinish,
           //TODO:// spread date to single
-          initialValues: { ...spreadPatientData(patient), dob: "" },
+          initialValues: patient && { ...patientToForm(patient), dob: "" },
         }}
         items={[
           ...(patientForm ? patientForm : []),

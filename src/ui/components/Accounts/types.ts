@@ -1,6 +1,7 @@
 import React from "react";
 import { IPerson } from "../Person";
-import { IStaff } from "../Staff";
+import { IEmployee } from "../Employees/Employee";
+import { BOOLEAN_STRING } from "../types";
 
 export interface IPaymentCategory {
   _id: string;
@@ -23,6 +24,8 @@ export interface IBank {
   number: number;
   branch: string;
   description: string;
+  is_admin: BOOLEAN_STRING;
+  active: BOOLEAN_STRING;
 }
 
 export enum TxType {
@@ -76,7 +79,7 @@ export interface IPayment {
   person?: IPerson;
   description?: string;
   //staff in charge of the system
-  staff_id: string;
+  employee_id: string;
   //txs that show the categories in the payment
   txIds: string[];
   txs?: ITx[];
@@ -94,16 +97,14 @@ export enum BankTxType {
 }
 export interface IBankTx {
   _id: string;
-  tx_type: string; // BankTxType;
-  staff_id: string;
-  staff?: Partial<IStaff>;
+  tx_type: BankTxType; // BankTxType;
+  employee_id: string;
+  employee?: Partial<IEmployee>;
   bank_id: string;
   bank?: Partial<IOrgBank>;
   amount: number;
   description: string;
-  ref_id: string;
-  payment_id: string;
-  payment?: Partial<IPayment>;
+  payment_type: keyof typeof PaymentType;
   created_at: string;
 }
 export interface ICashBundle {
@@ -133,7 +134,7 @@ export type IPaymentTypeCount = Partial<
   Record<PaymentType, Partial<Record<keyof typeof TxType, number>>>
 >;
 export type IPaymentActionCount = Record<AccountAction, number>;
-export interface IPaymentReceiver extends IStaff {
+export interface IPaymentReceiver extends IEmployee {
   date: string;
   action_count?: IPaymentActionCount;
   type_count?: IPaymentTypeCount;
@@ -177,11 +178,11 @@ export interface IPayrollAction {
 }
 export interface IPaySlip {
   _id: string;
-  staff_id: string;
+  employee_id: string;
   bonus_amount: number;
   deducted_amount: number;
   //dynamics
-  staff?: IStaff;
+  staff?: IEmployee;
   bonus_ids?: string[];
   bonuses?: IPayrollAction[];
   deduction_ids?: string[];

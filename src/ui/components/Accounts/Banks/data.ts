@@ -36,6 +36,14 @@ export const bankInputForm: IFormItems[] = [
   {
     fieldType: FORM_FIELD_TYPES.TEXT,
     itemProps: {
+      name: "bank",
+      label: "Bank Name",
+      rules: [{ required: true }],
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.TEXT,
+    itemProps: {
       name: "name",
       label: "Account Name",
       rules: [{ required: true }],
@@ -79,7 +87,21 @@ export const orgBankInputForm: IFormItems[] = [
     },
   },
 ];
-export const bankTxInputForm: IFormItems[] = [
+export const bankTxInputForm = (banks?: IOrgBank[]): IFormItems[] => [
+  {
+    fieldType: FORM_FIELD_TYPES.SELECT,
+    itemProps: {
+      name: "bank_id",
+      label: "Bank",
+      rules: [{ required: true }],
+    },
+    fieldProps: {
+      options: banks?.map((bank) => ({
+        value: bank._id,
+        label: bank.bank as string,
+      })),
+    },
+  },
   {
     fieldType: FORM_FIELD_TYPES.SELECT,
     itemProps: {
@@ -116,14 +138,6 @@ export const bankTxInputForm: IFormItems[] = [
     },
   },
   {
-    fieldType: FORM_FIELD_TYPES.TEXT,
-    itemProps: {
-      name: "ref_id",
-      label: "Ref ID",
-      rules: [{ required: true }],
-    },
-  },
-  {
     fieldType: FORM_FIELD_TYPES.TEXT_AREA,
     itemProps: {
       name: "description",
@@ -155,11 +169,23 @@ export const getBankTableColumns = (
   ) => React.ReactNode | RenderedCell<IOrgBank>
 ): TableColumnType<IOrgBank>[] => [
   {
+    key: "_id",
+    dataIndex: "_id",
+    fixed: "left",
+    title(props) {
+      return "ID";
+    },
+    render(value, record, index) {
+      value = String(value).substring(value.length - 4);
+      return render?.("_id")(value, record, index) || value;
+    },
+  },
+  {
     key: "bank",
     dataIndex: "bank",
     fixed: "left",
     title(props) {
-      return "Bank Name";
+      return "Bank";
     },
     render: render?.("bank"),
   },
@@ -168,14 +194,14 @@ export const getBankTableColumns = (
     dataIndex: "name",
     fixed: "left",
     title(_) {
-      return "Account Name";
+      return "Name";
     },
     render: render?.("name"),
   },
   {
     key: "number",
     dataIndex: "number",
-    title: "Account Number",
+    title: "Number",
     render: render?.("number"),
   },
   {
@@ -187,7 +213,7 @@ export const getBankTableColumns = (
   {
     key: "balance",
     dataIndex: "balance",
-    title: "Account Balance",
+    title: "Balance",
     render: render?.("balance"),
   },
   {
@@ -206,6 +232,8 @@ export const bankLabelMap: Record<keyof IOrgBank, string> = {
   branch: "Bank Branch",
   bank: "Bank Name",
   _id: "ID",
+  is_admin: "Admin Bank",
+  active: "Status",
 };
 export const getBankTxTableColumns = (
   render?: (
@@ -223,7 +251,10 @@ export const getBankTxTableColumns = (
     title(props) {
       return "Date";
     },
-    render: render?.("created_at"),
+    render(value, record, index) {
+      const dateString = new Date(value).toLocaleDateString();
+      return render?.("created_at")(dateString, record, index) || dateString;
+    },
   },
   {
     key: "tx_type",
@@ -235,19 +266,19 @@ export const getBankTxTableColumns = (
     render: render?.("tx_type"),
   },
   {
-    key: "staff_id",
-    dataIndex: "staff_id",
+    key: "employee_id",
+    dataIndex: "employee_id",
     fixed: "left",
     title(_) {
       return "Staff ID";
     },
-    render: render?.("staff_id"),
+    render: render?.("employee_id"),
   },
   {
-    key: "ref_id",
-    dataIndex: "ref_id",
-    title: "Tx Ref",
-    render: render?.("ref_id"),
+    key: "description",
+    dataIndex: "description",
+    title: "Description",
+    render: render?.("description"),
   },
   {
     key: "amount",
@@ -264,15 +295,13 @@ export const getBankTxTableColumns = (
 ];
 export const bankTxLabelMap: Record<keyof IBankTx, React.ReactNode> = {
   _id: "Tx ID",
-  ref_id: "Tx Ref",
   description: "Account Description",
   bank_id: "Bank ID",
-  staff_id: "Staff ID",
+  employee_id: "Staff ID",
   tx_type: "Tx Type",
   amount: "Amount",
   created_at: "Date",
-  payment_id: "Payment ID",
-  bank: "",
-  staff: "",
-  payment: "",
+  payment_type: "",
+  bank: "Bank",
+  employee: "Employee",
 };

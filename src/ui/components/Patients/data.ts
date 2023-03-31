@@ -6,14 +6,17 @@ import { RenderedCell } from "rc-table/lib/interface";
 import { IPerson, IProfile } from "../Person";
 import React from "react";
 
-export const patientForm = [{
-  fieldType: FORM_FIELD_TYPES.TEXT,
-  itemProps: {
-    name: "old_id",
-    label: "Old Patient ID",
-    rules: [{ required: true }],
+export const patientForm = [
+  {
+    fieldType: FORM_FIELD_TYPES.TEXT,
+    itemProps: {
+      name: "old_id",
+      label: "Old Patient ID",
+      rules: [{ required: true }],
+    },
   },
-}, ...personForm];
+  ...personForm,
+];
 const defaultRender = (keyIndex: string, record: IPatient) => {
   type skipKey = keyof (IPatient & IPerson & IProfile);
   const skips: skipKey[] = ["person", "addresses", "next_of_kins"];
@@ -47,7 +50,7 @@ export const getPatientColumns = (
           index
         );
       }
-      return defaultRender("patient_id", record);
+      return String(defaultRender("patient_id", record)).padStart(6, "0");
     },
   },
   {

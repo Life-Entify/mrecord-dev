@@ -4,13 +4,10 @@ import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
 import { INewPatientProps, NewPatient } from "./NewPatient";
 import { EditProfileForm, EditProfileFormProps } from "./EditProfile";
-import {
-  INewPtNotificationProps,
-  NewPtNotification,
-} from "./NewPtNotification";
 import { IViewPatientProps, ViewPatient } from "./ViewPatient/ViewPatient";
 import { IPatient } from "./types";
 import { getPatientColumns } from "./data";
+import { ExistingPersonDisplay, IExistingPersonDisplayProps } from "../Person";
 
 const TableContainer = styled.div`
   margin-top: 50px;
@@ -26,7 +23,9 @@ export interface IPatientProps {
   toolbarProps?: IToolbarProps;
   drawerProps?: DrawerProps & { drawerType?: PATIENT_DIALOG_TYPE };
   newPatientProps?: INewPatientProps;
-  newPtNotificationProps?: INewPtNotificationProps;
+  newPtNotificationProps?: IExistingPersonDisplayProps & {
+    onBack?: React.MouseEventHandler;
+  };
   tableProps?: Omit<TableProps<IPatient>, "columns" | "scroll">;
   viewPatientProps?: IViewPatientProps;
   editProfileProps?: EditProfileFormProps & {
@@ -46,14 +45,20 @@ export function Patients({
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { onBack: editOnBack, ...deepEditProfileProps } =
     editProfileProps || {};
+  const { onBack: newPtNotifBack, ...deepNewPtNotificationProps } =
+    newPtNotificationProps || {};
   const getExtra = useCallback(
     (type?: PATIENT_DIALOG_TYPE) => {
       switch (type) {
         case PATIENT_DIALOG_TYPE.EDIT_PROFILE:
           return <Button onClick={editOnBack}>Back</Button>;
       }
+      switch (type) {
+        case PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION:
+          return <Button onClick={newPtNotifBack}>Back</Button>;
+      }
     },
-    [!!editOnBack]
+    [!!editOnBack, !!newPtNotifBack]
   );
   return (
     <div>
@@ -70,7 +75,7 @@ export function Patients({
           <NewPatient {...newPatientProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.PATIENT_NOTIFICATION && (
-          <NewPtNotification {...newPtNotificationProps} />
+          <ExistingPersonDisplay {...deepNewPtNotificationProps} />
         )}
         {drawerType === PATIENT_DIALOG_TYPE.VIEW_PATIENT && (
           <ViewPatient {...viewPatientProps} />

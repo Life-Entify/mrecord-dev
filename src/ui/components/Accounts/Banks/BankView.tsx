@@ -9,6 +9,7 @@ import {
   IToolbarProps,
   Toolbar,
 } from "ui/common";
+import { BOOLEAN_STRING } from "ui/components/types";
 import { BankTxType, IOrgBank, IBankTx } from "../types";
 import { bankLabelMap, getBankTxTableColumns } from "./data";
 
@@ -16,6 +17,7 @@ const Root = styled.div``;
 
 export interface IBankViewProps {
   bank?: IOrgBank;
+  bankTxs?: IBankTx[];
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
@@ -23,18 +25,25 @@ export interface IBankViewProps {
   toolbarProps?: Omit<IToolbarProps, "dropdownProps"> & {
     onNewTransaction?: (key: BankTxType) => void;
   };
-  tableProps?: Omit<TableProps<IBankTx>, "columns">;
+  tableProps?: Omit<TableProps<IBankTx>, "columns" | "dataSource">;
+  onDeleteBankTx?: (bankTx: IBankTx) => void;
+  onEditBankTx?: (bankTx: IBankTx) => void;
 }
 interface IBankViewState {
   showDetail: boolean;
 }
 export function BankView({
   bank,
+  bankTxs,
   infoBoardProps,
   toolbarProps,
   tableProps,
+  onDeleteBankTx,
+  onEditBankTx,
 }: IBankViewProps) {
-  const [state, _setState] = useState<Partial<IBankViewState>>({});
+  const [state, _setState] = useState<Partial<IBankViewState>>({
+    showDetail: true,
+  });
   const setState = (_state: Partial<IBankViewState>) =>
     _setState((state) => ({ ...state, ..._state }));
   const { onNewTransaction, ...deepToolbarProps } = toolbarProps || {};
@@ -51,7 +60,9 @@ export function BankView({
         <>
           <InfoBoard<keyof IOrgBank>
             {...infoBoardProps}
-            title={bank?.bank}
+            title={`${bank?.bank} ${
+              bank?.active === BOOLEAN_STRING.no ? "(Deactivated)" : ""
+            }`}
             data={bank}
             dataMap={bankLabelMap}
             skipMap={["_id"]}
@@ -84,8 +95,12 @@ export function BankView({
       />
       <div style={{ marginTop: 50 }} />
       <Table
+        size="small"
         {...tableProps}
+        dataSource={bankTxs}
         columns={getBankTxTableColumns((dataIndex) => (value, record) => {
+          //@ts-ignore
+          delete record.__typename;
           if (dataIndex === "action") {
             return (
               <Space>
@@ -93,19 +108,13 @@ export function BankView({
                   <EditOutlined
                     style={{ marginRight: 10 }}
                     size={12}
-                    onClick={
-                      () => {}
-                      // onFundEdit?.(record, BANK_EDIT_ACTIONS.ADD)
-                    }
+                    onClick={() => onEditBankTx?.(record)}
                   />
                 </Tooltip>
                 <Tooltip title="Delete transaction">
                   <DeleteOutlined
                     size={12}
-                    onClick={
-                      () => {}
-                      // onFundEdit?.(record, BANK_EDIT_ACTIONS.DEDUCT)
-                    }
+                    onClick={() => onDeleteBankTx?.(record)}
                   />
                 </Tooltip>
               </Space>

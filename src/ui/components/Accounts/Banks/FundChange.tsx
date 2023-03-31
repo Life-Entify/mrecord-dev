@@ -1,34 +1,28 @@
-import { Divider, FormInstance } from "antd";
+import { Divider } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
 import { BankTxType, IOrgBank } from "../types";
 import { bankLabelMap } from "./data";
-import { INewBankDepositTxProps, NewBankDepositTx } from "./NewBankTx";
-import {
-  INewBankWithdrawalTxProps,
-  NewBankWithdrawalTx,
-} from "./NewBankTx/Withdrawal";
+import { INewBankTxProps, NewBankTx } from "./NewBankTx";
 
 const Root = styled.div``;
 
-export interface IBankFundChangeProps {
+export interface IBankFundChangeProps extends INewBankTxProps {
   bank?: IOrgBank;
-  bankAction?: BankTxType;
+  bankTxType?: BankTxType;
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
   >;
-  newDepositTxProps?: INewBankDepositTxProps;
-  newWithdrawalTxProps?: INewBankWithdrawalTxProps;
 }
 
 export function BankFundChange({
   bank,
-  bankAction,
+  bankTx,
+  bankTxType,
   infoBoardProps,
-  newDepositTxProps,
-  newWithdrawalTxProps,
+  ...deepNewBankTxProps
 }: IBankFundChangeProps) {
   return (
     <Root>
@@ -40,12 +34,12 @@ export function BankFundChange({
         skipMap={["_id"]}
       />
       <Divider style={{ marginTop: 50 }} />
-
-      {bankAction === BankTxType.DEPOSIT ? (
-        <NewBankDepositTx {...newDepositTxProps} />
-      ) : (
-        <NewBankWithdrawalTx {...newWithdrawalTxProps} />
-      )}
+      <NewBankTx
+        isEdit={Boolean(bankTx)}
+        bankTx={bankTx}
+        title={bankTxType === BankTxType.DEPOSIT ? "Deposit" : "Withdrawal"}
+        {...deepNewBankTxProps}
+      />
     </Root>
   );
 }

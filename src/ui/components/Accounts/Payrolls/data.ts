@@ -1,7 +1,7 @@
 import { TableColumnType } from "antd";
 import { IPayroll, IPaySlip } from "../types";
 import { RenderedCell } from "rc-table/lib/interface";
-import { IStaff } from "ui/components/Staff";
+import { IEmployee } from "ui/components/Employees/Employee";
 
 export const getPaySlipTableColumns = (
   removeColumns?: (keyof IPaySlip)[],
@@ -22,11 +22,11 @@ export const getPaySlipTableColumns = (
       render: render?.("_id"),
     },
     {
-      key: "staff_id",
-      dataIndex: "staff_id",
+      key: "employee_id",
+      dataIndex: "employee_id",
       title: "Staff ID",
       fixed: "left",
-      render: render?.("staff_id"),
+      render: render?.("employee_id"),
     },
     {
       key: "staff",

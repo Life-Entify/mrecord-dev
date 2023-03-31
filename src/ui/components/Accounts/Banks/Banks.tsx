@@ -16,11 +16,7 @@ import { INewBankProps, NewBank } from "./NewBank";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { BankFundChange, IBankFundChangeProps } from "./FundChange";
 import { BankView, IBankViewProps } from "./BankView";
-import { INewBankDepositTxProps, NewBankDepositTx } from "./NewBankTx";
-import {
-  INewBankWithdrawalTxProps,
-  NewBankWithdrawalTx,
-} from "./NewBankTx/Withdrawal";
+import { BOOLEAN_STRING } from "ui/components/types";
 
 const TableContainer = styled.div`
   margin-top: 50px;
@@ -30,23 +26,25 @@ export enum BANK_DIALOG_TYPE {
   FUND_CHANGE = 1,
   NEW_BANK = 2,
   VIEW_BANK = 3,
+  EDIT_BANK = 6,
   NEW_BANK_TX_DEPOSIT = 4,
   NEW_BANK_TX_WITHDRAWAL = 5,
 }
 export interface IBanksProps {
+  banks?: IOrgBank[];
   toolbarProps?: IToolbarProps;
   drawerProps?: DrawerProps & {
     drawerType?: BANK_DIALOG_TYPE;
   };
-  newBankProps?: Omit<INewBankProps, "inputFields">;
-  tableProps?: Omit<TableProps<IOrgBank>, "columns"> & {
+  newBankProps?: Omit<INewBankProps<IOrgBank>, "inputFields">;
+  tableProps?: Omit<TableProps<IOrgBank>, "columns" | "dataSource"> & {
     onFundEdit?: (record: IOrgBank, action: BankTxType) => void;
   };
   fundChangeProps?: IBankFundChangeProps;
-  bankTxProps?: IBankViewProps & { onBack?: React.MouseEventHandler };
-  newBankTxProps?: {
-    depositProps?: INewBankDepositTxProps;
-    withdrawalProps?: INewBankWithdrawalTxProps;
+  bankViewProps?: IBankViewProps & {
+    onBack?: React.MouseEventHandler;
+    onDisplayEdit?: () => void;
+    onChangeBankStatus?: (active: BOOLEAN_STRING) => void;
   };
 }
 
@@ -56,12 +54,19 @@ export function Banks({
   newBankProps,
   tableProps,
   fundChangeProps,
-  bankTxProps,
-  newBankTxProps,
+  bankViewProps,
+  banks,
 }: IBanksProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { onFundEdit, ...deepTableProps } = tableProps || {};
-  const { onBack, ...deepBankTxProps } = bankTxProps || {};
+  const {
+    onBack,
+    infoBoardProps,
+    onDisplayEdit,
+    onChangeBankStatus,
+    bank,
+    ...deepBankViewProps
+  } = bankViewProps || {};
 
   function getExtra(
     type?: BANK_DIALOG_TYPE,
@@ -80,6 +85,7 @@ export function Banks({
       <TableContainer>
         <Table<IOrgBank>
           {...deepTableProps}
+          dataSource={banks?.map((i) => ({ ...i, key: i._id }))}
           columns={getBankTableColumns((dataIndex) => (value, record) => {
             if (dataIndex === "action") {
               return (
@@ -114,17 +120,43 @@ export function Banks({
         {drawerType === BANK_DIALOG_TYPE.NEW_BANK && (
           <NewBank {...newBankProps} inputFields={orgBankInputForm} />
         )}
+        {drawerType === BANK_DIALOG_TYPE.EDIT_BANK && (
+          <NewBank {...newBankProps} inputFields={orgBankInputForm} isEdit />
+        )}
         {drawerType === BANK_DIALOG_TYPE.FUND_CHANGE && (
           <BankFundChange {...fundChangeProps} />
         )}
         {drawerType === BANK_DIALOG_TYPE.VIEW_BANK && (
-          <BankView {...deepBankTxProps} />
-        )}
-        {drawerType === BANK_DIALOG_TYPE.NEW_BANK_TX_DEPOSIT && (
-          <NewBankDepositTx {...newBankTxProps?.depositProps} />
-        )}
-        {drawerType === BANK_DIALOG_TYPE.NEW_BANK_TX_WITHDRAWAL && (
-          <NewBankWithdrawalTx {...newBankTxProps?.withdrawalProps} />
+          <BankView
+            bank={bank}
+            {...deepBankViewProps}
+            infoBoardProps={{
+              ...infoBoardProps,
+              descriptionProps: {
+                extra: (
+                  <Space>
+                    <Button
+                      size="small"
+                      onClick={() =>
+                        onChangeBankStatus?.(
+                          bank?.active === BOOLEAN_STRING.yes
+                            ? BOOLEAN_STRING.no
+                            : BOOLEAN_STRING.yes
+                        )
+                      }
+                    >
+                      {bank?.active === BOOLEAN_STRING.yes
+                        ? "Deactivate"
+                        : "Activate"}
+                    </Button>
+                    <Button size="small" onClick={() => onDisplayEdit?.()}>
+                      Edit
+                    </Button>
+                  </Space>
+                ),
+              },
+            }}
+          />
         )}
       </Drawer>
     </div>
