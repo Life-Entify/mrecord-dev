@@ -1,5 +1,5 @@
 import { FORM_FIELD_TYPES, IFormItems, TableColumnType } from "ui/common";
-import { IBank, ICheque } from "../types";
+import { IBank, ICheque, IOrgBank } from "../types";
 import { RenderedCell } from "rc-table/lib/interface";
 
 export const getChequeForm = (banks?: IBank[]): IFormItems[] => [
@@ -14,7 +14,7 @@ export const getChequeForm = (banks?: IBank[]): IFormItems[] => [
   {
     fieldType: FORM_FIELD_TYPES.TEXT,
     itemProps: {
-      name: "cheque_leaflet",
+      name: "cheque_leaflets",
       label: "Leaflets",
       rules: [{ required: true }],
     },
@@ -51,6 +51,7 @@ export const getChequeForm = (banks?: IBank[]): IFormItems[] => [
 ];
 
 export const getChequeTableColumns = (
+  banks?: IOrgBank[],
   removeColumns?: (keyof ICheque)[],
   render?: (
     keyIndex: string
@@ -64,7 +65,7 @@ export const getChequeTableColumns = (
     {
       key: "cheque_number",
       dataIndex: "cheque_number",
-      title: "Client",
+      title: "Cheque No.",
       fixed: "left",
       render: render?.("cheque_number"),
     },
@@ -73,7 +74,11 @@ export const getChequeTableColumns = (
       dataIndex: "bank_id",
       title: "Bank",
       fixed: "left",
-      render: render?.("bank_id"),
+      render(value, record, index) {
+        const bank = banks?.find((bank) => bank._id === value);
+        if (bank) value = bank.bank;
+        return render?.("bank_id")(value, record, index) || value;
+      },
     },
     {
       key: "cheque_leaflets",
@@ -81,7 +86,12 @@ export const getChequeTableColumns = (
       title(props) {
         return "Leaflets";
       },
-      render: render?.("cheque_leaflets"),
+      render(value, record, index) {
+        const usedLts = record.used_leaflets || 0;
+        const lts = record.cheque_leaflets || 0;
+        value = `${lts - usedLts} / ${lts}`;
+        return render?.("cheque_leaflets")(value, record, index) || value;
+      },
     },
     {
       key: "description",
@@ -90,6 +100,12 @@ export const getChequeTableColumns = (
         return "Description";
       },
       render: render?.("description"),
+    },
+    {
+      key: "actions",
+      dataIndex: "actions",
+      title: "Actions",
+      render: render?.("actions"),
     },
   ];
   if (removeColumns && removeColumns.length > 0) {

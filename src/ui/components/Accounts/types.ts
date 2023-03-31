@@ -150,7 +150,7 @@ export interface ICheque {
   used_leaflets?: number;
   created_at?: string;
 }
-export type IChequeForm = ICheque;
+export interface IChequeForm extends ICheque {}
 
 export enum PAYROLL_ACTION_TYPES {
   bonus = "bonus",
