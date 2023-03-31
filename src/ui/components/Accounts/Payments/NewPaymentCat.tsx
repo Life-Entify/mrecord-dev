@@ -1,5 +1,5 @@
-import { FormInstance } from "antd";
-import React from "react";
+import { FormInstance, Form as AntForm } from "antd";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { IPaymentCategory, TxType } from "../types";
@@ -8,6 +8,17 @@ import { payTxCategoryForm } from "./data";
 const Root = styled.div``;
 const Title = styled.h3`
   text-align: center;
+`;
+const Description = styled.div`
+  text-align: center;
+`;
+const CalcContainer = styled.div`
+  margin-top: 20px;
+  margin-left: 40px;
+`;
+const Calculator = styled.div``;
+const Result = styled.h3`
+  // background: grey;
 `;
 export interface INewPaymentCatProps {
   txType?: TxType;
@@ -20,26 +31,39 @@ function NewPaymentCatFunc({
   expenditureCats,
 }: INewPaymentCatProps) {
   const formRef = React.useRef<FormInstance<any>>(null);
+  const [form, setForm] = useState<FormInstance>();
+  const nameValue = AntForm.useWatch("category-list", form);
+  let calc = "";
+  let result = 0;
+  if (nameValue && nameValue.length > 0) {
+    nameValue?.map((item: any, index: number) => {
+      if (!item || !item.amount) return;
+      if (index === 0) calc = Number(item.amount).toLocaleString();
+      else calc += ` + ${Number(item.amount).toLocaleString()}`;
+      result += Number(item.amount);
+    });
+  }
   return (
     <Root>
       <Title>
-        Select Category{" "}
-        {txType === TxType.expenditure ? "Expenditure" : "Income"}
+        {txType === TxType.expenditure ? "Expenditure" : "Income"} Payment
       </Title>
+      <Description>Add the category of payment and the amount</Description>
+      <CalcContainer>
+        <Calculator>Calculator: {calc}</Calculator>
+        <Result>Total Amount: {Number(result).toLocaleString()}</Result>
+      </CalcContainer>
       <Form
         formRef={formRef}
+        getForm={(form) => {
+          setForm(form);
+        }}
         formProps={{
-          name: "payment-new-form",
+          name: "payment-cat-new-form",
           layout: "vertical",
-          // labelCol: { span: 10 },
-          // wrapperCol: { span: 10 },
-          style: {
-            // alignItems: "center",
-            // display: "flex",
-            // justifyContent: "center",
-            border: "solid",
+          onFinish(values) {
+            console.log(values);
           },
-          // onFinish: onCreateItem,
           // initialValues,
         }}
         items={[
@@ -57,7 +81,7 @@ function NewPaymentCatFunc({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Payment",
+                  children: "Continue",
                 },
               },
             ],

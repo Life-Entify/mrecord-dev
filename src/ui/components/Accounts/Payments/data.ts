@@ -32,6 +32,7 @@ export const payTxCategoryForm = (
   {
     fieldType: FORM_FIELD_TYPES.LIST,
     itemProps: {
+      name: "category",
       rules: [{ required: true }],
     },
     fieldProps: [
@@ -39,7 +40,8 @@ export const payTxCategoryForm = (
         fieldType: FORM_FIELD_TYPES.SELECT,
         itemProps: {
           name: "category_id",
-          wrapperCol: { span: 10 },
+          label: "Category",
+          style: { width: 300 },
         },
         fieldProps: {
           options: categories?.map((cat) => ({
@@ -52,7 +54,8 @@ export const payTxCategoryForm = (
         fieldType: FORM_FIELD_TYPES.TEXT,
         itemProps: {
           name: "amount",
-          wrapperCol: { span: 10},
+          label: "Amount",
+          style: { width: 200 },
         },
         fieldProps: {
           type: "number",

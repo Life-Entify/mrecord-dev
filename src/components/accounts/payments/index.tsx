@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IPayment,
   IPaymentForm,
@@ -27,6 +27,12 @@ export default function PaymentComponent() {
   const [payment, setPayment] = useState<IPayment>();
   const [txType, setTxType] = useState<TxType>();
 
+  useEffect(() => {
+    setState({
+      openDrawer: true,
+      dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
+    });
+  }, []);
   return (
     <Payments
       toolbarProps={{
