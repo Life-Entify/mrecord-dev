@@ -1,23 +1,41 @@
 import { FormInstance } from "antd";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IBank, IChequeForm } from "../types";
+import { IBank, ICheque, IChequeForm } from "../types";
 import { getChequeForm } from "./data";
 
 const Root = styled.div``;
 
 export interface INewChequeProps {
-  onCreateItem?: (values: IChequeForm) => void;
+  cheque?: ICheque;
+  isEdit?: boolean;
+  onUpdateCheque?: (
+    values: Partial<ICheque>,
+    formRef?: React.RefObject<FormInstance<IChequeForm>>
+  ) => void;
+  onCreateCheque?: (
+    values: IChequeForm,
+    formRef?: React.RefObject<FormInstance<IChequeForm>>
+  ) => void;
   initialValues?: IChequeForm;
   banks?: IBank[];
 }
 function NewChequeFunc({
-  onCreateItem,
+  onCreateCheque,
+  onUpdateCheque,
   initialValues,
   banks,
+  cheque,
+  isEdit,
 }: INewChequeProps) {
   const formRef = React.useRef<FormInstance<IChequeForm>>(null);
+  const [chequeChanges, setChequeChanges] = useState<Partial<ICheque>>();
+  useEffect(() => {
+    if (isEdit && cheque) {
+      formRef.current?.setFieldsValue(cheque);
+    }
+  }, [JSON.stringify(cheque), isEdit]);
   return (
     <Root>
       <Form
@@ -27,7 +45,14 @@ function NewChequeFunc({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
-          onFinish: onCreateItem,
+          onValuesChange(changedValues, values) {
+            setChequeChanges((state) => ({ ...state, ...changedValues }));
+          },
+          onFinish(values) {
+            isEdit
+              ? onUpdateCheque?.(chequeChanges as Partial<ICheque>, formRef)
+              : onCreateCheque?.(values, formRef);
+          },
           initialValues,
         }}
         items={[
@@ -43,7 +68,7 @@ function NewChequeFunc({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Booklet",
+                  children: `${isEdit ? "Update " : "Create "} Booklet`,
                 },
               },
             ],
