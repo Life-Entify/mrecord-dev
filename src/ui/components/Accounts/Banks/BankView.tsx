@@ -17,6 +17,7 @@ const Root = styled.div``;
 
 export interface IBankViewProps {
   bank?: IOrgBank;
+  bankTxs?: IBankTx[];
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
@@ -24,7 +25,7 @@ export interface IBankViewProps {
   toolbarProps?: Omit<IToolbarProps, "dropdownProps"> & {
     onNewTransaction?: (key: BankTxType) => void;
   };
-  tableProps?: Omit<TableProps<IBankTx>, "columns">;
+  tableProps?: Omit<TableProps<IBankTx>, "columns" | "dataSource">;
   onDeleteBankTx?: (bankTx: IBankTx) => void;
   onEditBankTx?: (bankTx: IBankTx) => void;
 }
@@ -33,6 +34,7 @@ interface IBankViewState {
 }
 export function BankView({
   bank,
+  bankTxs,
   infoBoardProps,
   toolbarProps,
   tableProps,
@@ -93,7 +95,9 @@ export function BankView({
       />
       <div style={{ marginTop: 50 }} />
       <Table
+        size="small"
         {...tableProps}
+        dataSource={bankTxs}
         columns={getBankTxTableColumns((dataIndex) => (value, record) => {
           //@ts-ignore
           delete record.__typename;

@@ -1,35 +1,28 @@
-import { Divider, FormInstance } from "antd";
+import { Divider } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
-import { BankTxType, IBankTx, IOrgBank } from "../types";
+import { BankTxType, IOrgBank } from "../types";
 import { bankLabelMap } from "./data";
-import { IBankTxMoment, NewBankTx } from "./NewBankTx";
+import { INewBankTxProps, NewBankTx } from "./NewBankTx";
 
 const Root = styled.div``;
 
-export interface IBankFundChangeProps {
-  banks?: IOrgBank[];
+export interface IBankFundChangeProps extends INewBankTxProps {
   bank?: IOrgBank;
-  bankTx?: IBankTxMoment;
   bankTxType?: BankTxType;
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof IOrgBank>,
     "data" | "dataMap" | "skipMap"
   >;
-  onCreateBankTx?: (
-    bankTx: IBankTx,
-    formRef: React.RefObject<FormInstance<IBankTxMoment>>
-  ) => void;
 }
 
 export function BankFundChange({
-  banks,
   bank,
   bankTx,
   bankTxType,
   infoBoardProps,
-  onCreateBankTx,
+  ...deepNewBankTxProps
 }: IBankFundChangeProps) {
   return (
     <Root>
@@ -42,10 +35,10 @@ export function BankFundChange({
       />
       <Divider style={{ marginTop: 50 }} />
       <NewBankTx
-        banks={banks}
+        isEdit={Boolean(bankTx)}
         bankTx={bankTx}
         title={bankTxType === BankTxType.DEPOSIT ? "Deposit" : "Withdrawal"}
-        onCreateItem={onCreateBankTx}
+        {...deepNewBankTxProps}
       />
     </Root>
   );

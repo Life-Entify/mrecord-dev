@@ -1,5 +1,5 @@
 import { FormInstance } from "antd";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { bankTxInputForm } from "./data";
@@ -12,26 +12,34 @@ const FormTitle = styled.h3``;
 export interface IBankTxMoment extends Omit<IBankTx, "created_at"> {
   created_at?: Moment;
 }
-export interface INewBankDepositTxProps {
+export interface INewBankTxProps {
   title?: React.ReactNode;
   banks?: IOrgBank[];
   bankTx?: IBankTxMoment;
-  onCreateItem?: (
+  onCreateBankTx?: (
     bankTx: IBankTx,
     formRef: React.RefObject<FormInstance<IBankTxMoment>>
   ) => void;
+  onUpdateBankTx?: (
+    bankTx?: Partial<IBankTx>,
+    formRef?: React.RefObject<FormInstance<IBankTxMoment>>
+  ) => void;
+  isEdit?: boolean;
 }
 
 export function NewBankTx({
   title,
   banks = [],
   bankTx,
-  onCreateItem,
-}: INewBankDepositTxProps) {
+  isEdit,
+  onCreateBankTx,
+  onUpdateBankTx,
+}: INewBankTxProps) {
   const formRef =
     React.useRef<
       FormInstance<Omit<IBankTx, "created_at"> & { created_at: Moment }>
     >(null);
+  const [formChanges, setFormChanges] = useState<Partial<IBankTx>>();
   useEffect(() => {
     if (bankTx) formRef.current?.setFieldsValue(bankTx);
   }, [JSON.stringify(bankTx)]);
@@ -46,9 +54,13 @@ export function NewBankTx({
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
-          initialValues: bankTx,
+          onValuesChange(changedValues, values) {
+            setFormChanges((state) => ({ ...state, ...changedValues }));
+          },
           onFinish(values) {
-            onCreateItem?.(values, formRef);
+            isEdit
+              ? onUpdateBankTx?.(formChanges, formRef)
+              : onCreateBankTx?.(values, formRef);
           },
         }}
         items={[
@@ -64,7 +76,7 @@ export function NewBankTx({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Transaction",
+                  children: `${isEdit ? "Update " : "Create "} Transaction`,
                 },
               },
             ],

@@ -66,7 +66,11 @@ export function useBankTxAction() {
     [!!updateBankTx, JSON.stringify(bankTx)]
   );
   const updateBnkTx = useCallback(
-    async (bnkTx: Partial<IBankTx>, options?: { notify?: INotify }) => {
+    async (
+      bank: IOrgBank,
+      bnkTx: Partial<IBankTx>,
+      options?: { notify?: INotify }
+    ) => {
       if (Object.keys(bnkTx).length === 0) {
         return options?.notify?.("error", {
           key: "error-no-changes",
@@ -78,11 +82,11 @@ export function useBankTxAction() {
         const { data } = await updateBankTx({
           variables: { bank_tx: bnkTx, _id: bankTx?._id as string },
         });
-        if (data?.bank_tx) setBankTx(data.bank_tx);
+        await getBnkTxs(bank, { notify: options?.notify });
         options?.notify?.("success", {
           key: "update-bnkTx-success",
           message: "Success",
-          description: "BankTx updated",
+          description: "Bank transaction updated",
         });
       } catch (e) {
         options?.notify?.("error", {

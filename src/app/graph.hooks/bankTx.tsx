@@ -20,6 +20,7 @@ const defaultValue: IReturnedData = {
   bank_tx: [
     "_id",
     "amount",
+    "payment_type",
     // "bank",
     "bank_id",
     "created_at",

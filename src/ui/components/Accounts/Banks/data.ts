@@ -251,7 +251,10 @@ export const getBankTxTableColumns = (
     title(props) {
       return "Date";
     },
-    render: render?.("created_at"),
+    render(value, record, index) {
+      const dateString = new Date(value).toLocaleDateString();
+      return render?.("created_at")(dateString, record, index) || dateString;
+    },
   },
   {
     key: "tx_type",

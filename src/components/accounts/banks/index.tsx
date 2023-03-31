@@ -22,8 +22,15 @@ interface IBankState {
 }
 export default function PaymentComponent() {
   const { banks, bank, setBank, createBank, updateBank } = useBankAction();
-  const { bankTxs, getBankTxs, createBankTx, setBankTx, bankTx } =
-    useBankTxAction();
+  const {
+    bankTxs,
+    getBankTxs,
+    createBankTx,
+    setBankTx,
+    bankTx,
+    updateBankTx,
+    deleteBankTx,
+  } = useBankTxAction();
   const [api, contextHolder] = notification.useNotification();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
@@ -104,6 +111,24 @@ export default function PaymentComponent() {
           bankTx: bankTx
             ? { ...bankTx, created_at: moment(new Date(bankTx?.created_at)) }
             : undefined,
+          onUpdateBankTx(bankTx, formRef) {
+            if (bank && bankTx) {
+              updateBankTx(bank, bankTx, { notify: openNotification }).then(
+                () => {
+                  formRef?.current?.resetFields();
+                  setState({
+                    dialogType: BANK_DIALOG_TYPE.VIEW_BANK,
+                    drawerTitle: "Bank Transactions",
+                  });
+                }
+              );
+            } else
+              openNotification("error", {
+                key: "nil-bank-tx-error",
+                message: "Error",
+                description: "No data transmitted or bank not passed",
+              });
+          },
           onCreateBankTx(bankTx, formRef) {
             bankTx.tx_type = bankTxType as BankTxType;
             if (bank) {
@@ -120,6 +145,7 @@ export default function PaymentComponent() {
           },
         }}
         bankViewProps={{
+          bankTxs,
           onEditBankTx(bankTx) {
             setState({
               dialogType: BANK_DIALOG_TYPE.FUND_CHANGE,
@@ -130,7 +156,37 @@ export default function PaymentComponent() {
             setBank(bank);
           },
           onDeleteBankTx(bankTx) {
-            console.log(bankTx);
+            if (bank && bankTx._id) {
+              openNotification("warning", {
+                key: "confirm-delete-bank-tx",
+                message: "Warning",
+                description: `Sure you want to delete tx of value ${Number(
+                  bankTx.amount
+                ).toLocaleString()}?`,
+                btn: [
+                  {
+                    children: "Cancel",
+                    type: "primary",
+                    onClick: () => api.destroy("confirm-delete-bank-tx"),
+                  },
+                  {
+                    children: "Proceed",
+                    onClick: () => {
+                      deleteBankTx(bank, bankTx._id, {
+                        notify: openNotification,
+                      });
+                      api.destroy("confirm-delete-bank-tx");
+                    },
+                  },
+                ],
+              });
+            } else {
+              openNotification("error", {
+                key: "null-bank-or-banktx",
+                message: "Error",
+                description: "Nil bank or bank transaction",
+              });
+            }
           },
           onChangeBankStatus(active) {
             updateBank({ active }, { notify: openNotification });
@@ -161,9 +217,6 @@ export default function PaymentComponent() {
               setBank(bank);
             },
             dateRangePickerProps: {},
-          },
-          tableProps: {
-            dataSource: bankTxs,
           },
         }}
         newBankProps={{
