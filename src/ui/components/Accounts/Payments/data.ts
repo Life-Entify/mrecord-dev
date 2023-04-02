@@ -4,12 +4,27 @@ import {
   AccountAction,
   IBank,
   ICheque,
+  IExpenditureAction,
   IIncomeActions,
   IPayment,
   IPaymentCategory,
   PaymentType,
   TxType,
 } from "../types";
+
+const expenditures: (keyof typeof IExpenditureAction)[] = [
+  "deposit_withdrawal",
+  "loan",
+  "pay",
+];
+const externalIncome: (keyof typeof IIncomeActions)[] = [
+  "receive_deposit",
+  "receive_pay",
+  "loan_repayment",
+  "redeem_credit",
+];
+const internalIncome: (keyof typeof IIncomeActions)[] = ["use_deposit"];
+const falseIncome: (keyof typeof IIncomeActions)[] = ["register_credit"];
 
 export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   _id: "ID",
@@ -100,7 +115,8 @@ export const paymentForm = (
           children: [
             { value: AccountAction.receive_pay, title: "Receive Payment" },
             { value: AccountAction.receive_deposit, title: "Receive Deposit" },
-            { value: AccountAction.register_credit, title: "On Credit" },
+            { value: AccountAction.use_deposit, title: "Use Deposit" },
+            { value: AccountAction.register_credit, title: "As Credit" },
             { value: AccountAction.redeem_credit, title: "Redeem Debt" },
             { value: AccountAction.loan_repayment, title: "Loan Repayment" },
           ],
@@ -120,8 +136,9 @@ export const paymentForm = (
       },
     },
     itemFunc(formInstance, fieldForm, fieldData) {
-      return formInstance?.getFieldValue?.("action_type") !==
-        IIncomeActions.register_credit
+      const actionType = formInstance?.getFieldValue?.("action_type");
+      return !internalIncome.includes(actionType) &&
+        actionType !== IIncomeActions.register_credit
         ? fieldData && fieldForm?.(fieldData)
         : null;
     },
@@ -145,11 +162,16 @@ export const paymentForm = (
     itemProps: {
       noStyle: true,
       shouldUpdate: (prevValues, currentValues) => {
-        return prevValues.pay_type !== currentValues.pay_type;
+        return (
+          prevValues.pay_type !== currentValues.pay_type ||
+          prevValues.action_type !== currentValues.action_type
+        );
       },
     },
     itemFunc(formInstance, fieldForm, fieldData) {
-      return formInstance?.getFieldValue?.("pay_type") === PaymentType.cheque
+      return expenditures.includes(
+        formInstance?.getFieldValue?.("action_type")
+      ) && formInstance?.getFieldValue?.("pay_type") === PaymentType.cheque
         ? fieldData && fieldForm?.(fieldData)
         : null;
     },
@@ -172,11 +194,16 @@ export const paymentForm = (
     itemProps: {
       noStyle: true,
       shouldUpdate: (prevValues, currentValues) => {
-        return prevValues.pay_type !== currentValues.pay_type;
+        return (
+          prevValues.action_type !== currentValues.action_type ||
+          prevValues.pay_type !== currentValues.pay_type
+        );
       },
     },
     itemFunc(formInstance, fieldForm, fieldData) {
-      return formInstance?.getFieldValue?.("pay_type") === PaymentType.transfer
+      return formInstance?.getFieldValue?.("action_type") !==
+        IIncomeActions.register_credit &&
+        formInstance?.getFieldValue?.("pay_type") === PaymentType.transfer
         ? fieldData && fieldForm?.(fieldData)
         : null;
     },
@@ -263,7 +290,10 @@ export const paymentForm = (
     },
     itemFunc(formInstance, fieldForm, fieldData) {
       const value = formInstance?.getFieldValue?.("action_type");
-      return [AccountAction.receive_pay, AccountAction.pay].includes(value)
+      return [
+        AccountAction.receive_pay,
+        AccountAction.register_credit,
+      ].includes(value)
         ? fieldData &&
             fieldForm?.({
               ...fieldData,
@@ -307,13 +337,6 @@ export const paymentForm = (
     },
     fieldProps: {
       type: "number",
-    },
-  },
-  {
-    fieldType: FORM_FIELD_TYPES.TEXT,
-    itemProps: {
-      name: "doc_id",
-      label: "Document Ref",
     },
   },
   {

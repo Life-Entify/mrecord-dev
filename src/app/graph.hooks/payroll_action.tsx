@@ -17,7 +17,20 @@ export interface IQPayrollActionRes {
   payroll_action: IPayrollAction;
 }
 const defaultValue: IReturnedData = {
-  payroll_action: ["_id"],
+  payroll_action: [
+    "_id",
+    "action_kind",
+    "action_type",
+    "active",
+    "amount",
+    "count",
+    "description",
+    "employee_ids",
+    "is_constant",
+    "is_general",
+    "name",
+    "repeats",
+  ],
 };
 export function usePayrollAction(
   graphReturnedData: IReturnedData = defaultValue

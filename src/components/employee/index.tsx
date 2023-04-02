@@ -163,8 +163,8 @@ export default function StaffComponent() {
             }),
           size: "large",
         }}
-        staffViewProps={{
-          staff: employee,
+        empViewProps={{
+          employee,
           departments: departments,
           onStatusChange(status) {
             updateEmployee({ status }, { notify: openNotification });
@@ -177,7 +177,7 @@ export default function StaffComponent() {
               "next_of_kins_details",
             ],
           },
-          staffDepartmentProps: {
+          empDepartmentProps: {
             onAddDepartment(dept, login) {
               if (dept?._id) {
                 if (login) login.department_id = dept._id;
@@ -219,7 +219,7 @@ export default function StaffComponent() {
               });
             },
           },
-          staffAccountProps: {
+          empAccountProps: {
             showNewBankForm() {
               setState({
                 openDrawer: true,

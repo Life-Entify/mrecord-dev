@@ -7,6 +7,8 @@ export const routeNames = {
   banks: "/accounts/banks",
   cash: "/accounts/cash",
   cheques: "/accounts/cheques",
+  debts: "/accounts/debts",
+  deposits: "/accounts/deposits",
   payrolls: "/accounts/payrolls",
   users: "/users",
   staff: "/hr/staff",

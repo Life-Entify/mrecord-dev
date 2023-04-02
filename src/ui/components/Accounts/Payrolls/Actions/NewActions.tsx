@@ -1,4 +1,4 @@
-import { FormInstance } from "antd";
+import { FormInstance, FormProps } from "antd";
 import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
@@ -7,11 +7,22 @@ import { getPayrollActionForm } from "./data";
 
 const Root = styled.div``;
 
-export interface INewPayrollActionProps {}
-function NewDeductionFunc({}: INewPayrollActionProps) {
+export interface INewPayrollActionProps extends FormProps<IPayrollAction> {
+  onOpenEmployees?: () => void;
+  payrollAction?: IPayrollAction;
+  isEdit?: boolean;
+}
+function NewDeductionFunc({
+  onOpenEmployees,
+  payrollAction,
+  isEdit,
+  ...formProps
+}: INewPayrollActionProps) {
   const formRef = React.useRef<FormInstance<IPayrollAction>>(null);
+  const numOfEmps = payrollAction?.employee_ids?.length || 0;
   return (
     <Root>
+      {numOfEmps > 0 && <strong>Number of Employee: {numOfEmps}</strong>}
       <Form
         formRef={formRef}
         formProps={{
@@ -19,11 +30,11 @@ function NewDeductionFunc({}: INewPayrollActionProps) {
           layout: "horizontal",
           labelCol: { span: 10 },
           wrapperCol: { span: 14 },
-          // onFinish: onCreateItem,
-          // initialValues,
+          initialValues: payrollAction,
+          ...formProps,
         }}
         items={[
-          ...getPayrollActionForm(),
+          ...getPayrollActionForm(onOpenEmployees),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {
@@ -35,7 +46,7 @@ function NewDeductionFunc({}: INewPayrollActionProps) {
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Action",
+                  children: `${isEdit ? "Update " : "Create "} Action`,
                 },
               },
             ],

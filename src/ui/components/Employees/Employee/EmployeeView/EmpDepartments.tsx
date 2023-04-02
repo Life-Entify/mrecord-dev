@@ -8,7 +8,6 @@ import {
   theme,
   Tooltip,
 } from "antd";
-import FormItemLabel from "antd/es/form/FormItemLabel";
 import React, { useState } from "react";
 import styled from "styled-components";
 import {
@@ -33,7 +32,7 @@ const TableContainer = styled.div`
 
 export interface IEmpDepartments {
   departments?: IDepartment[];
-  staff?: IEmployee;
+  employee?: IEmployee;
   tableProps?: TableProps<ILogin>;
   onAddDepartment?: (dept: IDepartment, login?: ILogin) => void;
   onRemoveDepartment?: (dept: IDepartment) => void;
@@ -42,7 +41,7 @@ export interface IEmpDepartments {
 
 function StaffDepartmentFunc({
   departments,
-  staff,
+  employee,
   tableProps,
   onAddDepartment,
   onRemoveDepartment,
@@ -56,7 +55,7 @@ function StaffDepartmentFunc({
     token: { colorBgLayout },
   } = theme.useToken();
   const newDepartments = departments?.filter(
-    (item) => !staff?.department_ids?.includes(item._id as string)
+    (item) => !employee?.department_ids?.includes(item._id as string)
   );
   return (
     <Root>
@@ -149,7 +148,7 @@ function StaffDepartmentFunc({
         <Title>Login Details</Title>
         <Table
           {...tableProps}
-          dataSource={staff?.logins}
+          dataSource={employee?.logins}
           columns={getLoginColumns(
             departments,
             (keyIndex) => (value, record) => {
@@ -190,4 +189,4 @@ function StaffDepartmentFunc({
   );
 }
 
-export const StaffDepartments = React.memo(StaffDepartmentFunc);
+export const EmpDepartments = React.memo(StaffDepartmentFunc);

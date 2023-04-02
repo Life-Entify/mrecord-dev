@@ -40,7 +40,7 @@ export interface IEmployeeProps {
   newEmpNotificationProps?: IExistingPersonDisplayProps & {
     onBack?: React.MouseEventHandler;
   };
-  staffViewProps?: IEmpViewProps;
+  empViewProps?: IEmpViewProps;
   newBankProps?: Omit<INewBankProps<IBank>, "inputFields"> & {
     onBack?: React.MouseEventHandler;
   };
@@ -51,7 +51,7 @@ export function Staff({
   tableProps,
   drawerProps,
   newStaffProps,
-  staffViewProps,
+  empViewProps,
   newBankProps,
   newEmpNotificationProps,
 }: IEmployeeProps) {
@@ -88,7 +88,7 @@ export function Staff({
               <ExistingPersonDisplay {...deepNewPtNotificationProps} />
             )}
             {drawerType === STAFF_DIALOG_TYPES.STAFF_VIEW && (
-              <EmpView {...staffViewProps} />
+              <EmpView {...empViewProps} />
             )}
             {drawerType === STAFF_DIALOG_TYPES.NEW_BANK && (
               <NewBank {...deepNewBankProps} inputFields={bankInputForm} />

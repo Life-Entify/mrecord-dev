@@ -1,6 +1,6 @@
 import React from "react";
 import { FORM_FIELD_TYPES, IFormItems } from "ui/common";
-import { IBank, PAYROLL_ACTION_KINDS, PAYROLL_ACTION_TYPES } from "../../types";
+import { IBank, IPayroll, IPayrollAction, PAYROLL_ACTION_KINDS, PAYROLL_ACTION_TYPES } from "../../types";
 
 export const getPayrollActionForm = (
   openStaff?: React.MouseEventHandler
@@ -116,7 +116,7 @@ export const getPayrollActionForm = (
     fieldProps: {
       fieldType: FORM_FIELD_TYPES.TEXT,
       itemProps: {
-        name: "repeat_duration",
+        name: "repeats",
         label: "Repeat Duration",
       },
       fieldProps: {
@@ -124,15 +124,19 @@ export const getPayrollActionForm = (
       },
     },
   },
-  {
-    fieldType: FORM_FIELD_TYPES.TEXT_AREA,
-    itemProps: {
-      name: "description",
-      label: "Other description of account",
-    },
-    fieldProps: {
-      maxLength: 100,
-      showCount: true,
-    },
-  },
 ];
+export const payrollActionDataMap:  Record<keyof IPayrollAction, string> = {
+  _id: "ID",
+  name: "Name",
+  description: "Description",
+  active: "Status",
+  is_general: "General",
+  employee_ids: "Employees",
+  action_type: "Action Type",
+  action_kind: "Action Kind",
+  amount: "Amount",
+  is_constant: "Constant",
+  repeats: "Repeats",
+  count: "Count",
+  total_value: "Total Value"
+}

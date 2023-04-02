@@ -5,7 +5,7 @@ import { RenderedCell } from "rc-table/lib/interface";
 import { IPerson, IProfile } from "../../Person";
 import React from "react";
 
-export const staffFormFields = personForm;
+export const empFormFields = personForm;
 const defaultRender = (keyIndex: string, record: IEmployee) => {
   type skipKey = keyof (IEmployee & IPerson & IProfile);
   const skips: skipKey[] = ["person", "addresses", "next_of_kins"];
@@ -115,7 +115,7 @@ export const getStaffColumns = (
     },
   },
 ];
-export const staffDataMapping: Record<
+export const empDataMapping: Record<
   keyof (IEmployee & Omit<IPerson, "_id"> & IProfile),
   string
 > = {

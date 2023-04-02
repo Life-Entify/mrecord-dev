@@ -158,7 +158,7 @@ const bankTx: IBankTx = {
   description: "staff salary",
   created_at: "2023-02-25",
   tx_type: BankTxType.DEPOSIT,
-  payment_type: "cash"
+  payment_type: "cash",
 };
 
 const orgBank: IOrgBank = {
@@ -187,6 +187,7 @@ const paymentReceiver: IPaymentReceiver = {
     redeem_credit: 30000,
     register_credit: 4000,
     deposit_withdrawal: 5000,
+    use_deposit: 3000,
     pay: 3000,
     loan: 0,
     loan_repayment: 3000,
@@ -202,6 +203,7 @@ const bonus: IPayrollAction = {
   amount: 10000,
   is_constant: true,
   action_type: "bonus",
+  _id: "1",
 };
 const deduction: IPayrollAction = {
   name: "Gross Deduction",
@@ -212,6 +214,7 @@ const deduction: IPayrollAction = {
   amount: 10000,
   is_constant: true,
   action_type: "deduction",
+  _id: "1",
 };
 const paySlip: IPaySlip = {
   _id: "1",

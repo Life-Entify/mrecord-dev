@@ -12,24 +12,24 @@ import { IEmployee } from "../../types";
 const Root = styled.div``;
 
 export interface IStaffAccountProps {
-  staff?: IEmployee;
+  employee?: IEmployee;
   showNewBankForm?: React.MouseEventHandler;
   paymentTableProps?: Omit<IPaymentTableProps, "showTx">;
 }
 
 export function StaffAccount({
-  staff,
+  employee,
   showNewBankForm,
   paymentTableProps,
 }: IStaffAccountProps) {
   const [openDetails, setDetails] = useState<boolean>();
   return (
     <Root>
-      {!staff?.person?.bank ? (
+      {!employee?.person?.bank ? (
         <Button onClick={showNewBankForm}>Create Bank Account</Button>
       ) : (
         <InfoBoard<keyof IBank>
-          data={staff?.person?.bank}
+          data={employee?.person?.bank}
           title="Bank Details"
           dataMap={bankLabelMap}
           skipMap={["_id"]}

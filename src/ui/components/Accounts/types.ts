@@ -28,6 +28,28 @@ export interface IBank {
   active: BOOLEAN_STRING;
 }
 
+export interface ICashFlow {
+  _id: string;
+  payment_id: string;
+  amount: number;
+  direction: "in" | "out";
+}
+
+export interface Deposit {
+  _id: string;
+  person_id: number;
+  amount: number;
+  description: string;
+}
+export interface IDebt {
+  _id: string;
+  person_id: number;
+  amount: number;
+  payment_id: string;
+
+  payment?: IPayment;
+}
+
 export enum TxType {
   income = "income",
   expenditure = "expenditure",
@@ -50,8 +72,9 @@ export enum PaymentType {
 export enum IIncomeActions {
   receive_pay = "receive_pay",
   receive_deposit = "receive_deposit",
-  redeem_credit = "redeem_credit",
   register_credit = "register_credit",
+  redeem_credit = "redeem_credit",
+  use_deposit = "use_deposit",
   loan_repayment = "loan_repayment",
 }
 export enum IExpenditureAction {
@@ -65,6 +88,7 @@ export enum AccountAction {
   receive_deposit = "receive_deposit",
   deposit_withdrawal = "deposit_withdrawal",
   register_credit = "register_credit",
+  use_deposit = "use_deposit",
   redeem_credit = "redeem_credit",
   loan = "loan",
   loan_repayment = "loan_repayment",
@@ -161,21 +185,22 @@ export enum PAYROLL_ACTION_KINDS {
   percent = "percent",
 }
 export interface IPayrollAction {
-  _id?: string;
+  _id: string;
   name: string;
   description: string;
   active: boolean;
   is_general: boolean;
-  staff_ids?: string[];
+  employee_ids?: string[];
   action_type: keyof typeof PAYROLL_ACTION_TYPES;
   action_kind: keyof typeof PAYROLL_ACTION_KINDS;
   amount: number; // value or percent
   is_constant: boolean;
-  repeat?: number; //number of times
+  repeats?: number; //number of times
   // dynamic
   count?: number; //number of times done
   total_value?: number;
 }
+
 export interface IPaySlip {
   _id: string;
   employee_id: string;

@@ -6,19 +6,29 @@ import { IPayrollAction } from "../../types";
 
 const Root = styled.div``;
 
-export interface IPayrollDeductionProps {
-  staffs?: IEmployee[]; // I want to use this to display the names of staff involved if it is not for all
+export interface IPayrollActionProps {
+  employees?: IEmployee[]; // I want to use this to display the names of employee involved if it is not for all
   actions?: IPayrollAction[];
+  onDelete?: (payrollAction: IPayrollAction) => void;
+  onEdit?: (payrollAction: IPayrollAction) => void;
+  onView?: (payrollAction: IPayrollAction) => void;
+  onActiveChange?: (payrollAction: IPayrollAction, active: boolean) => void;
 }
 
-function PayrollActionFunc({ staffs, actions }: IPayrollDeductionProps) {
+function PayrollActionFunc({
+  employees,
+  actions,
+  onDelete,
+  onEdit,
+  onView,
+  onActiveChange,
+}: IPayrollActionProps) {
   return (
     <Root>
       <List<IPayrollAction>
         dataSource={actions}
         renderItem={(item) => {
-          const { is_constant, is_general } = item;
-
+          const { is_constant, is_general, active } = item;
           return (
             <List.Item
               extra={
@@ -27,21 +37,46 @@ function PayrollActionFunc({ staffs, actions }: IPayrollDeductionProps) {
                   <Tag>
                     {is_general
                       ? "General"
-                      : (item.staff_ids?.length || 0) + " staff"}
+                      : (item.employee_ids?.length || 0) + " employee(s)"}
                   </Tag>
                   <Tag>{Number(item.amount || 0).toLocaleString()}</Tag>
                 </div>
               }
             >
               <List.Item.Meta
-                title={item.name}
+                title={`${item.name} (${active ? "Active" : "Inactive"})`}
                 description={
                   <>
                     <div>{item.description}</div>
                     <div>
-                      {!is_general && <Button size="small">Show staff</Button>}
-                      <Button size="small" type="link">
+                      <Button
+                        size="small"
+                        type="link"
+                        onClick={() => onView?.(item)}
+                      >
                         View
+                      </Button>
+                      <Button
+                        size="small"
+                        type="link"
+                        onClick={() => onActiveChange?.(item, !active)}
+                      >
+                        {active ? "Deactivate" : "Activate"}
+                      </Button>
+                      <Button
+                        size="small"
+                        type="link"
+                        onClick={() => onEdit?.(item)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="small"
+                        style={{ color: "#e29898" }}
+                        type="link"
+                        onClick={() => onDelete?.(item)}
+                      >
+                        Delete
                       </Button>
                     </div>
                   </>

@@ -5,6 +5,8 @@ const Dashboard = React.lazy(() => import("components/dashboard/index"));
 const Payments = React.lazy(() => import("components/accounts/payments/index"));
 const Cash = React.lazy(() => import("components/accounts/cash/index"));
 const Cheques = React.lazy(() => import("components/accounts/cheques/index"));
+const Debts = React.lazy(() => import("components/accounts/debts/index"));
+const Deposits = React.lazy(() => import("components/accounts/deposits/index"));
 const Banks = React.lazy(() => import("components/accounts/banks/index"));
 const Payrolls = React.lazy(() => import("components/accounts/payrolls/index"));
 const Staff = React.lazy(() => import("components/employee/index"));
@@ -37,6 +39,14 @@ export const routes: {
   {
     path: routeNames.cheques,
     Component: Cheques,
+  },
+  {
+    path: routeNames.debts,
+    Component: Debts,
+  },
+  {
+    path: routeNames.deposits,
+    Component: Deposits,
   },
   {
     path: routeNames.payrolls,

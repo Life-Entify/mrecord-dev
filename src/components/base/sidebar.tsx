@@ -20,6 +20,8 @@ export const items = [
     getItem("Banks", routeNames.banks),
     getItem("Cash", routeNames.cash),
     getItem("Cheques", routeNames.cheques),
+    getItem("Debts", routeNames.debts),
+    getItem("Deposits", routeNames.deposits),
     getItem("Payments", routeNames.payments),
     getItem("Payrolls", routeNames.payrolls),
   ]),

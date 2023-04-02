@@ -4,10 +4,10 @@ import styled from "styled-components";
 import { IInfoBoardProps, InfoBoard } from "ui/common";
 import { IDepartment } from "ui/components/Departments";
 import { IPerson, IProfile } from "ui/components/Person";
-import { staffDataMapping } from "../data";
+import { empDataMapping } from "../data";
 import { EMPLOYEE_STATUS, IEmployee } from "../../types";
 import { IStaffAccountProps, StaffAccount } from "./EmpAccount";
-import { IEmpDepartments, StaffDepartments } from "./EmpDepartments";
+import { IEmpDepartments, EmpDepartments } from "./EmpDepartments";
 
 const Root = styled.div``;
 const Title = styled.h3``;
@@ -29,30 +29,30 @@ const DeptContainer = styled.div`
 `;
 
 export interface IEmpViewProps {
-  staff?: IEmployee;
+  employee?: IEmployee;
   infoBoardProps?: Omit<
     IInfoBoardProps<keyof (IEmployee & IPerson & IProfile)>,
     "data" | "dataMap"
   >;
   tabProps?: TabsProps;
-  staffAccountProps?: IStaffAccountProps;
+  empAccountProps?: IStaffAccountProps;
   departments?: IDepartment[];
   removeDept?: (dept: IDepartment) => void;
   onStatusChange?: (status: EMPLOYEE_STATUS) => void;
-  staffDepartmentProps?: Omit<IEmpDepartments, "departments" | "staff">;
+  empDepartmentProps?: Omit<IEmpDepartments, "departments" | "employee">;
 }
 export function EmpView({
-  staff,
+  employee,
   infoBoardProps,
   tabProps,
-  staffAccountProps,
+  empAccountProps,
   departments,
-  staffDepartmentProps,
+  empDepartmentProps,
   removeDept,
   onStatusChange,
 }: IEmpViewProps) {
   const [showDetails, setShowDetail] = useState<boolean>();
-  const { last_name, first_name } = staff?.person?.profile || {};
+  const { last_name, first_name } = employee?.person?.profile || {};
   const title = `${last_name} ${first_name}`.trim();
   let description = "";
   if (title) description = "Profile Details";
@@ -60,7 +60,7 @@ export function EmpView({
     <Root>
       {title && (
         <Title>
-          {title} ({staff?.status?.toUpperCase()})
+          {title} ({employee?.status?.toUpperCase()})
         </Title>
       )}
       {description && <Description>{description}</Description>}
@@ -87,12 +87,12 @@ export function EmpView({
         <>
           <InfoBoard
             {...infoBoardProps}
-            dataMap={staffDataMapping}
+            dataMap={empDataMapping}
             data={
               {
-                ...staff?.person?.profile,
-                ...staff?.person,
-                ...staff,
+                ...employee?.person?.profile,
+                ...employee?.person,
+                ...employee,
               } as Record<string, string>
             }
           />
@@ -103,13 +103,13 @@ export function EmpView({
       <Divider style={{ margin: "20px 0px" }} />
       <DeptContainer>
         <Title>Departments</Title>
-        {staff?.department_ids?.map((deptId, index) => {
+        {employee?.department_ids?.map((deptId, index) => {
           const dept = departments?.find((d) => d._id === deptId);
           if (!dept) return null;
           return (
             <Tag
               color="blue"
-              key={`staff-dept-${index}`}
+              key={`emp-dept-${index}`}
               closable
               onClose={(e) => {
                 e.preventDefault();
@@ -124,14 +124,14 @@ export function EmpView({
       <StyledTabs tabIndex={2} type="card" {...tabProps}>
         <Tabs.TabPane tab="Family" key={1}></Tabs.TabPane>
         <Tabs.TabPane tab="Departments" key={2}>
-          <StaffDepartments
-            {...staffDepartmentProps}
+          <EmpDepartments
+            {...empDepartmentProps}
             departments={departments}
-            staff={staff}
+            employee={employee}
           />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Account" key={3}>
-          <StaffAccount {...staffAccountProps} staff={staff} />
+          <StaffAccount {...empAccountProps} employee={employee} />
         </Tabs.TabPane>
         <Tabs.TabPane tab="Loans" key={4}></Tabs.TabPane>
       </StyledTabs>
