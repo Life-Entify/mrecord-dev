@@ -36,7 +36,9 @@ export interface IPaymentsProps {
   drawerProps?: DrawerProps & { drawerType?: PAYMENT_DIALOG_TYPE };
   paymentCategoryProps?: IPaymentCategoryProps;
   newPaymentProps?: INewPaymentProps;
-  addPaymentCatProps?: INewPaymentCatProps;
+  addPaymentCatProps?: INewPaymentCatProps & {
+    onBack?: React.MouseEventHandler;
+  };
   paymentTableProps?: IPaymentTableProps;
   paymentTxsProps?: IPaymentTxProps;
   paymentReceiptProps?: IPaymentReceiptProps & {
@@ -65,6 +67,8 @@ export function Payments({
   const { onBack: receiptOnBack, ...deepPaymentReceiptProps } =
     paymentReceiptProps || {};
   const { onBack: personOnBack, ...deepPersonProps } = personProps || {};
+  const { onBack: addPayCatOnBack, ...deepAddPaymentCatProps } =
+    addPaymentCatProps || {};
   const getExtra = useCallback(
     (type: PAYMENT_DIALOG_TYPE) => {
       switch (type) {
@@ -72,9 +76,11 @@ export function Payments({
           return <Button onClick={receiptOnBack}>Back</Button>;
         case PAYMENT_DIALOG_TYPE.SHOW_CLIENT:
           return <Button onClick={personOnBack}>Back</Button>;
+        case PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT:
+          return <Button onClick={addPayCatOnBack}>Back</Button>;
       }
     },
-    [!!receiptOnBack, !!personOnBack]
+    [!!receiptOnBack, !!personOnBack, !!addPayCatOnBack]
   );
   return (
     <Root>
@@ -111,7 +117,7 @@ export function Payments({
             <NewPayment {...newPaymentProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT && (
-            <NewPaymentCat {...addPaymentCatProps} />
+            <NewPaymentCat {...deepAddPaymentCatProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.PAYMENT_TXS && (
             <PaymentTxs {...paymentTxsProps} />

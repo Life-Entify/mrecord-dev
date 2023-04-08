@@ -99,13 +99,13 @@ export interface IPayment {
   tx_type: keyof typeof TxType;
   action: keyof typeof AccountAction;
   // receive/pay money from pt or staff or write description
-  person_id?: string;
+  person_id?: number;
   person?: IPerson;
   description?: string;
   //staff in charge of the system
   employee_id: string;
   //txs that show the categories in the payment
-  txIds: string[];
+  tx_ids: string[];
   txs?: ITx[];
 
   total_amount: number;
@@ -144,15 +144,16 @@ export interface ICashBundle {
   cashout_payments?: IPayment[];
 }
 
-export type IPaymentForm = Pick<
-  IPayment,
-  "tx_type" | "pay_type" | "total_amount" | "person_id" | "description"
-> & {
-  txs: Pick<
-    ITx,
-    "amount" | "category_id" | "created_at" | "remark" | "tx_type"
-  >;
-};
+// export type IPaymentForm = Pick<
+//   IPayment,
+//   "tx_type" | "pay_type" | "total_amount" | "person_id" | "description"
+// > & {
+//   txs: Pick<
+//     ITx,
+//     "amount" | "category_id" | "created_at" | "remark" | "tx_type"
+//   >;
+// };
+export interface IPaymentForm extends IPayment {}
 
 export type IPaymentTypeCount = Partial<
   Record<PaymentType, Partial<Record<keyof typeof TxType, number>>>

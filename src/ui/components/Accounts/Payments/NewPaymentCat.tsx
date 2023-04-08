@@ -2,7 +2,7 @@ import { FormInstance, Form as AntForm } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IPaymentCategory, TxType } from "../types";
+import { IPaymentCategory, ITx, TxType } from "../types";
 import { payTxCategoryForm } from "./data";
 
 const Root = styled.div``;
@@ -24,13 +24,15 @@ export interface INewPaymentCatProps {
   txType?: TxType;
   incomeCats?: IPaymentCategory[];
   expenditureCats?: IPaymentCategory[];
+  onContinue?: (values: { "category-list": ITx[] }) => void;
 }
 function NewPaymentCatFunc({
   txType,
   incomeCats,
   expenditureCats,
+  onContinue,
 }: INewPaymentCatProps) {
-  const formRef = React.useRef<FormInstance<any>>(null);
+  const formRef = React.useRef<FormInstance<ITx>>(null);
   const [form, setForm] = useState<FormInstance>();
   const nameValue = AntForm.useWatch("category-list", form);
   let calc = "";
@@ -61,9 +63,7 @@ function NewPaymentCatFunc({
         formProps={{
           name: "payment-cat-new-form",
           layout: "vertical",
-          onFinish(values) {
-            console.log(values);
-          },
+          onFinish: onContinue,
           // initialValues,
         }}
         items={[

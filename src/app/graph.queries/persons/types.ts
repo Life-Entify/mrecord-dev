@@ -1,4 +1,4 @@
-import { IAddress, INextOfKin, IProfile } from "ui/components/Person";
+import { IAddress, INextOfKin, IPerson, IProfile } from "ui/components/Person";
 
 export interface QDataPerson {
   _id: string;
@@ -22,7 +22,7 @@ export type IPersonQueryArray = (keyof (QAddress & IProfile))[];
 export interface NestedPersonObject {
   addresses?: (keyof IAddress)[];
   profile?: (keyof IProfile)[];
-  next_of_kins?: (keyof INextOfKin)[]
+  next_of_kins?: (keyof INextOfKin)[];
 }
 export interface QPersonQueryParams {
   keyword?: QKeywordPerson;

@@ -7,3 +7,4 @@ export * from "./Employees";
 export * from "./Employees/Employee";
 export * from "./Appointments";
 export * from "./Departments";
+export * from "./Person";

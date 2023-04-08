@@ -1,12 +1,19 @@
-import React, { useEffect, useState } from "react";
+import { QKeywordPerson } from "app/graph.queries/persons/types";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+  INotify,
   IPayment,
+  IPerson,
   IPaymentForm,
+  ITx,
+  notification,
+  notifyObject,
   Payments,
   PAYMENT_DIALOG_TYPE,
   TxType,
 } from "ui";
 import { dummy } from "../../dummy";
+import { usePaymentAction } from "./actions";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -17,22 +24,65 @@ const dialogNewPayment: Partial<IPaymentState> = {
   drawerTitle: "New Payment",
 };
 export default function PaymentComponent() {
+  const {
+    createPayment,
+    updatePayment,
+    payments,
+    payment,
+    persons,
+    setPayment,
+    getPersons,
+  } = usePaymentAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
   const setState = (state: Partial<IPaymentState>) =>
     _setState((_state) => ({ ..._state, ...state }));
-  const [paymentForm, setPaymentForm] = useState<IPaymentForm>();
+  const [paymentForm, setPaymentForm] = useState<Partial<IPaymentForm>>({});
+  const [paymentTxs, setPaymentTxs] = useState<ITx[]>();
+  const [client, setClient] = useState<IPerson>();
 
-  const [payment, setPayment] = useState<IPayment>();
   const [txType, setTxType] = useState<TxType>();
+  const [personQuery, setPersonQuery] = useState<{
+    keyword: QKeywordPerson;
+    limit: number;
+    skip: number;
+  }>();
 
-  // useEffect(() => {
-  //   setState({
-  //     openDrawer: true,
-  //     dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
-  //   });
-  // }, []);
+  const [api, contextHolder] = notification.useNotification();
+  const openNotification: INotify = (type, props) => {
+    api[type](notifyObject(props));
+  };
+  const closeDialog = () =>
+    setState({
+      openDrawer: false,
+      drawerTitle: undefined,
+      dialogType: undefined,
+    });
+  useEffect(() => {
+    (async () => {
+      const { keyword, limit, skip } = personQuery || {};
+      getPersons(keyword, limit, skip, { notify: openNotification });
+    })();
+  }, [JSON.stringify(personQuery)]);
+  const valueFields = (allFields: any) => {
+    const newValues: any = {};
+    for (const key in allFields) {
+      if (Object.prototype.hasOwnProperty.call(allFields, key)) {
+        const element = allFields[key];
+        if (allFields[key]) newValues[key] = allFields[key];
+      }
+    }
+    return newValues;
+  };
+  const getClientName = useCallback(() => {
+    if (client && paymentForm) {
+      const { last_name, first_name } = client.profile || {};
+      return `${last_name || ""} ${first_name || ""}`.trim();
+    }
+  }, [JSON.stringify(paymentForm), JSON.stringify(client)]);
+  console.log(paymentForm);
+  //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
   return (
     <Payments
       toolbarProps={{
@@ -77,7 +127,7 @@ export default function PaymentComponent() {
         },
       }}
       paymentTableProps={{
-        payments: dummy.payments,
+        payments: payments,
         showTx: false,
         tableProps: {
           rowSelection: {
@@ -118,18 +168,33 @@ export default function PaymentComponent() {
         },
       }}
       newPaymentProps={{
-        initialValues: paymentForm,
         banks: dummy.orgBanks,
+        clientName: getClientName(),
         cheques: [],
-        onCreateItem(values) {
-          console.log(values);
+        formProps: {
+          initialValues: paymentForm,
+          onValuesChange(changedValues) {
+            setPaymentForm((state) => ({ ...state, ...changedValues }));
+          },
+          onFinish(values) {
+            values.person_id = client?.person_id;
+            return console.log(values, paymentTxs);
+            createPayment(values as IPayment, paymentTxs, {
+              notify: openNotification,
+            }).then(closeDialog);
+          },
         },
         openClient(form) {
           setState({
             dialogType: PAYMENT_DIALOG_TYPE.SHOW_CLIENT,
             drawerTitle: "Select Client",
           });
-          setPaymentForm(form.current?.getFieldsValue());
+          setPaymentForm(
+            valueFields({
+              ...paymentForm,
+              ...form.current?.getFieldsValue(),
+            }) as Partial<IPaymentForm>
+          );
         },
         openPaymentCategory(form, txType) {
           setState({
@@ -137,18 +202,33 @@ export default function PaymentComponent() {
             drawerTitle: "Select Payment Categories(s)",
           });
           setTxType(txType);
-          setPaymentForm(form.current?.getFieldsValue());
+          setPaymentForm(
+            valueFields({
+              ...paymentForm,
+              ...form.current?.getFieldsValue(),
+            }) as Partial<IPaymentForm>
+          );
         },
       }}
       personProps={{
+        persons: persons?.map((i) => ({ ...i, key: i.person_id })),
         toolbarProps: {
           dateRangePickerProps: {},
         },
         tableProps: {
           rowSelection: {
             type: "radio",
-            selectedRowKeys: [-1],
-            onSelect(person) {},
+            selectedRowKeys: [],
+            onChange(selectedRowKeys) {
+              const person_id = selectedRowKeys[0] as number;
+              const client = persons?.find(
+                (item) => item.person_id === person_id
+              );
+              client && setClient(client);
+              setState({
+                ...dialogNewPayment,
+              });
+            },
           },
         },
         onBack: () => {
@@ -161,6 +241,17 @@ export default function PaymentComponent() {
         incomeCats: dummy.category,
         expenditureCats: dummy.category,
         txType,
+        onBack: () => {
+          setState({
+            ...dialogNewPayment,
+          });
+        },
+        onContinue(values) {
+          setPaymentTxs(values["category-list"]);
+          setState({
+            ...dialogNewPayment,
+          });
+        },
       }}
     />
   );

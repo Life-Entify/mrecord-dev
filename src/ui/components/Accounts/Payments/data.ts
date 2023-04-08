@@ -34,7 +34,7 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   person_id: "Person (ID)",
   person: "Person",
   employee_id: "Staff (ID)",
-  txIds: "Transaction ID(s)",
+  tx_ids: "Transaction ID(s)",
   txs: "Transactions",
   total_amount: "Total Amount",
   created_at: "Date",
@@ -84,7 +84,8 @@ export const paymentForm = (
   openClient?: React.MouseEventHandler,
   openCategory?: (txType: TxType) => void,
   cheques?: ICheque[],
-  banks?: IBank[]
+  banks?: IBank[],
+  clientName?: string
 ): IFormItems[] => [
   {
     fieldType: FORM_FIELD_TYPES.TREE_SELECT,
@@ -272,7 +273,7 @@ export const paymentForm = (
         {
           fieldType: FORM_FIELD_TYPES.BUTTON,
           fieldProps: {
-            children: "Open Client",
+            children: clientName || "Open Client",
             onClick: openClient,
           },
         },

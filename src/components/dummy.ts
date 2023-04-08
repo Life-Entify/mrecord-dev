@@ -61,9 +61,9 @@ const payments: IPayment[] = [
   {
     _id: "23",
     pay_type: "cash",
-    person_id: "1",
+    person_id: 1,
     employee_id: "2",
-    txIds: ["2"],
+    tx_ids: ["2"],
     tx_type: "expenditure",
     total_amount: 29000,
     created_at: "2023/03/02",
