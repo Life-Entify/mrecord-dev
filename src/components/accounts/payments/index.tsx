@@ -13,7 +13,8 @@ import {
   TxType,
 } from "ui";
 import { dummy } from "../../dummy";
-import { usePaymentAction } from "./actions";
+import { usePaymentAction } from "./actions/payment";
+import { usePaymentCategoryAction } from "./actions/payment_category";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -33,6 +34,7 @@ export default function PaymentComponent() {
     setPayment,
     getPersons,
   } = usePaymentAction();
+  const { paymentCategories } = usePaymentCategoryAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -84,175 +86,183 @@ export default function PaymentComponent() {
   console.log(paymentForm);
   //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
   return (
-    <Payments
-      toolbarProps={{
-        newBtnProps: {
-          style: { marginLeft: 10 },
-          onClick: () =>
-            setState({
-              openDrawer: true,
-              ...dialogNewPayment,
-            }),
-          title: "New Payment",
-        },
-        extra: {
-          categoryBtnProps: {
+    <>
+      {contextHolder}
+      <Payments
+        toolbarProps={{
+          newBtnProps: {
+            style: { marginLeft: 10 },
             onClick: () =>
               setState({
                 openDrawer: true,
-                dialogType: PAYMENT_DIALOG_TYPE.CATEGORIES,
-                drawerTitle: "Payment Categories",
+                ...dialogNewPayment,
               }),
+            title: "New Payment",
           },
-        },
-      }}
-      drawerProps={{
-        title: state.drawerTitle,
-        open: state.openDrawer,
-        drawerType: state.dialogType,
-        onClose: () =>
-          setState({
-            openDrawer: false,
-            drawerTitle: undefined,
-            dialogType: undefined,
-          }),
-        size: "large",
-      }}
-      paymentCategoryProps={{
-        incomeProps: {
-          listProps: {
-            onActionClick(type, item) {},
-            dataSource: dummy.category,
-          },
-        },
-      }}
-      paymentTableProps={{
-        payments: payments,
-        showTx: false,
-        tableProps: {
-          rowSelection: {
-            selectedRowKeys: [0],
-            type: "radio",
-            onSelect(record) {
-              setState({
-                openDrawer: true,
-                drawerTitle: "Payment Transactions",
-                dialogType: PAYMENT_DIALOG_TYPE.PAYMENT_TXS,
-              });
-              setPayment(record);
+          extra: {
+            categoryBtnProps: {
+              onClick: () =>
+                setState({
+                  openDrawer: true,
+                  dialogType: PAYMENT_DIALOG_TYPE.CATEGORIES,
+                  drawerTitle: "Payment Categories",
+                }),
             },
           },
-        },
-      }}
-      receiverProps={{
-        receivers: dummy.receivers,
-      }}
-      paymentTxsProps={{
-        payment,
-        txTableProps: {
-          onShowReceipt: () => {
+        }}
+        drawerProps={{
+          title: state.drawerTitle,
+          open: state.openDrawer,
+          drawerType: state.dialogType,
+          onClose: () =>
             setState({
-              dialogType: PAYMENT_DIALOG_TYPE.SHOW_RECEIPT,
-              drawerTitle: "Payment Receipt",
+              openDrawer: false,
+              drawerTitle: undefined,
+              dialogType: undefined,
+            }),
+          size: "large",
+        }}
+        paymentCategoryProps={{
+          incomeProps: {
+            listProps: {
+              onActionClick(type, item) {},
+              dataSource: paymentCategories?.income,
+            },
+          },
+          expenditureProps: {
+            listProps: {
+              dataSource: paymentCategories?.expenditure,
+            },
+          },
+        }}
+        paymentTableProps={{
+          payments: payments,
+          showTx: false,
+          tableProps: {
+            rowSelection: {
+              selectedRowKeys: [0],
+              type: "radio",
+              onSelect(record) {
+                setState({
+                  openDrawer: true,
+                  drawerTitle: "Payment Transactions",
+                  dialogType: PAYMENT_DIALOG_TYPE.PAYMENT_TXS,
+                });
+                setPayment(record);
+              },
+            },
+          },
+        }}
+        receiverProps={{
+          receivers: dummy.receivers,
+        }}
+        paymentTxsProps={{
+          payment,
+          txTableProps: {
+            onShowReceipt: () => {
+              setState({
+                dialogType: PAYMENT_DIALOG_TYPE.SHOW_RECEIPT,
+                drawerTitle: "Payment Receipt",
+              });
+            },
+          },
+        }}
+        paymentReceiptProps={{
+          org: dummy.settings.org,
+          onBack: () => {
+            setState({
+              dialogType: PAYMENT_DIALOG_TYPE.PAYMENT_TXS,
+              drawerTitle: "Payment Transactions",
             });
           },
-        },
-      }}
-      paymentReceiptProps={{
-        org: dummy.settings.org,
-        onBack: () => {
-          setState({
-            dialogType: PAYMENT_DIALOG_TYPE.PAYMENT_TXS,
-            drawerTitle: "Payment Transactions",
-          });
-        },
-      }}
-      newPaymentProps={{
-        banks: dummy.orgBanks,
-        clientName: getClientName(),
-        cheques: [],
-        formProps: {
-          initialValues: paymentForm,
-          onValuesChange(changedValues) {
-            setPaymentForm((state) => ({ ...state, ...changedValues }));
-          },
-          onFinish(values) {
-            values.person_id = client?.person_id;
-            return console.log(values, paymentTxs);
-            createPayment(values as IPayment, paymentTxs, {
-              notify: openNotification,
-            }).then(closeDialog);
-          },
-        },
-        openClient(form) {
-          setState({
-            dialogType: PAYMENT_DIALOG_TYPE.SHOW_CLIENT,
-            drawerTitle: "Select Client",
-          });
-          setPaymentForm(
-            valueFields({
-              ...paymentForm,
-              ...form.current?.getFieldsValue(),
-            }) as Partial<IPaymentForm>
-          );
-        },
-        openPaymentCategory(form, txType) {
-          setState({
-            dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
-            drawerTitle: "Select Payment Categories(s)",
-          });
-          setTxType(txType);
-          setPaymentForm(
-            valueFields({
-              ...paymentForm,
-              ...form.current?.getFieldsValue(),
-            }) as Partial<IPaymentForm>
-          );
-        },
-      }}
-      personProps={{
-        persons: persons?.map((i) => ({ ...i, key: i.person_id })),
-        toolbarProps: {
-          dateRangePickerProps: {},
-        },
-        tableProps: {
-          rowSelection: {
-            type: "radio",
-            selectedRowKeys: [],
-            onChange(selectedRowKeys) {
-              const person_id = selectedRowKeys[0] as number;
-              const client = persons?.find(
-                (item) => item.person_id === person_id
-              );
-              client && setClient(client);
-              setState({
-                ...dialogNewPayment,
-              });
+        }}
+        newPaymentProps={{
+          banks: dummy.orgBanks,
+          clientName: getClientName(),
+          cheques: [],
+          formProps: {
+            initialValues: paymentForm,
+            onValuesChange(changedValues) {
+              setPaymentForm((state) => ({ ...state, ...changedValues }));
+            },
+            onFinish(values) {
+              values.person_id = client?.person_id;
+              return console.log(values, paymentTxs);
+              createPayment(values as IPayment, paymentTxs, {
+                notify: openNotification,
+              }).then(closeDialog);
             },
           },
-        },
-        onBack: () => {
-          setState({
-            ...dialogNewPayment,
-          });
-        },
-      }}
-      addPaymentCatProps={{
-        incomeCats: dummy.category,
-        expenditureCats: dummy.category,
-        txType,
-        onBack: () => {
-          setState({
-            ...dialogNewPayment,
-          });
-        },
-        onContinue(values) {
-          setPaymentTxs(values["category-list"]);
-          setState({
-            ...dialogNewPayment,
-          });
-        },
-      }}
-    />
+          openClient(form) {
+            setState({
+              dialogType: PAYMENT_DIALOG_TYPE.SHOW_CLIENT,
+              drawerTitle: "Select Client",
+            });
+            setPaymentForm(
+              valueFields({
+                ...paymentForm,
+                ...form.current?.getFieldsValue(),
+              }) as Partial<IPaymentForm>
+            );
+          },
+          openPaymentCategory(form, txType) {
+            setState({
+              dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT_CAT,
+              drawerTitle: "Select Payment Categories(s)",
+            });
+            setTxType(txType);
+            setPaymentForm(
+              valueFields({
+                ...paymentForm,
+                ...form.current?.getFieldsValue(),
+              }) as Partial<IPaymentForm>
+            );
+          },
+        }}
+        personProps={{
+          persons: persons?.map((i) => ({ ...i, key: i.person_id })),
+          toolbarProps: {
+            dateRangePickerProps: {},
+          },
+          tableProps: {
+            rowSelection: {
+              type: "radio",
+              selectedRowKeys: [],
+              onChange(selectedRowKeys) {
+                const person_id = selectedRowKeys[0] as number;
+                const client = persons?.find(
+                  (item) => item.person_id === person_id
+                );
+                client && setClient(client);
+                setState({
+                  ...dialogNewPayment,
+                });
+              },
+            },
+          },
+          onBack: () => {
+            setState({
+              ...dialogNewPayment,
+            });
+          },
+        }}
+        addPaymentCatProps={{
+          incomeCats: dummy.category,
+          expenditureCats: dummy.category,
+          txType,
+          onBack: () => {
+            setState({
+              ...dialogNewPayment,
+            });
+          },
+          onContinue(values) {
+            setPaymentTxs(values["category-list"]);
+            setState({
+              ...dialogNewPayment,
+            });
+          },
+        }}
+      />
+    </>
   );
 }

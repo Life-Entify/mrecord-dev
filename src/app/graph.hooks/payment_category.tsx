@@ -27,7 +27,7 @@ export function usePaymentCategory(
     IQPaymentCategoryInput
   >(graphCreatePaymentCategory(graphReturnedData.paymentCategory));
   const [getPaymentCategories] = useLazyQuery<
-    { paymentCategorys: IPaymentCategory[] },
+    { paymentCategories: IPaymentCategory[] },
     { keyword: Partial<IPaymentCategory> }
   >(graphGetPaymentCategories(graphReturnedData.paymentCategory), {
     fetchPolicy: "network-only",
