@@ -10,7 +10,7 @@ export const categoryFormInputs: IFormItems[] = [
     },
   },
   {
-    fieldType: FORM_FIELD_TYPES.TEXT,
+    fieldType: FORM_FIELD_TYPES.TEXT_AREA,
     itemProps: {
       name: "description",
       label: "Description",

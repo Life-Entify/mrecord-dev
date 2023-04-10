@@ -41,8 +41,8 @@ export interface QEmployeeQueryParams {
 export type IEmployeeQueryArray = IQueryArray | keyof ILogin;
 
 export interface IEmployeeNestedQueryObject extends NestedPatientObject {
-  logins: (keyof ILogin)[];
+  logins?: (keyof ILogin)[];
 }
 export interface IEmployeeQueryReturnData extends IEmployeeNestedQueryObject {
-  employee: (keyof IEmployee)[];
+  employee?: (keyof IEmployee)[];
 }

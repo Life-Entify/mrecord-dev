@@ -22,12 +22,14 @@ const Result = styled.h3`
 `;
 export interface INewPaymentCatProps {
   txType?: TxType;
+  paymentTxs?: ITx[];
   incomeCats?: IPaymentCategory[];
   expenditureCats?: IPaymentCategory[];
-  onContinue?: (values: { "category-list": ITx[] }) => void;
+  onContinue?: (values: ITx[]) => void;
 }
 function NewPaymentCatFunc({
   txType,
+  paymentTxs,
   incomeCats,
   expenditureCats,
   onContinue,
@@ -63,8 +65,10 @@ function NewPaymentCatFunc({
         formProps={{
           name: "payment-cat-new-form",
           layout: "vertical",
-          onFinish: onContinue,
-          // initialValues,
+          onFinish(values) {
+            onContinue?.(values?.["category-list"]);
+          },
+          initialValues: { ["category-list"]: paymentTxs },
         }}
         items={[
           ...payTxCategoryForm(

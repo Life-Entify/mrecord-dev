@@ -19,7 +19,7 @@ export interface IQPaymentRes {
 const defaultValue: IReturnedData = {
   payment: [
     "_id",
-    "action",
+    "action_type",
     "created_at",
     "description",
     "employee_id",

@@ -22,8 +22,8 @@ export const graphUpdatePayment = (payment?: (keyof IPayment)[]) => {
 export const graphCreatePayment = (payment?: (keyof IPayment)[]) => {
   const query = payment ? payment.join(" ") : "_id";
   return gql`
-    mutation createPayment($payment : PaymentInputType, $transaction: TransactionInputType) {
-      payment : createPayment(payment : $payment, transaction: $transaction) {
+    mutation createPayment($payment : PaymentInputType, $transactions: [TransactionInputType]) {
+      payment : createPayment(payment : $payment, transactions: $transactions) {
             ${query}
         }
     }`;

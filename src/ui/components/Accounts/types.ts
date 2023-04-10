@@ -2,7 +2,10 @@ import React from "react";
 import { IPerson } from "../Person";
 import { IEmployee } from "../Employees/Employee";
 import { BOOLEAN_STRING } from "../types";
-
+export interface IPaymentCatDiff {
+  income: IPaymentCategory[];
+  expenditure: IPaymentCategory[];
+}
 export interface IPaymentCategory {
   _id: string;
   title: React.ReactNode;
@@ -97,13 +100,15 @@ export interface IPayment {
   _id: string;
   pay_type: keyof typeof PaymentType;
   tx_type: keyof typeof TxType;
-  action: keyof typeof AccountAction;
+  action_type: keyof typeof AccountAction;
   // receive/pay money from pt or staff or write description
   person_id?: number;
+  bank_id?: string;
   person?: IPerson;
   description?: string;
   //staff in charge of the system
-  employee_id: string;
+  employee_id: number;
+  employee?: IEmployee;
   //txs that show the categories in the payment
   tx_ids: string[];
   txs?: ITx[];
@@ -204,7 +209,7 @@ export interface IPayrollAction {
 
 export interface IPaySlip {
   _id: string;
-  employee_id: string;
+  employee_id: number;
   bonus_amount: number;
   deducted_amount: number;
   //dynamics

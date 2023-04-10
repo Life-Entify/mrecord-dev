@@ -1,4 +1,5 @@
 import { QKeywordPerson } from "app/graph.queries/persons/types";
+import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   INotify,
@@ -15,6 +16,7 @@ import {
   IPaymentCategory,
 } from "ui";
 import { dummy } from "../../dummy";
+import { useBankAction } from "../banks/actions";
 import { usePaymentAction } from "./actions/payment";
 import { usePaymentCategoryAction } from "./actions/payment_category";
 interface IPaymentState {
@@ -42,6 +44,7 @@ export default function PaymentComponent() {
     updatePaymentCategory,
     deletePaymentCategory,
   } = usePaymentCategoryAction();
+  const { banks } = useBankAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -138,7 +141,6 @@ export default function PaymentComponent() {
         }
       }
     };
-  console.log(paymentForm);
   //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
   return (
     <>
@@ -245,8 +247,14 @@ export default function PaymentComponent() {
           },
         }}
         newPaymentProps={{
-          banks: dummy.orgBanks,
+          banks,
+          categories: paymentCategories,
+          transactions: paymentTxs,
+          txType,
           clientName: getClientName(),
+          resetTxs() {
+            setPaymentTxs(undefined);
+          },
           cheques: [],
           formProps: {
             initialValues: paymentForm,
@@ -254,11 +262,35 @@ export default function PaymentComponent() {
               setPaymentForm((state) => ({ ...state, ...changedValues }));
             },
             onFinish(values) {
-              values.person_id = client?.person_id;
-              return console.log(values, paymentTxs);
-              createPayment(values as IPayment, paymentTxs, {
+              if (values.use_client) {
+                values.person_id = client?.person_id;
+                delete values.client;
+              }
+              delete values.use_client;
+              delete values.category_id;
+              values.created_at = new Date(
+                moment(values.created_at || new Date()).format("YYYY-MM-DD")
+              )
+                .getTime()
+                .toString();
+              const txs = paymentTxs?.map((i) => ({
+                ...i,
+                tx_type: txType,
+                created_at: values.created_at,
+                amount: Number(i.amount),
+              }));
+              const payment: IPayment = {
+                ...values,
+                total_amount: txs?.map((i) => i.amount).reduce((a, b) => a + b),
+                tx_type: txType,
+              };
+              createPayment(payment, txs, {
                 notify: openNotification,
-              }).then(closeDialog);
+              }).then(() => {
+                setPaymentForm({});
+                setPaymentTxs(undefined);
+                closeDialog();
+              });
             },
           },
           openClient(form) {
@@ -315,16 +347,17 @@ export default function PaymentComponent() {
           },
         }}
         addPaymentCatProps={{
-          incomeCats: dummy.category,
-          expenditureCats: dummy.category,
+          incomeCats: paymentCategories?.income,
+          expenditureCats: paymentCategories?.expenditure,
           txType,
+          paymentTxs,
           onBack: () => {
             setState({
               ...dialogNewPayment,
             });
           },
           onContinue(values) {
-            setPaymentTxs(values["category-list"]);
+            setPaymentTxs(values);
             setState({
               ...dialogNewPayment,
             });

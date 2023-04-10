@@ -1,9 +1,17 @@
-import { FormInstance, FormProps, Steps } from "antd";
-import React from "react";
+import { FormInstance, FormProps, List, Steps } from "antd";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { IPerson } from "ui/components/Person";
-import { IBank, ICheque, IPaymentForm, ITx, TxType } from "../types";
+import {
+  IBank,
+  ICheque,
+  IPaymentCatDiff,
+  IPaymentCategory,
+  IPaymentForm,
+  ITx,
+  TxType,
+} from "../types";
 import { paymentForm } from "./data";
 
 const Root = styled.div``;
@@ -18,19 +26,70 @@ export interface INewPaymentProps {
   formProps?: FormProps;
   cheques?: ICheque[];
   banks?: IBank[];
+  transactions?: ITx[];
+  categories?: IPaymentCatDiff;
+  txType?: TxType;
+  resetTxs?: () => void;
 }
 
 export function NewPayment({
+  transactions,
+  categories,
   openClient,
   openPaymentCategory,
   formProps,
   cheques,
   banks,
+  txType,
   clientName,
+  resetTxs,
 }: INewPaymentProps) {
   const formRef = React.useRef<FormInstance<IPaymentForm>>(null);
   return (
     <Root>
+      {transactions && transactions.length > 0 && (
+        <div>
+          <List<ITx>
+            style={{ margin: "0px 55px" }}
+            size="small"
+            header={<strong>Transactions</strong>}
+            footer={
+              <List.Item
+                actions={[
+                  <strong>
+                    {Number(
+                      transactions
+                        ?.map((i) => Number(i.amount))
+                        .reduce((a, b) => a + b)
+                    ).toLocaleString()}
+                  </strong>,
+                ]}
+              >
+                <List.Item.Meta title="Total" />
+              </List.Item>
+            }
+            dataSource={transactions}
+            renderItem={(item, index) => {
+              const typeCategories =
+                txType === TxType.income
+                  ? categories?.income
+                  : categories?.expenditure;
+
+              const category = typeCategories?.find(
+                (i) => i._id === item.category_id
+              );
+              return (
+                <List.Item
+                  key={index}
+                  actions={[Number(item.amount).toLocaleString()]}
+                >
+                  <List.Item.Meta title={category?.title} />
+                </List.Item>
+              );
+            }}
+          />
+        </div>
+      )}
       <Form
         formRef={formRef}
         formProps={{
@@ -41,15 +100,18 @@ export function NewPayment({
           ...formProps,
         }}
         items={[
-          ...paymentForm(
-            () => openClient?.(formRef),
-            (txType) => {
+          ...paymentForm({
+            openClient() {
+              openClient?.(formRef);
+            },
+            openCategory(txType) {
               openPaymentCategory?.(formRef, txType);
             },
             cheques,
             banks,
-            clientName
-          ),
+            clientName,
+            resetTxs,
+          }),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {

@@ -4,7 +4,7 @@ import { RootState } from "./store";
 
 const initialState: IOrgBank[] = [];
 
-const userSlice = createSlice({
+const bankSlice = createSlice({
   name: "banks",
   initialState,
   reducers: {
@@ -15,8 +15,8 @@ const userSlice = createSlice({
   },
 });
 
-export const { setBanks } = userSlice.actions;
+export const { setBanks } = bankSlice.actions;
 // Other code such as selectors can use the imported `RootState` type
 export const selectBank = (state: RootState) => state.banks;
 
-export default userSlice.reducer;
+export default bankSlice.reducer;

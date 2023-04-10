@@ -43,7 +43,7 @@ export const useEmployeeActions = () => {
   const { createEmpWithPerson } = useCreateEmployeeWithPerson();
   const { createEmployeeWithNok } = useCreateEmployeeWithNok();
   const { createEmployeeWithMeta } = useCreateEmployeeWithMeta();
-  const { getPersonsByID } = usePerson();
+  const { getPersonsByPersonID } = usePerson();
   const [empQueryParams, setEmpQueryParams] = useState<QEmployeeQueryParams>({
     skip: 0,
     limit: 100,
@@ -68,9 +68,9 @@ export const useEmployeeActions = () => {
     if (!getFamily) return;
     const { next_of_kins } = record?.person || {};
     if (next_of_kins && next_of_kins.length > 0) {
-      getPersonsByID({
+      getPersonsByPersonID({
         variables: {
-          _ids: next_of_kins?.map((nok) => nok.person_id),
+          ids: next_of_kins?.map((nok) => nok.person_id),
         },
       }).then(
         ({ data }) => {

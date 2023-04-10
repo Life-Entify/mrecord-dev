@@ -53,7 +53,7 @@ const txs: ITx[] = [
     amount: 5000,
     payment_id: "23",
     category_id: "1",
-    created_at: "2023/03/01",
+    created_at: "8999",
     remark: "something",
   },
 ];
@@ -62,12 +62,12 @@ const payments: IPayment[] = [
     _id: "23",
     pay_type: "cash",
     person_id: 1,
-    employee_id: "2",
+    employee_id: 2,
     tx_ids: ["2"],
     tx_type: "expenditure",
     total_amount: 29000,
-    created_at: "2023/03/02",
-    action: "pay",
+    created_at: "122",
+    action_type: "pay",
     txs,
   },
 ];
@@ -142,7 +142,7 @@ const login: ILogin = {
   department_id: "1",
 };
 const staff: IEmployee = {
-  employee_id: "1",
+  employee_id: 1,
   person: structuredClone(person) as IPerson,
   _id: "1",
   person_id: "1",
@@ -220,7 +220,7 @@ const paySlip: IPaySlip = {
   _id: "1",
   bonus_amount: 100000,
   deducted_amount: 20000,
-  employee_id: "1",
+  employee_id: 1,
   bonuses: [bonus],
 };
 const payroll: IPayroll = {

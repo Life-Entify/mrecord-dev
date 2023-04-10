@@ -35,15 +35,12 @@ export type INotify = (
   props: INotifyObjectProps
 ) => void;
 export const usePatientActions = () => {
-  const {
-    getPatients,
-    updatePatient,
-  } = usePatient();
+  const { getPatients, updatePatient } = usePatient();
   const { createPatient } = useCreatePatientAction();
   const { createPtWithPerson } = useCreatePatientWithPerson();
-  const {createPatientWithNok} = useCreatePatientWithNok();
-  const {createPatientWithMeta} = useCreatePatientWithMeta();
-  const { getPersonsByID, getPersons, createPerson } = usePerson();
+  const { createPatientWithNok } = useCreatePatientWithNok();
+  const { createPatientWithMeta } = useCreatePatientWithMeta();
+  const { getPersonsByPersonID, getPersons, createPerson } = usePerson();
   const [ptQueryParams, setPtQueryParams] = useState<QPatientQueryParams>({
     skip: 0,
     limit: 100,
@@ -68,9 +65,9 @@ export const usePatientActions = () => {
     if (!getFamily) return;
     const { next_of_kins } = record?.person || {};
     if (next_of_kins && next_of_kins.length > 0) {
-      getPersonsByID({
+      getPersonsByPersonID({
         variables: {
-          _ids: next_of_kins?.map((nok) => nok.person_id),
+          ids: next_of_kins?.map((nok) => nok.person_id),
         },
       }).then(
         ({ data }) => {
@@ -193,13 +190,13 @@ export const usePatientActions = () => {
       try {
         const newPt = await createPtWithPerson(updatedInfo);
         const { data: updatedPtData } = await getPatients({});
-          const newPts = updatedPtData?.patients;
-          setPatients(newPts);
-          notify("success", {
-            key: "create-pt-success",
-            message: "Patient created!",
-            description: `patient with Patient ID ${newPt?.patient_id} created!`,
-          });
+        const newPts = updatedPtData?.patients;
+        setPatients(newPts);
+        notify("success", {
+          key: "create-pt-success",
+          message: "Patient created!",
+          description: `patient with Patient ID ${newPt?.patient_id} created!`,
+        });
       } catch (e) {
         const error = e as AppError<IPerson>;
         if (error.cause?.code === 2) {
@@ -250,7 +247,7 @@ export const usePatientActions = () => {
                 relationship: newPtFormData?.next_of_kins?.[0].relationship,
                 person_id: person?.person_id,
               } as INextOfKin,
-            ]
+            ],
           });
           const { data: updatedPtData } = await getPatients({});
           const newPts = updatedPtData?.patients;

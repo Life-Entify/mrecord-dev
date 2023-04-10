@@ -1,12 +1,8 @@
 import { usePaymentCategory } from "app/graph.hooks/payment_category";
 import React, { useCallback, useEffect, useState } from "react";
-import { IPaymentCategory, INotify, TxType } from "ui";
+import { IPaymentCategory, INotify, TxType, IPaymentCatDiff } from "ui";
 export interface IActionOptions {
   notify: INotify;
-}
-interface ICatState {
-  income: IPaymentCategory[];
-  expenditure: IPaymentCategory[];
 }
 export function usePaymentCategoryAction() {
   const {
@@ -15,7 +11,7 @@ export function usePaymentCategoryAction() {
     updatePaymentCategory,
     deletePaymentCategory,
   } = usePaymentCategory();
-  const [paymentCategories, setPaymentCategories] = useState<ICatState>();
+  const [paymentCategories, setPaymentCategories] = useState<IPaymentCatDiff>();
   const [searchKeyword, setSearchKeyword] = useState<Partial<IPaymentCategory>>(
     {}
   );
@@ -42,7 +38,7 @@ export function usePaymentCategoryAction() {
             ({
               ...state,
               income: paymentCategories,
-            } as ICatState)
+            } as IPaymentCatDiff)
         );
         options?.noise &&
           options?.notify?.("success", {
@@ -72,7 +68,7 @@ export function usePaymentCategoryAction() {
         });
         const { paymentCategories } = data || {};
         setPaymentCategories(
-          (state) => ({ ...state, expenditure: paymentCategories } as ICatState)
+          (state) => ({ ...state, expenditure: paymentCategories } as IPaymentCatDiff)
         );
         options?.noise &&
           options?.notify?.("success", {

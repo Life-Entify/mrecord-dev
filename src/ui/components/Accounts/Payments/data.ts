@@ -30,7 +30,7 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   _id: "ID",
   pay_type: "Payment Type",
   tx_type: "Transaction Type",
-  action: "Action",
+  action_type: "Action",
   person_id: "Person (ID)",
   person: "Person",
   employee_id: "Staff (ID)",
@@ -40,6 +40,8 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   created_at: "Date",
   description: "Description",
   unresolved: "Unresolved",
+  bank_id: "Bank ID",
+  employee: "Employee",
 };
 export const payTxCategoryForm = (
   categories?: IPaymentCategory[]
@@ -80,13 +82,21 @@ export const payTxCategoryForm = (
     ],
   },
 ];
-export const paymentForm = (
-  openClient?: React.MouseEventHandler,
-  openCategory?: (txType: TxType) => void,
-  cheques?: ICheque[],
-  banks?: IBank[],
-  clientName?: string
-): IFormItems[] => [
+export const paymentForm = ({
+  openClient,
+  openCategory,
+  cheques,
+  banks,
+  clientName,
+  resetTxs,
+}: {
+  openClient?: React.MouseEventHandler;
+  openCategory?: (txType: TxType) => void;
+  cheques?: ICheque[];
+  banks?: IBank[];
+  clientName?: string;
+  resetTxs?: () => void;
+}): IFormItems[] => [
   {
     fieldType: FORM_FIELD_TYPES.TREE_SELECT,
     itemProps: {
@@ -294,6 +304,7 @@ export const paymentForm = (
       return [
         AccountAction.receive_pay,
         AccountAction.register_credit,
+        AccountAction.pay,
       ].includes(value)
         ? fieldData &&
             fieldForm?.({
@@ -305,13 +316,20 @@ export const paymentForm = (
                     ...(fieldData.fieldProps as IFieldsProps[])?.[0]
                       ?.fieldProps,
                     onClick: () => {
-                      openCategory?.(value);
+                      openCategory?.(
+                        value === AccountAction.pay
+                          ? TxType.expenditure
+                          : TxType.income
+                      );
                     },
                   },
                 },
               ],
             })
-        : null;
+        : (() => {
+            resetTxs?.();
+            return null;
+          })();
     },
     fieldProps: {
       fieldType: FORM_FIELD_TYPES.FIELDS,
@@ -330,14 +348,39 @@ export const paymentForm = (
     },
   },
   {
-    fieldType: FORM_FIELD_TYPES.TEXT,
+    fieldType: FORM_FIELD_TYPES.HIDDEN,
     itemProps: {
-      name: "amount",
-      label: "Amount",
-      rules: [{ required: true }],
+      noStyle: true,
+      shouldUpdate: (prevValues, currentValues) => {
+        return prevValues.action_type !== currentValues.action_type;
+      },
+    },
+    itemFunc(formInstance, fieldForm, fieldData) {
+      const value = formInstance?.getFieldValue?.("action_type");
+      return ![
+        AccountAction.receive_pay,
+        AccountAction.register_credit,
+        AccountAction.pay,
+      ].includes(value)
+        ? fieldData && fieldForm?.(fieldData)
+        : null;
     },
     fieldProps: {
-      type: "number",
+      fieldType: FORM_FIELD_TYPES.TEXT,
+      itemProps: {
+        name: "amount",
+        label: "Amount",
+      },
+      fieldProps: {
+        type: "number",
+      },
+    },
+  },
+  {
+    fieldType: FORM_FIELD_TYPES.DATE,
+    itemProps: {
+      name: "created_at",
+      label: "Date",
     },
   },
   {

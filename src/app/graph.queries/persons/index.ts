@@ -18,6 +18,18 @@ function queryStringBuilder(
   }
   return queryString;
 }
+export const graphGetPersonsByPersonID = (
+  person?: (keyof IPerson)[],
+  nestedValues?: NestedPersonObject
+) => {
+  const query = person ? queryStringBuilder(person, nestedValues) : "_id";
+  return gql`
+    query getPersonsByPersonID($ids: [Int]) {
+      persons : getPersonsByPersonID(ids: $ids) {
+            ${query}
+        }
+    }`;
+};
 export const graphGetPersonsByID = (
   person?: (keyof IPerson)[],
   nestedValues?: NestedPersonObject

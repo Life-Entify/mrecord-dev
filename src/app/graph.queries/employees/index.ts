@@ -118,3 +118,16 @@ export const graphGetEmployees = (
     }
   `;
 };
+export const graphGetEmployeesByEmployeeId = (
+  employee?: (keyof IEmployee)[],
+  nestedValues?: IEmployeeNestedQueryObject
+) => {
+  const query = employee ? queryStringBuilder(employee, nestedValues) : "_id";
+  return gql`
+    query getEmployeesByEmployeeId($ids: [Int]) {
+      employees: getEmployeesByEmployeeId(ids: $ids) {
+        ${query}
+      }
+    }
+  `;
+};

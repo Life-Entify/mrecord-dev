@@ -4,7 +4,7 @@ import { RootState } from "./store";
 
 const initialState: IDepartment[] = [];
 
-const userSlice = createSlice({
+const departmentSlice = createSlice({
   name: "departments",
   initialState,
   reducers: {
@@ -15,8 +15,8 @@ const userSlice = createSlice({
   },
 });
 
-export const { setDepartments } = userSlice.actions;
+export const { setDepartments } = departmentSlice.actions;
 // Other code such as selectors can use the imported `RootState` type
 export const selectDepartment = (state: RootState) => state.departments;
 
-export default userSlice.reducer;
+export default departmentSlice.reducer;

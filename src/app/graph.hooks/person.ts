@@ -21,6 +21,7 @@ import {
   graphCreatePerson,
   graphGetPersons,
   graphGetPersonsByID,
+  graphGetPersonsByPersonID,
 } from "app/graph.queries/persons";
 import {
   QDataPerson,
@@ -30,14 +31,12 @@ import React from "react";
 import { IPatient } from "ui/components/Patients/types";
 import { IAddress, INextOfKin, IPerson, IProfile } from "ui/components/Person";
 interface IReturnedData {
-  patient: (keyof IPatient)[];
   person: (keyof IPerson)[];
-  profile: (keyof IProfile)[];
-  addresses: (keyof IAddress)[];
-  next_of_kins: (keyof INextOfKin)[];
+  profile?: (keyof IProfile)[];
+  addresses?: (keyof IAddress)[];
+  next_of_kins?: (keyof INextOfKin)[];
 }
-const graphReturnedData: IReturnedData = {
-  patient: ["_id", "patient_id", "person", "old_id"],
+const defaultReturnData: IReturnedData = {
   person: ["_id", "person_id", "profile", "next_of_kins"],
   profile: [
     "last_name",
@@ -64,36 +63,47 @@ export interface IPersonGraphQlActions {
     options: MutationFunctionOptions<{ person: IPerson }, { profile: IProfile }>
   ) => Promise<FetchResult<{ person: IPerson }>>;
 }
-export function usePerson() {
+export function usePerson(personReturnData: IReturnedData = defaultReturnData) {
   const [createPerson] = useMutation<
     { person: IPerson },
     { profile: IProfile }
   >(
-    graphCreatePerson(graphReturnedData.person, {
-      profile: graphReturnedData.profile,
-      next_of_kins: graphReturnedData.next_of_kins,
+    graphCreatePerson(personReturnData.person, {
+      profile: personReturnData.profile,
+      next_of_kins: personReturnData.next_of_kins,
     })
   );
   const [getPersons] = useLazyQuery<{ persons: IPerson[] }, QPersonQueryParams>(
-    graphGetPersons(graphReturnedData.person, {
-      profile: graphReturnedData.profile,
-      addresses: graphReturnedData.addresses,
-      next_of_kins: graphReturnedData.next_of_kins,
+    graphGetPersons(personReturnData.person, {
+      profile: personReturnData.profile,
+      addresses: personReturnData.addresses,
+      next_of_kins: personReturnData.next_of_kins,
     })
   );
   const [getPersonsByID] = useLazyQuery<
     { persons: IPerson[] },
-    { _ids: number[] }
+    { _ids: string[] }
   >(
-    graphGetPersonsByID(graphReturnedData.person, {
-      profile: graphReturnedData.profile,
-      addresses: graphReturnedData.addresses,
-      next_of_kins: graphReturnedData.next_of_kins,
+    graphGetPersonsByID(personReturnData.person, {
+      profile: personReturnData.profile,
+      addresses: personReturnData.addresses,
+      next_of_kins: personReturnData.next_of_kins,
+    })
+  );
+  const [getPersonsByPersonID] = useLazyQuery<
+    { persons: IPerson[] },
+    { ids: number[] }
+  >(
+    graphGetPersonsByPersonID(personReturnData.person, {
+      profile: personReturnData.profile,
+      addresses: personReturnData.addresses,
+      next_of_kins: personReturnData.next_of_kins,
     })
   );
   return {
     createPerson,
     getPersons,
     getPersonsByID,
+    getPersonsByPersonID,
   };
 }

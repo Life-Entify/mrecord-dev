@@ -18,6 +18,7 @@ import {
 import type { FormInstance, FormItemProps, FormProps } from "antd/es/form";
 import { TextAreaProps } from "antd/es/input";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import { NamePath } from "antd/es/form/interface";
 
 const { Option } = Select;
 
@@ -62,13 +63,16 @@ export interface IFormItems {
     fieldData?: IFormItems
   ) => React.ReactNode | null;
   fieldType: FORM_FIELD_TYPES;
+  form?: FormInstance;
 }
 export const FormFields: React.FC<IFormItems> = ({
   fieldType,
   fieldProps,
   itemProps,
   itemFunc,
+  form,
 }) => {
+  const { getFieldValue } = form || {};
   switch (fieldType) {
     case FORM_FIELD_TYPES.HIDDEN:
       return (
@@ -99,7 +103,10 @@ export const FormFields: React.FC<IFormItems> = ({
     case FORM_FIELD_TYPES.SWITCH:
       return (
         <AntForm.Item {...itemProps}>
-          <Switch {...(fieldProps as SwitchProps)} />
+          <Switch
+            {...(fieldProps as SwitchProps)}
+            checked={getFieldValue?.(itemProps?.name as NamePath)}
+          />
         </AntForm.Item>
       );
     case FORM_FIELD_TYPES.DATE:
@@ -231,7 +238,7 @@ export const Form: React.FC<IFormProps> = ({
       form={form}
     >
       {items?.map((item, index) => {
-        return <FormFields key={index} {...item} />;
+        return <FormFields key={index} {...item} form={form} />;
       })}
     </AntForm>
   );

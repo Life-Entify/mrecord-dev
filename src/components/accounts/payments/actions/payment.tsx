@@ -1,8 +1,10 @@
+import { useEmployee } from "app/graph.hooks/employee";
 import { usePayment } from "app/graph.hooks/payment";
-import { usePaymentCategory } from "app/graph.hooks/payment_category";
 import { usePerson } from "app/graph.hooks/person";
 import { QKeywordPerson } from "app/graph.queries/persons/types";
+import { selectUser } from "app/redux/user.core";
 import React, { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { IPayment, INotify, ITx } from "ui";
 import { IPerson } from "ui/components/Person";
 export interface IActionOptions {
@@ -11,7 +13,16 @@ export interface IActionOptions {
 export function usePaymentAction() {
   const { getPayments, createPayment, updatePayment, deletePayment } =
     usePayment();
-  const { getPersons } = usePerson();
+  const { getPersons, getPersonsByPersonID } = usePerson({
+    person: ["_id", "person_id", "profile"],
+    profile: ["last_name", "first_name"],
+  });
+  const { getEmployeesByEmployeeId } = useEmployee({
+    employee: ["_id", "employee_id", "person"],
+    person: ["profile"],
+    profile: ["last_name", "first_name"],
+  });
+  const user = useSelector(selectUser);
   const [payments, setPayments] = useState<IPayment[]>();
   const [paymentQuery, setPaymentQuery] = useState<{
     keyword?: Partial<IPayment>;
@@ -63,7 +74,43 @@ export function usePaymentAction() {
             skip,
           },
         });
-        const { payments } = data || {};
+        let { payments } = data || {};
+        const personIds = payments
+          ?.map((i) => i.person_id)
+          .filter((value, index, record) => record.indexOf(value) === index);
+        const employee_ids = payments
+          ?.map((i) => i.employee_id)
+          .filter((value, index, record) => record.indexOf(value) === index);
+        if (personIds && personIds.length > 0) {
+          const { data: personData } = await getPersonsByPersonID({
+            variables: {
+              ids: personIds as number[],
+            },
+          });
+          const { persons } = personData || {};
+          payments = payments?.map((payment) => {
+            const person = persons?.find(
+              (person) => person.person_id === payment.person_id
+            );
+            payment.person = person;
+            return payment;
+          });
+        }
+        if (employee_ids && employee_ids.length > 0) {
+          const { data: empData } = await getEmployeesByEmployeeId({
+            variables: {
+              ids: employee_ids,
+            },
+          });
+          const { employees } = empData || {};
+          payments = payments?.map((i) => {
+            const employee = employees?.find(
+              (emp) => emp.employee_id === i.employee_id
+            );
+            if (employee) i.employee = employee;
+            return i;
+          });
+        }
         setPayments(payments);
         options?.noise &&
           options?.notify?.("success", {
@@ -149,10 +196,9 @@ export function usePaymentAction() {
       options?: IActionOptions
     ) => {
       try {
-        payment.created_at = Date.now().toString();
         await createPayment({
           variables: {
-            payment: payment as IPayment,
+            payment: { ...payment, employee_id: user.employee_id } as IPayment,
             transactions: txs as ITx[],
           },
         });
@@ -170,7 +216,7 @@ export function usePaymentAction() {
         });
       }
     },
-    [!!createPayment]
+    [!!createPayment, JSON.stringify(user)]
   );
   useEffect(() => {
     getPaymts();
