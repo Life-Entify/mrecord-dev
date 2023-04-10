@@ -15,8 +15,8 @@ export const graphUpdatePaymentCategory = (
 ) => {
   const query = paymentCategory ? paymentCategory.join(" ") : "_id";
   return gql`
-    mutation updatePaymentCategory($_id: String, $paymentCategory: PaymentCategoryInputType) {
-        paymentCategory : updatePaymentCategory(_id: $_id, paymentCategory: $paymentCategory) {
+    mutation updatePaymentCategory($_id: String, $payment_category: PaymentCategoryInputType) {
+        paymentCategory : updatePaymentCategory(_id: $_id, payment_category: $payment_category) {
             ${query}
         }
     }`;
@@ -26,8 +26,8 @@ export const graphCreatePaymentCategory = (
 ) => {
   const query = paymentCategory ? paymentCategory.join(" ") : "_id";
   return gql`
-    mutation createPaymentCategory($paymentCategory : PaymentCategoryInputType) {
-      paymentCategory : createPaymentCategory(paymentCategory : $paymentCategory) {
+    mutation createPaymentCategory($payment_category : PaymentCategoryInputType) {
+      paymentCategory : createPaymentCategory(payment_category : $payment_category) {
             ${query}
         }
     }`;

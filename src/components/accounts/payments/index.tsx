@@ -11,6 +11,8 @@ import {
   Payments,
   PAYMENT_DIALOG_TYPE,
   TxType,
+  LIST_ACTIONS,
+  IPaymentCategory,
 } from "ui";
 import { dummy } from "../../dummy";
 import { usePaymentAction } from "./actions/payment";
@@ -34,7 +36,12 @@ export default function PaymentComponent() {
     setPayment,
     getPersons,
   } = usePaymentAction();
-  const { paymentCategories } = usePaymentCategoryAction();
+  const {
+    paymentCategories,
+    createPaymentCategory,
+    updatePaymentCategory,
+    deletePaymentCategory,
+  } = usePaymentCategoryAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -83,6 +90,54 @@ export default function PaymentComponent() {
       return `${last_name || ""} ${first_name || ""}`.trim();
     }
   }, [JSON.stringify(paymentForm), JSON.stringify(client)]);
+  const onActionClick =
+    (type: TxType) =>
+    (
+      action: LIST_ACTIONS,
+      item: IPaymentCategory,
+      options?: {
+        callback?: () => void;
+        prevItem?: IPaymentCategory;
+      }
+    ) => {
+      if (LIST_ACTIONS.DELETE === action) {
+        openNotification("warning", {
+          key: "delete-pay-cat-warning",
+          message: "Warning",
+          description: `Sure you want to delete category ${item.title}?`,
+          btn: [
+            {
+              children: "Cancel",
+              type: "primary",
+              onClick() {
+                api.destroy("delete-pay-cat-warning");
+              },
+            },
+            {
+              children: "Proceed",
+              onClick() {
+                api.destroy("delete-pay-cat-warning");
+                deletePaymentCategory(item._id, type, {
+                  notify: openNotification,
+                }).then(options?.callback);
+              },
+            },
+          ],
+        });
+      } else {
+        if (options?.prevItem?._id) {
+          updatePaymentCategory(options?.prevItem?._id, item, type, {
+            notify: openNotification,
+          }).then(options?.callback);
+        } else {
+          openNotification("error", {
+            key: "update-pay-cat-error",
+            message: "Error",
+            description: "Payment Category ID can not be null",
+          });
+        }
+      }
+    };
   console.log(paymentForm);
   //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
   return (
@@ -125,13 +180,26 @@ export default function PaymentComponent() {
         paymentCategoryProps={{
           incomeProps: {
             listProps: {
-              onActionClick(type, item) {},
+              onActionClick: onActionClick(TxType.income),
+              onCreateItem(values, options) {
+                values.type = "income";
+                createPaymentCategory(values, TxType.income, {
+                  notify: openNotification,
+                }).then(options?.callback);
+              },
               dataSource: paymentCategories?.income,
             },
           },
           expenditureProps: {
             listProps: {
               dataSource: paymentCategories?.expenditure,
+              onActionClick: onActionClick(TxType.expenditure),
+              onCreateItem(values, options) {
+                values.type = "expenditure";
+                createPaymentCategory(values, TxType.expenditure, {
+                  notify: openNotification,
+                }).then(options?.callback);
+              },
             },
           },
         }}

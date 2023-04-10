@@ -11,13 +11,13 @@ interface IReturnedData {
   paymentCategory: (keyof IPaymentCategory)[];
 }
 export interface IQPaymentCategoryInput {
-  paymentCategory: Partial<IPaymentCategory>;
+  payment_category: Partial<IPaymentCategory>;
 }
 export interface IQPaymentCategoryRes {
   paymentCategory: IPaymentCategory;
 }
 const defaultValue: IReturnedData = {
-  paymentCategory: ["_id"],
+  paymentCategory: ["_id", "type", "description", "title"],
 };
 export function usePaymentCategory(
   graphReturnedData: IReturnedData = defaultValue
@@ -34,7 +34,7 @@ export function usePaymentCategory(
   });
   const [updatePaymentCategory] = useMutation<
     IQPaymentCategoryRes,
-    { _id: string; paymentCategory: Partial<IPaymentCategory> }
+    { _id: string; payment_category: Partial<IPaymentCategory> }
   >(graphUpdatePaymentCategory(graphReturnedData.paymentCategory));
   const [deletePaymentCategory] = useMutation<{ _id: string }, { _id: string }>(
     graphDeletePaymentCategory()

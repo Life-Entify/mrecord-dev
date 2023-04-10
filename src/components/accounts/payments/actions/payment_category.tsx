@@ -1,6 +1,6 @@
 import { usePaymentCategory } from "app/graph.hooks/payment_category";
 import React, { useCallback, useEffect, useState } from "react";
-import { IPaymentCategory, INotify, ITx } from "ui";
+import { IPaymentCategory, INotify, TxType } from "ui";
 export interface IActionOptions {
   notify: INotify;
 }
@@ -16,7 +16,6 @@ export function usePaymentCategoryAction() {
     deletePaymentCategory,
   } = usePaymentCategory();
   const [paymentCategories, setPaymentCategories] = useState<ICatState>();
-  const [paymentCategory, setPaymentCategory] = useState<IPaymentCategory>();
   const [searchKeyword, setSearchKeyword] = useState<Partial<IPaymentCategory>>(
     {}
   );
@@ -96,7 +95,11 @@ export function usePaymentCategoryAction() {
   }, [JSON.stringify(searchKeyword)]);
 
   const deletePayCat = useCallback(
-    async (paymentCategoryId?: string, options?: IActionOptions) => {
+    async (
+      paymentCategoryId?: string,
+      type?: TxType,
+      options?: IActionOptions
+    ) => {
       if (!paymentCategoryId) {
         return options?.notify?.("error", {
           key: "error-no-changes",
@@ -108,7 +111,11 @@ export function usePaymentCategoryAction() {
         await deletePaymentCategory({
           variables: { _id: paymentCategoryId },
         });
-        await getPayCat({ ...options });
+        if (type === TxType.expenditure) {
+          getExpenditurePayCat(options);
+        } else {
+          getIncomePayCat(options);
+        }
         options?.notify?.("success", {
           key: "delete-payCat-success",
           message: "Success",
@@ -122,10 +129,15 @@ export function usePaymentCategoryAction() {
         });
       }
     },
-    [!!updatePaymentCategory, JSON.stringify(paymentCategory)]
+    [!!updatePaymentCategory]
   );
   const updatePayCat = useCallback(
-    async (payCat: Partial<IPaymentCategory>, options?: IActionOptions) => {
+    async (
+      _id: string,
+      payCat: Partial<IPaymentCategory>,
+      type?: TxType,
+      options?: IActionOptions
+    ) => {
       if (Object.keys(payCat).length === 0) {
         return options?.notify?.("error", {
           key: "error-no-changes",
@@ -136,11 +148,15 @@ export function usePaymentCategoryAction() {
       try {
         const { data } = await updatePaymentCategory({
           variables: {
-            paymentCategory: payCat,
-            _id: paymentCategory?._id as string,
+            payment_category: payCat,
+            _id,
           },
         });
-        await getPayCat({ notify: options?.notify });
+        if (type === TxType.expenditure) {
+          getExpenditurePayCat(options);
+        } else {
+          getIncomePayCat(options);
+        }
         options?.notify?.("success", {
           key: "update-payCat-success",
           message: "Success",
@@ -154,21 +170,25 @@ export function usePaymentCategoryAction() {
         });
       }
     },
-    [!!updatePaymentCategory, JSON.stringify(paymentCategory)]
+    [!!updatePaymentCategory]
   );
   const createPayCat = useCallback(
     async (
       paymentCategory: Partial<IPaymentCategory>,
-      txs?: Partial<ITx>[],
+      type: TxType,
       options?: IActionOptions
     ) => {
       try {
         await createPaymentCategory({
           variables: {
-            paymentCategory: paymentCategory as IPaymentCategory,
+            payment_category: paymentCategory as IPaymentCategory,
           },
         });
-        await getPayCat({ notify: options?.notify });
+        if (type === TxType.expenditure) {
+          getExpenditurePayCat(options);
+        } else {
+          getIncomePayCat(options);
+        }
         return options?.notify?.("success", {
           key: "create-payCat-success",
           message: "Success",
@@ -190,8 +210,6 @@ export function usePaymentCategoryAction() {
 
   return {
     paymentCategories,
-    paymentCategory,
-    setPaymentCategory,
     // getPaymentCategories: getPayCat,
     setSearchKeyword,
     createPaymentCategory: createPayCat,
