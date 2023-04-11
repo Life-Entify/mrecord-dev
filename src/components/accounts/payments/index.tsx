@@ -208,6 +208,7 @@ export default function PaymentComponent() {
         paymentTableProps={{
           payments: payments,
           showTx: false,
+          banks,
           tableProps: {
             rowSelection: {
               selectedRowKeys: [0],

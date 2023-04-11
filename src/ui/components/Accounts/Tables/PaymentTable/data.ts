@@ -1,4 +1,4 @@
-import { IPayment } from "../../types";
+import { IOrgBank, IPayment, PaymentType } from "../../types";
 import { RenderedCell } from "rc-table/lib/interface";
 import { TableColumnType } from "antd";
 import React from "react";
@@ -11,7 +11,8 @@ export const getPaymentTableColumns = (
     value: any,
     record: IPayment,
     index: number
-  ) => React.ReactNode | RenderedCell<IPayment>
+  ) => React.ReactNode | RenderedCell<IPayment>,
+  banks?: IOrgBank[]
 ): TableColumnType<IPayment>[] => {
   const columns: TableColumnType<IPayment>[] = [
     {
@@ -50,6 +51,22 @@ export const getPaymentTableColumns = (
         return "Tx Action";
       },
       render: render?.("action_type"),
+    },
+    {
+      key: "pay_type",
+      dataIndex: "pay_type",
+      title(props) {
+        return "Pay Type";
+      },
+      render(value, record, index) {
+        if (value === PaymentType.transfer) {
+          const bank = banks?.find((i) => i._id === record.bank_id);
+          if (bank) {
+            value += ` (${bank.bank})`;
+          }
+        }
+        return render?.("pay_type")(value, record, index) || value;
+      },
     },
     {
       key: "employee_id",
