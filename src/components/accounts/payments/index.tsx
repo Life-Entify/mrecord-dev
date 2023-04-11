@@ -19,6 +19,7 @@ import { dummy } from "../../dummy";
 import { useBankAction } from "../banks/actions";
 import { usePaymentAction } from "./actions/payment";
 import { usePaymentCategoryAction } from "./actions/payment_category";
+import { useTransactionAction } from "./actions/transaction";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -45,6 +46,8 @@ export default function PaymentComponent() {
     deletePaymentCategory,
   } = usePaymentCategoryAction();
   const { banks } = useBankAction();
+  const { setTransactions, transactions, getTransactionsById } =
+    useTransactionAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -220,6 +223,8 @@ export default function PaymentComponent() {
                   dialogType: PAYMENT_DIALOG_TYPE.PAYMENT_TXS,
                 });
                 setPayment(record);
+                setTransactions(undefined);
+                getTransactionsById(record.tx_ids);
               },
             },
           },
@@ -228,7 +233,7 @@ export default function PaymentComponent() {
           receivers: dummy.receivers,
         }}
         paymentTxsProps={{
-          payment,
+          payment: payment && { ...payment, txs: transactions },
           txTableProps: {
             onShowReceipt: () => {
               setState({
