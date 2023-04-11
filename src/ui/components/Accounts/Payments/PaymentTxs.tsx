@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { InfoBoard } from "ui/common";
 import { ITxTableProps, TxTable } from "../Tables";
-import { IPayment } from "../types";
+import { IPayment, IPaymentCategory } from "../types";
 import { paymentLabelMap } from "./data";
 
 const Root = styled.div``;
@@ -14,6 +14,7 @@ const TopBtnBox = styled.div`
   margin-bottom: 20px;
 `;
 export interface IPaymentTxProps {
+  categories?: IPaymentCategory[];
   payment?: IPayment;
   txTableProps?: Omit<ITxTableProps, "txs">;
   resolvePayment?: (paymentId: string) => void;
@@ -23,6 +24,7 @@ export interface IPaymentTxProps {
 export function PaymentTxs({
   txTableProps,
   payment,
+  categories,
   resolvePayment,
   markAsUnresolved,
 }: IPaymentTxProps) {
@@ -64,7 +66,11 @@ export function PaymentTxs({
           ...txTableProps,
           tableProps: {
             ...txTableProps?.tableProps,
-            dataSource: payment?.txs,
+            dataSource: payment?.txs?.map((i) => {
+              const cat = categories?.find((c) => c._id === i.category_id);
+              if (cat) i.category = cat;
+              return i;
+            }),
           },
         }}
       />

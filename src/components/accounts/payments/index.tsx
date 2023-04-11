@@ -234,6 +234,9 @@ export default function PaymentComponent() {
         }}
         paymentTxsProps={{
           payment: payment && { ...payment, txs: transactions },
+          categories:
+            paymentCategories?.expenditure.concat(paymentCategories.income) ||
+            [],
           txTableProps: {
             onShowReceipt: () => {
               setState({

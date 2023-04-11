@@ -19,7 +19,12 @@ export const getTxTableColumns = (
     title(props) {
       return "Date";
     },
-    render: render?.("created_at"),
+    render(value, record, index) {
+      if (value) {
+        value = new Date(Number(value)).toLocaleDateString();
+      }
+      return render?.("created_at")(value, record, index) || value;
+    },
   },
   {
     key: "tx_type",
@@ -37,7 +42,12 @@ export const getTxTableColumns = (
     title(_) {
       return "Category";
     },
-    render: render?.("category_id"),
+    render(value, record, index) {
+      if (record.category) {
+        value = record.category.title;
+      }
+      return render?.("category_id")(value, record, index) || value;
+    },
   },
   {
     key: "amount",
@@ -46,7 +56,10 @@ export const getTxTableColumns = (
     title(_) {
       return "Amount";
     },
-    render: render?.("amount"),
+    render(value, record, index) {
+      value = Number(value).toLocaleString();
+      return render?.("amount")(value, record, index) || value;
+    },
   },
   {
     key: "remark",
