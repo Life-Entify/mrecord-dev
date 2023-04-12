@@ -21,8 +21,12 @@ export const getPaymentTableColumns = (
       title: "Client",
       fixed: "left",
       render(value, record, index) {
-        const { last_name, first_name } = record?.person?.profile || {};
-        value = `${last_name} ${first_name}`;
+        if (value) {
+          const { last_name, first_name } = record?.person?.profile || {};
+          value = `${last_name} ${first_name}`;
+        } else {
+          value = record.client;
+        }
         return render?.("person_id")(value, record, index) || value;
       },
     },

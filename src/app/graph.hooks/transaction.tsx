@@ -7,7 +7,7 @@ import {
   graphUpdateTransaction,
 } from "app/graph.queries/transactions";
 import React from "react";
-import { ITx } from "ui";
+import { IPayment, ITx } from "ui";
 interface IReturnedData {
   transaction: (keyof ITx)[];
 }
@@ -50,9 +50,10 @@ export function useTransaction(
     IQTransactionRes,
     { _id: string; transaction: Partial<ITx> }
   >(graphUpdateTransaction(graphReturnedData.transaction));
-  const [deleteTransaction] = useMutation<{ _id: string }, { _id: string }>(
-    graphDeleteTransaction()
-  );
+  const [deleteTransaction] = useMutation<
+    { payment: IPayment },
+    { _id: string; payment_id: string }
+  >(graphDeleteTransaction());
 
   return {
     createTransaction,

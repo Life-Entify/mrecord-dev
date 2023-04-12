@@ -152,7 +152,7 @@ const staff: IEmployee = {
 };
 const bankTx: IBankTx = {
   _id: "129484",
-  employee_id: "3455sd",
+  employee_id: 1,
   bank_id: "dfsfds",
   amount: 30000,
   description: "staff salary",

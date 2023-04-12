@@ -27,8 +27,8 @@ export interface INewPaymentProps {
   cheques?: ICheque[];
   banks?: IBank[];
   transactions?: ITx[];
-  categories?: IPaymentCatDiff;
-  txType?: TxType;
+  categories?: IPaymentCategory[];
+  isEdit?: boolean;
   resetTxs?: () => void;
 }
 
@@ -40,8 +40,8 @@ export function NewPayment({
   formProps,
   cheques,
   banks,
-  txType,
   clientName,
+  isEdit,
   resetTxs,
 }: INewPaymentProps) {
   const formRef = React.useRef<FormInstance<IPaymentForm>>(null);
@@ -70,12 +70,7 @@ export function NewPayment({
             }
             dataSource={transactions}
             renderItem={(item, index) => {
-              const typeCategories =
-                txType === TxType.income
-                  ? categories?.income
-                  : categories?.expenditure;
-
-              const category = typeCategories?.find(
+              const category = categories?.find(
                 (i) => i._id === item.category_id
               );
               return (
@@ -111,6 +106,7 @@ export function NewPayment({
             banks,
             clientName,
             resetTxs,
+            isEdit,
           }),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
@@ -123,7 +119,7 @@ export function NewPayment({
                 fieldProps: {
                   type: "primary",
                   htmlType: "submit",
-                  children: "Create Payment",
+                  children: `${isEdit ? "Update" : "Create"} Payment`,
                 },
               },
             ],

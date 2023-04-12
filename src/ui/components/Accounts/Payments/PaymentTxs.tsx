@@ -2,6 +2,7 @@ import { Button, Divider, Space } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { InfoBoard } from "ui/common";
+import { BOOLEAN_STRING } from "ui/components/types";
 import { ITxTableProps, TxTable } from "../Tables";
 import { IPayment, IPaymentCategory } from "../types";
 import { paymentLabelMap } from "./data";
@@ -17,38 +18,52 @@ export interface IPaymentTxProps {
   categories?: IPaymentCategory[];
   payment?: IPayment;
   txTableProps?: Omit<ITxTableProps, "txs">;
-  resolvePayment?: (paymentId: string) => void;
-  markAsUnresolved?: (paymentId: string) => void;
+  onResolvePayment?: (resolve: BOOLEAN_STRING, paymentId: string) => void;
+  onDeletePayment?: (payment: IPayment) => void;
+  onOpenUpdatePage?: (payment: IPayment) => void;
 }
 
 export function PaymentTxs({
   txTableProps,
   payment,
   categories,
-  resolvePayment,
-  markAsUnresolved,
+  onResolvePayment,
+  onDeletePayment,
+  onOpenUpdatePage,
 }: IPaymentTxProps) {
   const [showDetails, setShowDetails] = useState<boolean>(false);
   const { unresolved } = payment || {};
   return (
     <Root>
       <TopBtnBox>
-        <Button onClick={() => setShowDetails(!showDetails)}>
-          {showDetails ? "Hide " : "Show "} Details
-        </Button>
-        <Button
-          onClick={() => {
-            if (payment) {
-              if (unresolved) {
-                resolvePayment?.(payment._id);
-              } else {
-                markAsUnresolved?.(payment._id);
+        <Space>
+          <Button type="primary" onClick={() => setShowDetails(!showDetails)}>
+            {showDetails ? "Hide " : "Show "} Details
+          </Button>
+          <Button onClick={() => onOpenUpdatePage?.(payment as IPayment)}>
+            Update Payment
+          </Button>
+        </Space>
+        <Space>
+          <Button
+            onClick={() => {
+              if (payment) {
+                if (unresolved === BOOLEAN_STRING.yes) {
+                  onResolvePayment?.(BOOLEAN_STRING.no, payment._id);
+                } else {
+                  onResolvePayment?.(BOOLEAN_STRING.yes, payment._id);
+                }
               }
-            }
-          }}
-        >
-          {unresolved ? "Resolve Payment" : "Mark as unresolved"}
-        </Button>
+            }}
+          >
+            {unresolved === BOOLEAN_STRING.yes
+              ? "Resolve Payment"
+              : "Mark as unresolved"}
+          </Button>
+          <Button onClick={() => onDeletePayment?.(payment as IPayment)}>
+            Delete Payment
+          </Button>
+        </Space>
       </TopBtnBox>
       {showDetails && (
         <>
@@ -62,6 +77,7 @@ export function PaymentTxs({
       )}
 
       <TxTable
+        removeColumns={["tx_type"]}
         {...{
           ...txTableProps,
           tableProps: {

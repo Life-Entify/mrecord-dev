@@ -114,13 +114,13 @@ export function usePaymentAction() {
         setPayments(payments);
         options?.noise &&
           options?.notify?.("success", {
-            key: "get-bnk-success",
+            key: "get-pay-success",
             message: "Success",
             description: "Fetched payments",
           });
       } catch (e) {
         options?.notify?.("error", {
-          key: "get-bnk-error",
+          key: "get-pay-error",
           message: "Error",
           description: (e as Error).message,
         });
@@ -146,7 +146,7 @@ export function usePaymentAction() {
         });
         await getPaymts({ ...options });
         options?.notify?.("success", {
-          key: "delete-bnk-success",
+          key: "delete-pay-success",
           message: "Success",
           description: "Payment deleted",
         });
@@ -156,13 +156,14 @@ export function usePaymentAction() {
           message: "Error",
           description: (e as Error).message,
         });
+        throw e;
       }
     },
     [!!updatePayment, JSON.stringify(payment)]
   );
   const updatePaymt = useCallback(
-    async (bnk: Partial<IPayment>, options?: IActionOptions) => {
-      if (Object.keys(bnk).length === 0) {
+    async (pay: Partial<IPayment>, txs?: ITx[], options?: IActionOptions) => {
+      if (Object.keys(pay).length === 0 && (!txs || txs?.length === 0)) {
         return options?.notify?.("error", {
           key: "error-no-changes",
           message: "Error",
@@ -171,11 +172,17 @@ export function usePaymentAction() {
       }
       try {
         const { data } = await updatePayment({
-          variables: { payment: bnk, _id: payment?._id as string },
+          variables: {
+            payment: pay,
+            _id: payment?._id as string,
+            transactions: txs,
+          },
         });
+        const { payment: newPayment } = data || {};
+        setPayment(newPayment);
         await getPaymts({ notify: options?.notify });
         options?.notify?.("success", {
-          key: "update-bnk-success",
+          key: "update-pay-success",
           message: "Success",
           description: "Payment updated",
         });
@@ -185,6 +192,7 @@ export function usePaymentAction() {
           message: "Error",
           description: (e as Error).message,
         });
+        throw e;
       }
     },
     [!!updatePayment, JSON.stringify(payment)]
@@ -204,16 +212,17 @@ export function usePaymentAction() {
         });
         await getPaymts({ notify: options?.notify });
         return options?.notify?.("success", {
-          key: "create-bnk-success",
+          key: "create-pay-success",
           message: "Success",
           description: "Payment created!",
         });
       } catch (e) {
         return options?.notify?.("error", {
-          key: "create-bnk-error",
+          key: "create-pay-error",
           message: "Error",
           description: (e as Error).message,
         });
+        throw e;
       }
     },
     [!!createPayment, JSON.stringify(user)]

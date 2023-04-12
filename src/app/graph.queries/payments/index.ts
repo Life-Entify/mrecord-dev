@@ -13,8 +13,8 @@ export const graphDeletePayment = () => {
 export const graphUpdatePayment = (payment?: (keyof IPayment)[]) => {
   const query = payment ? payment.join(" ") : "_id";
   return gql`
-    mutation updatePayment($_id: String, $payment: PaymentInputType) {
-        payment : updatePayment(_id: $_id, payment: $payment) {
+    mutation updatePayment($_id: String, $payment: PaymentInputType, $transactions: [TransactionInputType]) {
+        payment : updatePayment(_id: $_id, payment: $payment, transactions: $transactions) {
             ${query}
         }
     }`;

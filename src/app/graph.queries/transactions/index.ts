@@ -1,11 +1,12 @@
 import { gql } from "@apollo/client";
-import { ITx } from "ui";
+import { IPayment, ITx } from "ui";
 
-export const graphDeleteTransaction = () => {
+export const graphDeleteTransaction = (payment?: (keyof IPayment)[]) => {
+  const query = payment ? payment?.join(" ") : "_id";
   return gql`
-    mutation deleteTransaction($_id: String) {
-      _id: deleteTransaction(_id: $_id) {
-        _id
+    mutation deleteTransaction($_id: String, $payment_id: String) {
+      payment: deleteTransaction(_id: $_id, payment_id: $payment_id) {
+        ${query}
       }
     }
   `;

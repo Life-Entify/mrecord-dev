@@ -64,6 +64,7 @@ export interface IFormItems {
   ) => React.ReactNode | null;
   fieldType: FORM_FIELD_TYPES;
   form?: FormInstance;
+  isEdit?: boolean;
 }
 export const FormFields: React.FC<IFormItems> = ({
   fieldType,
@@ -71,6 +72,7 @@ export const FormFields: React.FC<IFormItems> = ({
   itemProps,
   itemFunc,
   form,
+  isEdit,
 }) => {
   const { getFieldValue } = form || {};
   switch (fieldType) {
@@ -186,11 +188,13 @@ export const FormFields: React.FC<IFormItems> = ({
                         />
                       );
                     })}
-                    <AntForm.Item>
-                      <MinusCircleOutlined
-                        onClick={() => remove(listField.name)}
-                      />
-                    </AntForm.Item>
+                    {!isEdit && (
+                      <AntForm.Item>
+                        <MinusCircleOutlined
+                          onClick={() => remove(listField.name)}
+                        />
+                      </AntForm.Item>
+                    )}
                   </div>
                 );
               })}
@@ -199,6 +203,7 @@ export const FormFields: React.FC<IFormItems> = ({
                   type="dashed"
                   onClick={() => add()}
                   icon={<PlusOutlined />}
+                  disabled={isEdit}
                 >
                   Add item
                 </Button>
@@ -215,6 +220,7 @@ export interface IFormProps {
   formProps?: FormProps;
   items?: IFormItems[];
   getForm?: (form: FormInstance) => void;
+  isEdit?: boolean;
 }
 
 export const Form: React.FC<IFormProps> = ({
@@ -222,6 +228,7 @@ export const Form: React.FC<IFormProps> = ({
   formRef,
   items,
   getForm,
+  isEdit,
 }) => {
   const [form] = AntForm.useForm();
   if (getForm) {
@@ -238,7 +245,7 @@ export const Form: React.FC<IFormProps> = ({
       form={form}
     >
       {items?.map((item, index) => {
-        return <FormFields key={index} {...item} form={form} />;
+        return <FormFields key={index} {...item} form={form} isEdit={isEdit} />;
       })}
     </AntForm>
   );

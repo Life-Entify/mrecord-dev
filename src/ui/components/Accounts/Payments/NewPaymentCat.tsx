@@ -22,10 +22,12 @@ const Result = styled.h3`
 `;
 export interface INewPaymentCatProps {
   txType?: TxType;
+  isEdit?: boolean;
   paymentTxs?: ITx[];
   incomeCats?: IPaymentCategory[];
   expenditureCats?: IPaymentCategory[];
-  onContinue?: (values: ITx[]) => void;
+  onContinue?: (values?: ITx[]) => void;
+  onContinueEdit?: (values?: ITx[]) => void;
 }
 function NewPaymentCatFunc({
   txType,
@@ -33,8 +35,11 @@ function NewPaymentCatFunc({
   incomeCats,
   expenditureCats,
   onContinue,
+  isEdit,
+  onContinueEdit,
 }: INewPaymentCatProps) {
   const formRef = React.useRef<FormInstance<ITx>>(null);
+  const [fieldChanges, setFieldChanges] = useState<ITx[]>();
   const [form, setForm] = useState<FormInstance>();
   const nameValue = AntForm.useWatch("category-list", form);
   let calc = "";
@@ -58,6 +63,7 @@ function NewPaymentCatFunc({
         <Result>Total Amount: {Number(result).toLocaleString()}</Result>
       </CalcContainer>
       <Form
+        isEdit={isEdit}
         formRef={formRef}
         getForm={(form) => {
           setForm(form);
@@ -65,8 +71,33 @@ function NewPaymentCatFunc({
         formProps={{
           name: "payment-cat-new-form",
           layout: "vertical",
+          onValuesChange(changedValues) {
+            let changedIndex;
+            const values = changedValues["category-list"] as ITx[];
+            values.forEach((_: ITx, index: number) => {
+              changedIndex = index;
+            });
+            if (changedIndex !== undefined) {
+              if (fieldChanges?.[changedIndex]) {
+                fieldChanges[changedIndex] = {
+                  ...(fieldChanges[changedIndex] as ITx),
+                  ...values[changedIndex],
+                };
+                setFieldChanges([...fieldChanges]);
+              } else if (fieldChanges) {
+                fieldChanges[changedIndex] = values[changedIndex];
+                setFieldChanges([...fieldChanges]);
+              } else {
+                setFieldChanges(values);
+              }
+            }
+          },
           onFinish(values) {
-            onContinue?.(values?.["category-list"]);
+            if (isEdit) {
+              onContinueEdit?.(fieldChanges);
+            } else {
+              onContinue?.(values?.["category-list"]);
+            }
           },
           initialValues: { ["category-list"]: paymentTxs },
         }}

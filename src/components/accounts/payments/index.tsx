@@ -1,3 +1,4 @@
+import { checkDEV } from "@apollo/client/utilities/globals";
 import { QKeywordPerson } from "app/graph.queries/persons/types";
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
@@ -15,8 +16,10 @@ import {
   LIST_ACTIONS,
   IPaymentCategory,
 } from "ui";
+import { BOOLEAN_STRING } from "ui/components/types";
 import { dummy } from "../../dummy";
 import { useBankAction } from "../banks/actions";
+import { useChequeAction } from "../cheques/actions";
 import { usePaymentAction } from "./actions/payment";
 import { usePaymentCategoryAction } from "./actions/payment_category";
 import { useTransactionAction } from "./actions/transaction";
@@ -32,12 +35,14 @@ const dialogNewPayment: Partial<IPaymentState> = {
 export default function PaymentComponent() {
   const {
     createPayment,
-    updatePayment,
+    getPayments,
     payments,
     payment,
     persons,
     setPayment,
+    deletePayment,
     getPersons,
+    updatePayment,
   } = usePaymentAction();
   const {
     paymentCategories,
@@ -46,16 +51,26 @@ export default function PaymentComponent() {
     deletePaymentCategory,
   } = usePaymentCategoryAction();
   const { banks } = useBankAction();
-  const { setTransactions, transactions, getTransactionsById } =
-    useTransactionAction();
+  const {
+    setTransactions,
+    transactions,
+    getTransactionsById,
+    deleteTransaction,
+  } = useTransactionAction();
+  const { cheques } = useChequeAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
   const setState = (state: Partial<IPaymentState>) =>
     _setState((_state) => ({ ..._state, ...state }));
   const [paymentForm, setPaymentForm] = useState<Partial<IPaymentForm>>({});
+  const [editPaymentForm, setEditPaymentForm] = useState<Partial<IPaymentForm>>(
+    {}
+  );
   const [paymentTxs, setPaymentTxs] = useState<ITx[]>();
+  const [editedPaymentTxs, setEditedPaymentTxs] = useState<ITx[]>();
   const [client, setClient] = useState<IPerson>();
+  const [isEditPayment, setEditPayment] = useState<boolean>();
 
   const [txType, setTxType] = useState<TxType>();
   const [personQuery, setPersonQuery] = useState<{
@@ -144,6 +159,14 @@ export default function PaymentComponent() {
         }
       }
     };
+  const resetPaymentForm = () => {
+    setPaymentForm({});
+    setEditPaymentForm({});
+    setEditedPaymentTxs(undefined);
+    setEditPayment(false);
+    setClient(undefined);
+    closeDialog();
+  };
   //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
   return (
     <>
@@ -152,11 +175,13 @@ export default function PaymentComponent() {
         toolbarProps={{
           newBtnProps: {
             style: { marginLeft: 10 },
-            onClick: () =>
+            onClick: () => {
+              resetPaymentForm();
               setState({
                 openDrawer: true,
                 ...dialogNewPayment,
-              }),
+              });
+            },
             title: "New Payment",
           },
           extra: {
@@ -235,9 +260,90 @@ export default function PaymentComponent() {
         paymentTxsProps={{
           payment: payment && { ...payment, txs: transactions },
           categories:
-            paymentCategories?.expenditure.concat(paymentCategories.income) ||
+            paymentCategories?.expenditure?.concat(paymentCategories?.income) ||
             [],
+          onOpenUpdatePage(payment) {
+            setPaymentForm({
+              ...payment,
+              created_at: moment(new Date(parseInt(payment.created_at))), //new Date(Number(payment.created_at)),
+              use_client: Boolean(payment.person_id),
+            } as any);
+            setEditPayment(true);
+            setClient(payment?.person);
+            setPaymentTxs(payment.txs);
+            setState({
+              dialogType: PAYMENT_DIALOG_TYPE.NEW_PAYMENT,
+            });
+          },
+          onResolvePayment(unresolved) {
+            openNotification("warning", {
+              key: "resolve-payment",
+              message: "Warning",
+              description: `Sure, you want to ${
+                unresolved === BOOLEAN_STRING.yes
+                  ? "resolve"
+                  : "mark this as unresolved"
+              } payment?`,
+              btn: [
+                {
+                  children: "Cancel",
+                  type: "primary",
+                  onClick: () => api.destroy("resolve-payment"),
+                },
+                {
+                  children: "Proceed",
+                  onClick: () => {
+                    api.destroy("resolve-payment");
+                    updatePayment({ unresolved }, undefined, {
+                      notify: openNotification,
+                    });
+                  },
+                },
+              ],
+            });
+          },
+          onDeletePayment(payment) {
+            deletePayment(payment._id, { notify: openNotification }).then(
+              () => {
+                closeDialog();
+              }
+            );
+          },
+
           txTableProps: {
+            onDeleteTx(tx) {
+              openNotification("warning", {
+                key: "delete-tx-warning",
+                message: "Warning",
+                description: `Sure, you want to delete this transaction worth - ${Number(
+                  tx.amount
+                ).toLocaleString()}. ${
+                  payment?.tx_ids.length === 1 &&
+                  "Note also that when this transaction is deleted, the payment would also be deleted"
+                }`,
+                btn: [
+                  {
+                    children: "Cancel",
+                    type: "primary",
+                    onClick: () => api.destroy("delete-tx-warning"),
+                  },
+                  {
+                    children: "Proceed",
+                    onClick: () => {
+                      api.destroy("delete-tx-warning");
+                      if (payment?._id) {
+                        deleteTransaction(tx._id, payment?._id, {
+                          notify: openNotification,
+                        }).then(() => {
+                          closeDialog();
+                          getPayments({ notify: openNotification });
+                        });
+                      }
+                    },
+                  },
+                ],
+              });
+            },
             onShowReceipt: () => {
               setState({
                 dialogType: PAYMENT_DIALOG_TYPE.SHOW_RECEIPT,
@@ -257,49 +363,71 @@ export default function PaymentComponent() {
         }}
         newPaymentProps={{
           banks,
-          categories: paymentCategories,
+          isEdit: isEditPayment,
+          categories:
+            paymentCategories?.expenditure?.concat(paymentCategories?.income) ||
+            [],
           transactions: paymentTxs,
-          txType,
           clientName: getClientName(),
           resetTxs() {
             setPaymentTxs(undefined);
           },
-          cheques: [],
+          cheques: cheques?.map((cheque) => {
+            const bank = banks?.find((bank) => bank._id === cheque.bank_id);
+            if (bank) cheque.bank = bank;
+            return cheque;
+          }),
           formProps: {
             initialValues: paymentForm,
             onValuesChange(changedValues) {
-              setPaymentForm((state) => ({ ...state, ...changedValues }));
+              if (isEditPayment) {
+                //setting payment for editing push a lot unnecessary values like person, emp. Need a clean slate
+                setEditPaymentForm((state) => ({ ...state, ...changedValues }));
+              } else {
+                //Because I need to change pages like client page to select client and cat page to select cats
+                setPaymentForm((state) => ({ ...state, ...changedValues }));
+              }
             },
             onFinish(values) {
-              if (values.use_client) {
-                values.person_id = client?.person_id;
-                delete values.client;
+              if (isEditPayment) {
+                updatePayment(editPaymentForm, editedPaymentTxs, {
+                  notify: openNotification,
+                }).then(() => {
+                  resetPaymentForm();
+                });
+              } else {
+                if (values.use_client) {
+                  values.person_id = client?.person_id;
+                  delete values.client;
+                }
+                delete values.use_client;
+                delete values.category_id;
+                values.created_at = new Date(
+                  moment(values.created_at || new Date()).format("YYYY-MM-DD")
+                )
+                  .getTime()
+                  .toString();
+                const txs = paymentTxs?.map((i) => ({
+                  ...i,
+                  tx_type: txType,
+                  created_at: values.created_at,
+                  amount: Number(i.amount),
+                }));
+                const payment: IPayment = {
+                  ...values,
+                  total_amount: txs
+                    ?.map((i) => i.amount)
+                    .reduce((a, b) => a + b),
+                  tx_type: txType,
+                };
+                createPayment(payment, txs, {
+                  notify: openNotification,
+                }).then(() => {
+                  setPaymentForm({});
+                  setPaymentTxs(undefined);
+                  closeDialog();
+                });
               }
-              delete values.use_client;
-              delete values.category_id;
-              values.created_at = new Date(
-                moment(values.created_at || new Date()).format("YYYY-MM-DD")
-              )
-                .getTime()
-                .toString();
-              const txs = paymentTxs?.map((i) => ({
-                ...i,
-                tx_type: txType,
-                created_at: values.created_at,
-                amount: Number(i.amount),
-              }));
-              const payment: IPayment = {
-                ...values,
-                total_amount: txs?.map((i) => i.amount).reduce((a, b) => a + b),
-                tx_type: txType,
-              };
-              createPayment(payment, txs, {
-                notify: openNotification,
-              }).then(() => {
-                setPaymentForm({});
-                setPaymentTxs(undefined);
-                closeDialog();
-              });
             },
           },
           openClient(form) {
@@ -356,11 +484,28 @@ export default function PaymentComponent() {
           },
         }}
         addPaymentCatProps={{
+          isEdit: isEditPayment,
           incomeCats: paymentCategories?.income,
           expenditureCats: paymentCategories?.expenditure,
           txType,
           paymentTxs,
           onBack: () => {
+            setState({
+              ...dialogNewPayment,
+            });
+          },
+          onContinueEdit(values) {
+            if (!values) {
+              //show error
+            }
+
+            if (paymentTxs && values)
+              for (let i = 0; i < values.length; i++) {
+                values[i] = { ...values[i], _id: paymentTxs[i]._id };
+                paymentTxs[i] = { ...paymentTxs[i], ...values[i] };
+              }
+            setEditedPaymentTxs(values);
+            setPaymentTxs(structuredClone(paymentTxs));
             setState({
               ...dialogNewPayment,
             });

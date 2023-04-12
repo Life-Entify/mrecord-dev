@@ -27,6 +27,7 @@ const defaultValue: IReturnedData = {
     "description",
     "employee_id",
     "tx_type",
+    "payment_id",
   ],
 };
 export function useBankTx(graphReturnedData: IReturnedData = defaultValue) {

@@ -304,4 +304,5 @@ export const bankTxLabelMap: Record<keyof IBankTx, React.ReactNode> = {
   payment_type: "",
   bank: "Bank",
   employee: "Employee",
+  payment_id: "Payment ID",
 };

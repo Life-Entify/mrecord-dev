@@ -14,6 +14,7 @@ export function useTransactionAction() {
     updateTransaction,
     deleteTransaction,
   } = useTransaction();
+  const [txIds, setTxIds] = useState<string[]>();
   const [transaction, setTransaction] = useState<ITx>();
   const [transactions, setTransactions] = useState<ITx[]>();
   const getTxs = async (noise?: boolean, options?: { notify: INotify }) => {
@@ -40,6 +41,7 @@ export function useTransactionAction() {
     options?: { notify: INotify; noise?: boolean }
   ) => {
     try {
+      setTxIds(_ids);
       const { data } = await getTransactionsById({
         variables: {
           _ids,
@@ -62,19 +64,15 @@ export function useTransactionAction() {
     }
   };
   const deleteTx = useCallback(
-    async (txId?: string, options?: IActionOptions) => {
-      if (!txId) {
-        return options?.notify?.("error", {
-          key: "error-no-changes",
-          message: "Error",
-          description: "No Transaction ID found!",
-        });
-      }
+    async (txId: string, paymentId: string, options?: IActionOptions) => {
       try {
         await deleteTransaction({
-          variables: { _id: txId },
+          variables: { _id: txId, payment_id: paymentId },
         });
-        await getTxs(false, options);
+        const newTxIds = txIds?.splice(txIds.indexOf(txId), 1);
+        if (newTxIds && newTxIds.length > 0) {
+          await getTxsById(newTxIds, options);
+        }
         options?.notify?.("success", {
           key: "delete-tx-success",
           message: "Success",
@@ -88,7 +86,7 @@ export function useTransactionAction() {
         });
       }
     },
-    [!!updateTransaction, JSON.stringify(transaction)]
+    [!!updateTransaction, JSON.stringify(txIds)]
   );
   const updateTx = useCallback(
     async (tx: Partial<ITx>, options?: IActionOptions) => {

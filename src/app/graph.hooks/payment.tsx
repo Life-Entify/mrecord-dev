@@ -29,6 +29,9 @@ const defaultValue: IReturnedData = {
     "total_amount",
     "tx_ids",
     "tx_type",
+    "unresolved",
+    "client",
+    "cheque_id",
   ],
 };
 export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
@@ -44,7 +47,11 @@ export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
   });
   const [updatePayment] = useMutation<
     IQPaymentRes,
-    { _id: string; payment: Partial<Omit<IPayment, "_id">> }
+    {
+      _id: string;
+      payment: Partial<Omit<IPayment, "_id">>;
+      transactions?: ITx[];
+    }
   >(graphUpdatePayment(graphReturnedData.payment));
   const [deletePayment] = useMutation<{ _id: string }, { _id: string }>(
     graphDeletePayment()

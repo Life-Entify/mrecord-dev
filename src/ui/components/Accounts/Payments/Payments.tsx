@@ -120,7 +120,7 @@ export function Payments({
             <NewPaymentCat {...deepAddPaymentCatProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.PAYMENT_TXS && (
-            <PaymentTxs {...paymentTxsProps} />
+            <PaymentTxs {...paymentTxsProps}/>
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.SHOW_RECEIPT && (
             <PaymentReceipt {...deepPaymentReceiptProps} />

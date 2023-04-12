@@ -104,8 +104,10 @@ export interface IPayment {
   // receive/pay money from pt or staff or write description
   person_id?: number;
   bank_id?: string;
+  cheque_id?: string;
   person?: IPerson;
   description?: string;
+  client?: string;
   //staff in charge of the system
   employee_id: number;
   employee?: IEmployee;
@@ -117,7 +119,7 @@ export interface IPayment {
   created_at: string;
 
   //monitor delayed transfer entry
-  unresolved?: boolean;
+  unresolved?: BOOLEAN_STRING;
 }
 
 export enum BankTxType {
@@ -127,7 +129,7 @@ export enum BankTxType {
 export interface IBankTx {
   _id: string;
   tx_type: BankTxType; // BankTxType;
-  employee_id: string;
+  employee_id: number;
   employee?: Partial<IEmployee>;
   bank_id: string;
   bank?: Partial<IOrgBank>;
@@ -135,6 +137,7 @@ export interface IBankTx {
   description: string;
   payment_type: keyof typeof PaymentType;
   created_at: string;
+  payment_id?: string;
 }
 export interface ICashBundle {
   _id: string;

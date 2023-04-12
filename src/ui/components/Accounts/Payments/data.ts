@@ -42,6 +42,8 @@ export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   unresolved: "Unresolved",
   bank_id: "Bank ID",
   employee: "Employee",
+  client: "Client",
+  cheque_id: "Cheque ID",
 };
 export const payTxCategoryForm = (
   categories?: IPaymentCategory[]
@@ -89,6 +91,7 @@ export const paymentForm = ({
   banks,
   clientName,
   resetTxs,
+  isEdit,
 }: {
   openClient?: React.MouseEventHandler;
   openCategory?: (txType: TxType) => void;
@@ -96,6 +99,7 @@ export const paymentForm = ({
   banks?: IBank[];
   clientName?: string;
   resetTxs?: () => void;
+  isEdit?: boolean;
 }): IFormItems[] => [
   {
     fieldType: FORM_FIELD_TYPES.TREE_SELECT,
@@ -105,6 +109,7 @@ export const paymentForm = ({
       rules: [{ required: true }],
     },
     fieldProps: {
+      disabled: isEdit,
       treeData: [
         {
           value: TxType.expenditure,
@@ -238,6 +243,9 @@ export const paymentForm = ({
       name: "use_client",
       label: "Use Saved Client",
     },
+    fieldProps: {
+      disabled: isEdit,
+    },
   },
   {
     fieldType: FORM_FIELD_TYPES.HIDDEN,
@@ -285,6 +293,7 @@ export const paymentForm = ({
           fieldProps: {
             children: clientName || "Open Client",
             onClick: openClient,
+            disabled: isEdit,
           },
         },
       ],

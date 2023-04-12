@@ -101,7 +101,7 @@ export function BankView({
         columns={getBankTxTableColumns((dataIndex) => (value, record) => {
           //@ts-ignore
           delete record.__typename;
-          if (dataIndex === "action") {
+          if (dataIndex === "action" && !record.payment_id) {
             return (
               <Space>
                 <Tooltip title="Edit transaction">
