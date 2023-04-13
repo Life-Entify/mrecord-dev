@@ -134,7 +134,7 @@ export interface IBankTx {
   bank_id: string;
   bank?: Partial<IOrgBank>;
   amount: number;
-  description: string;
+  description?: string;
   payment_type: keyof typeof PaymentType;
   created_at: string;
   payment_id?: string;

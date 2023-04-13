@@ -106,7 +106,6 @@ export default function PaymentComponent() {
         }}
         fundChangeProps={{
           bank,
-          banks,
           bankTxType,
           bankTx: bankTx
             ? { ...bankTx, created_at: moment(new Date(bankTx?.created_at)) }
@@ -131,6 +130,9 @@ export default function PaymentComponent() {
           },
           onCreateBankTx(bankTx, formRef) {
             bankTx.tx_type = bankTxType as BankTxType;
+            bankTx.created_at = new Date(bankTx.created_at || new Date())
+              .getTime()
+              .toString();
             if (bank) {
               createBankTx(bank, bankTx, { notify: openNotification }).then(
                 () => {

@@ -87,21 +87,7 @@ export const orgBankInputForm: IFormItems[] = [
     },
   },
 ];
-export const bankTxInputForm = (banks?: IOrgBank[]): IFormItems[] => [
-  {
-    fieldType: FORM_FIELD_TYPES.SELECT,
-    itemProps: {
-      name: "bank_id",
-      label: "Bank",
-      rules: [{ required: true }],
-    },
-    fieldProps: {
-      options: banks?.map((bank) => ({
-        value: bank._id,
-        label: bank.bank as string,
-      })),
-    },
-  },
+export const bankTxInputForm = (): IFormItems[] => [
   {
     fieldType: FORM_FIELD_TYPES.SELECT,
     itemProps: {
@@ -252,7 +238,7 @@ export const getBankTxTableColumns = (
       return "Date";
     },
     render(value, record, index) {
-      const dateString = new Date(value).toLocaleDateString();
+      const dateString = new Date(Number(value)).toLocaleDateString();
       return render?.("created_at")(dateString, record, index) || dateString;
     },
   },
@@ -270,9 +256,15 @@ export const getBankTxTableColumns = (
     dataIndex: "employee_id",
     fixed: "left",
     title(_) {
-      return "Staff ID";
+      return "Staff";
     },
-    render: render?.("employee_id"),
+    render(value, record, index) {
+      if (record?.employee) {
+        const { last_name, first_name } = record.employee.person?.profile || {};
+        value = `${last_name || ""} ${first_name || ""}`;
+      }
+      return render?.("employee_id")(value, record, index) || value;
+    },
   },
   {
     key: "description",

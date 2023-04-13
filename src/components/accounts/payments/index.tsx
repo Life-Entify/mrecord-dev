@@ -15,6 +15,9 @@ import {
   TxType,
   LIST_ACTIONS,
   IPaymentCategory,
+  IBank,
+  IOrgBank,
+  ICheque,
 } from "ui";
 import { BOOLEAN_STRING } from "ui/components/types";
 import { dummy } from "../../dummy";
@@ -50,7 +53,7 @@ export default function PaymentComponent() {
     updatePaymentCategory,
     deletePaymentCategory,
   } = usePaymentCategoryAction();
-  const { banks } = useBankAction();
+  const { activeBanks: banks } = useBankAction();
   const {
     setTransactions,
     transactions,
@@ -236,7 +239,7 @@ export default function PaymentComponent() {
         paymentTableProps={{
           payments: payments,
           showTx: false,
-          banks,
+          banks: banks as IOrgBank[],
           tableProps: {
             rowSelection: {
               selectedRowKeys: [0],
@@ -362,7 +365,7 @@ export default function PaymentComponent() {
           },
         }}
         newPaymentProps={{
-          banks,
+          banks: banks as IBank[],
           isEdit: isEditPayment,
           categories:
             paymentCategories?.expenditure?.concat(paymentCategories?.income) ||
@@ -373,10 +376,12 @@ export default function PaymentComponent() {
             setPaymentTxs(undefined);
           },
           cheques: cheques?.map((cheque) => {
-            const bank = banks?.find((bank) => bank._id === cheque.bank_id);
-            if (bank) cheque.bank = bank;
-            return cheque;
-          }),
+            const bank = banks?.find((bank) => bank?._id === cheque.bank_id);
+            if (bank) {
+              cheque.bank = bank;
+              return cheque;
+            }
+          }) as ICheque[],
           formProps: {
             initialValues: paymentForm,
             onValuesChange(changedValues) {

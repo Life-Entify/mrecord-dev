@@ -14,7 +14,6 @@ export interface IBankTxMoment extends Omit<IBankTx, "created_at"> {
 }
 export interface INewBankTxProps {
   title?: React.ReactNode;
-  banks?: IOrgBank[];
   bankTx?: IBankTxMoment;
   onCreateBankTx?: (
     bankTx: IBankTx,
@@ -29,7 +28,6 @@ export interface INewBankTxProps {
 
 export function NewBankTx({
   title,
-  banks = [],
   bankTx,
   isEdit,
   onCreateBankTx,
@@ -64,7 +62,7 @@ export function NewBankTx({
           },
         }}
         items={[
-          ...bankTxInputForm(banks),
+          ...bankTxInputForm(),
           {
             fieldType: FORM_FIELD_TYPES.FIELDS,
             itemProps: {

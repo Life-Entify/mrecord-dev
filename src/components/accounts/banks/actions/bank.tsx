@@ -129,6 +129,12 @@ export function useBankAction() {
 
   return {
     banks,
+    activeBanks:
+      banks?.map((bank) => {
+        if (bank.active === BOOLEAN_STRING.yes) {
+          return bank;
+        }
+      }) || [],
     bank,
     setBank,
     getBanks: getBnks,

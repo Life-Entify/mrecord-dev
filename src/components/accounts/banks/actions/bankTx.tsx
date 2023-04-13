@@ -1,11 +1,19 @@
 import { useBankTx } from "app/graph.hooks/bankTx";
+import { useEmployee } from "app/graph.hooks/employee";
+import { usePayment } from "app/graph.hooks/payment";
+import { selectUser } from "app/redux/user.core";
 import React, { useCallback, useState } from "react";
-import { IBankTx, INotify, IOrgBank } from "ui";
+import { useSelector } from "react-redux";
+import { BankTxType, IBankTx, INotify, IOrgBank } from "ui";
 
 export function useBankTxAction() {
   const { getBankTxs, createBankTx, updateBankTx, deleteBankTx } = useBankTx();
+  const { getEmployeesByEmployeeId } = useEmployee();
+  const { getPayments } = usePayment();
+  const user = useSelector(selectUser);
   const [bankTx, setBankTx] = useState<IBankTx>();
   const [bankTxs, setBankTxs] = useState<IBankTx[]>();
+
   const getBnkTxs = async (
     bank: IOrgBank,
     options?: { notify?: INotify; noise?: boolean }
@@ -17,6 +25,49 @@ export function useBankTxAction() {
         },
       });
       const { bank_txs } = data || {};
+      const { data: paymentData } = await getPayments({
+        variables: {
+          keyword: { bank_id: bank._id },
+        },
+      });
+      const { payments } = paymentData || {};
+      if (payments) {
+        for (let i = 0; i < payments.length; i++) {
+          const payment = payments[i];
+          bank_txs?.push({
+            description: payment.description,
+            payment_id: payment._id,
+            _id: payment._id,
+            tx_type:
+              payment.tx_type === "income"
+                ? BankTxType.DEPOSIT
+                : BankTxType.WITHDRAWAL,
+            employee_id: payment.employee_id,
+            bank_id: payment.bank_id as string,
+            amount: payment.total_amount,
+            payment_type: payment.pay_type,
+            created_at: payment.created_at,
+          });
+        }
+      }
+      const empIds: number[] = [];
+      bank_txs?.forEach((bankTx) => empIds.push(bankTx.employee_id));
+      if (empIds.length > 0) {
+        const { data: empData } = await getEmployeesByEmployeeId({
+          variables: {
+            ids: empIds,
+          },
+        });
+        const { employees } = empData || {};
+        bank_txs?.forEach((tx, index) => {
+          const emp = employees?.find(
+            (item) => item.employee_id === tx.employee_id
+          );
+          if (emp) {
+            bank_txs[index].employee = emp;
+          }
+        });
+      }
       setBankTxs(bank_txs);
       options?.noise &&
         options?.notify?.("success", {
@@ -111,8 +162,9 @@ export function useBankTxAction() {
           description: "Missing name field",
         });
       }
-      console.log(bankTx);
       try {
+        bankTx.employee_id = user.employee_id;
+        bankTx.bank_id = bank._id;
         await createBankTx({
           variables: { bank_tx: bankTx },
         });
@@ -130,7 +182,7 @@ export function useBankTxAction() {
         });
       }
     },
-    [!!createBankTx]
+    [!!createBankTx, JSON.stringify(user)]
   );
   return {
     bankTxs,
