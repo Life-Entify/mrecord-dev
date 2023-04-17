@@ -1,7 +1,7 @@
 import { Button, ButtonProps, Space } from "antd";
 import React, { ReactElement } from "react";
 
-export * from "@ant-design/icons";
+// export * from "@ant-design/icons";
 export type { TableColumnType } from "antd";
 export { notification, Button, Space } from "antd";
 export * from "./table.header";

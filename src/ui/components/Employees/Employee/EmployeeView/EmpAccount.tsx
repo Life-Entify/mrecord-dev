@@ -1,7 +1,8 @@
 import { Button, Divider } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
-import { ArrowDownOutlined, CloseOutlined, InfoBoard } from "ui/common";
+import { InfoBoard } from "ui/common";
+import { CloseOutlined, ArrowDownOutlined } from "@ant-design/icons";
 import { bankLabelMap, IBank } from "ui/components/Accounts";
 import {
   IPaymentTableProps,

@@ -1,12 +1,8 @@
 import { DrawerProps, Space, Table, TableProps, Tooltip } from "antd";
 import React from "react";
 import styled from "styled-components";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  IToolbarProps,
-  Toolbar,
-} from "ui/common";
+import { IToolbarProps, Toolbar } from "ui/common";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { AppDrawer } from "ui/common/views/AppDrawer/AppDrawer";
 import { getDepartmentTableColumns } from "./data";
 import { INewDepartmentProps, NewDepartment } from "./NewDepartment";

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Sidebar, getSidebarItem as getItem, MoneyCollectOutlined } from "ui";
+import { Sidebar, getSidebarItem as getItem, ILayoutSidebarProps } from "ui";
 import {
   HomeOutlined,
   UserOutlined,
@@ -8,8 +8,8 @@ import {
   BookOutlined,
   SettingOutlined,
   UsergroupAddOutlined,
-  ILayoutSidebarProps,
-} from "ui";
+  MoneyCollectOutlined,
+} from "@ant-design/icons";
 import { routeNames } from "app/utils";
 
 export const items = [

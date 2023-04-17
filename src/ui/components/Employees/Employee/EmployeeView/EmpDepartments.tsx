@@ -10,13 +10,10 @@ import {
 } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  Form,
-  FORM_FIELD_TYPES,
-} from "ui/common";
+import { Form, FORM_FIELD_TYPES } from "ui/common";
 import { IDepartment } from "ui/components/Departments";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+
 import { ILogin, IEmployee } from "../../types";
 import { getLoginColumns, loginForm } from "./data";
 

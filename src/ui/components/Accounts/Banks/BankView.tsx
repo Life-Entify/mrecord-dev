@@ -1,14 +1,8 @@
 import { Button, Divider, Space, Table, TableProps, Tooltip } from "antd";
 import React, { useState } from "react";
 import styled from "styled-components";
-import {
-  DeleteOutlined,
-  EditOutlined,
-  IInfoBoardProps,
-  InfoBoard,
-  IToolbarProps,
-  Toolbar,
-} from "ui/common";
+import { IInfoBoardProps, InfoBoard, IToolbarProps, Toolbar } from "ui/common";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { BOOLEAN_STRING } from "ui/components/types";
 import { BankTxType, IOrgBank, IBankTx } from "../types";
 import { bankLabelMap, getBankTxTableColumns } from "./data";
