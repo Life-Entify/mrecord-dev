@@ -19,6 +19,7 @@ import type { FormInstance, FormItemProps, FormProps } from "antd/es/form";
 import { TextAreaProps } from "antd/es/input";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { NamePath } from "antd/es/form/interface";
+import { FileDragIn } from "./Upload";
 
 const { Option } = Select;
 
@@ -39,6 +40,7 @@ export enum FORM_FIELD_TYPES {
   TREE_SELECT = 10,
   HIDDEN = 11,
   LIST = 12,
+  UPLOAD = 13,
 }
 type BtnProps = ButtonProps;
 type IFieldProps =
@@ -94,6 +96,12 @@ export const FormFields: React.FC<IFormItems> = ({
       return (
         <AntForm.Item {...itemProps}>
           <Input {...(fieldProps as InputProps)} />
+        </AntForm.Item>
+      );
+    case FORM_FIELD_TYPES.UPLOAD:
+      return (
+        <AntForm.Item {...itemProps}>
+          <FileDragIn />
         </AntForm.Item>
       );
     case FORM_FIELD_TYPES.TREE_SELECT:

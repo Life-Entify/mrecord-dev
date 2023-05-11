@@ -12,18 +12,18 @@ import {
   TxType,
 } from "../types";
 
-const expenditures: (keyof typeof IExpenditureAction)[] = [
+export const expenditures: (keyof typeof IExpenditureAction)[] = [
   "deposit_withdrawal",
   "loan",
   "pay",
 ];
-const externalIncome: (keyof typeof IIncomeActions)[] = [
+export const externalIncome: (keyof typeof IIncomeActions)[] = [
   "receive_deposit",
   "receive_pay",
   "loan_repayment",
   "redeem_credit",
 ];
-const internalIncome: (keyof typeof IIncomeActions)[] = ["use_deposit"];
+export const internalIncome: (keyof typeof IIncomeActions)[] = ["use_deposit"];
 const falseIncome: (keyof typeof IIncomeActions)[] = ["register_credit"];
 
 export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
@@ -121,7 +121,7 @@ export const paymentForm = ({
               value: AccountAction.deposit_withdrawal,
               title: "Withdraw Deposit",
             },
-            { value: AccountAction.loan, title: "Loan" },
+            // { value: AccountAction.loan, title: "Loan" },
           ],
         },
         {
@@ -134,7 +134,7 @@ export const paymentForm = ({
             { value: AccountAction.use_deposit, title: "Use Deposit" },
             { value: AccountAction.register_credit, title: "As Credit" },
             { value: AccountAction.redeem_credit, title: "Redeem Debt" },
-            { value: AccountAction.loan_repayment, title: "Loan Repayment" },
+            // { value: AccountAction.loan_repayment, title: "Loan Repayment" },
           ],
         },
       ],
@@ -377,7 +377,7 @@ export const paymentForm = ({
     fieldProps: {
       fieldType: FORM_FIELD_TYPES.TEXT,
       itemProps: {
-        name: "amount",
+        name: "total_amount",
         label: "Amount",
       },
       fieldProps: {

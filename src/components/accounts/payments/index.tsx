@@ -18,6 +18,7 @@ import {
   IBank,
   IOrgBank,
   ICheque,
+  expenditures,
 } from "ui";
 import { BOOLEAN_STRING } from "ui/components/types";
 import { dummy } from "../../dummy";
@@ -412,18 +413,22 @@ export default function PaymentComponent() {
                 )
                   .getTime()
                   .toString();
+                const tx_type =
+                  expenditures.indexOf(values.action_type) === -1
+                    ? TxType.income
+                    : TxType.expenditure;
                 const txs = paymentTxs?.map((i) => ({
                   ...i,
-                  tx_type: txType,
+                  tx_type,
                   created_at: values.created_at,
                   amount: Number(i.amount),
                 }));
                 const payment: IPayment = {
                   ...values,
-                  total_amount: txs
-                    ?.map((i) => i.amount)
-                    .reduce((a, b) => a + b),
-                  tx_type: txType,
+                  total_amount:
+                    txs?.map((i) => i.amount).reduce((a, b) => a + b) ||
+                    Number(values.total_amount),
+                  tx_type,
                 };
                 createPayment(payment, txs, {
                   notify: openNotification,

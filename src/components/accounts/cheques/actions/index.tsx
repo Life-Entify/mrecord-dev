@@ -1,7 +1,6 @@
 import { useCheque } from "app/graph.hooks/cheque";
 import React, { useCallback, useEffect, useState } from "react";
 import { ICheque, INotify } from "ui";
-import { BOOLEAN_STRING } from "ui/components/types";
 export interface IActionOptions {
   notify: INotify;
 }
