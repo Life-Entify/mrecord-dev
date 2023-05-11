@@ -366,12 +366,19 @@ export const paymentForm = ({
     },
     itemFunc(formInstance, fieldForm, fieldData) {
       const value = formInstance?.getFieldValue?.("action_type");
-      return ![
-        AccountAction.receive_pay,
-        AccountAction.register_credit,
-        AccountAction.pay,
-      ].includes(value)
-        ? fieldData && fieldForm?.(fieldData)
+      const disabled = [
+        AccountAction.deposit_withdrawal,
+        AccountAction.use_deposit,
+      ].includes(value);
+      return ![AccountAction.receive_pay].includes(value)
+        ? fieldData &&
+            fieldForm?.({
+              ...fieldData,
+              fieldProps: {
+                ...fieldData.fieldProps,
+                disabled,
+              } as any,
+            })
         : null;
     },
     fieldProps: {

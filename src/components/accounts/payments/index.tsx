@@ -19,6 +19,9 @@ import {
   IOrgBank,
   ICheque,
   expenditures,
+  IExpenditureAction,
+  IIncomeActions,
+  AccountAction,
 } from "ui";
 import { BOOLEAN_STRING } from "ui/components/types";
 import { dummy } from "../../dummy";
@@ -27,6 +30,7 @@ import { useChequeAction } from "../cheques/actions";
 import { usePaymentAction } from "./actions/payment";
 import { usePaymentCategoryAction } from "./actions/payment_category";
 import { useTransactionAction } from "./actions/transaction";
+import { useDepositAction } from "../deposits/actions";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -62,6 +66,7 @@ export default function PaymentComponent() {
     deleteTransaction,
   } = useTransactionAction();
   const { cheques } = useChequeAction();
+  const { getPersonDepositBalance } = useDepositAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -475,12 +480,35 @@ export default function PaymentComponent() {
             rowSelection: {
               type: "radio",
               selectedRowKeys: [],
-              onChange(selectedRowKeys) {
+              async onChange(selectedRowKeys) {
                 const person_id = selectedRowKeys[0] as number;
                 const client = persons?.find(
                   (item) => item.person_id === person_id
                 );
                 client && setClient(client);
+                if (
+                  client &&
+                  [
+                    AccountAction.deposit_withdrawal,
+                    AccountAction.use_deposit,
+                  ].indexOf(paymentForm.action_type as AccountAction) !== -1
+                ) {
+                  const personDepositBalance = await getPersonDepositBalance(
+                    client?.person_id,
+                    {
+                      notify: openNotification,
+                    }
+                  );
+                  if (personDepositBalance) {
+                    const {
+                      deposit = 0,
+                      used = 0,
+                      withdrawn = 0,
+                    } = personDepositBalance;
+                    const bal = deposit - used - withdrawn;
+                    setPaymentForm({ ...paymentForm, total_amount: bal });
+                  }
+                }
                 setState({
                   ...dialogNewPayment,
                 });

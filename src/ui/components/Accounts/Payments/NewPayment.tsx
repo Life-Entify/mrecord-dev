@@ -1,12 +1,10 @@
-import { FormInstance, FormProps, List, Steps } from "antd";
-import React, { useState } from "react";
+import { FormInstance, FormProps, List } from "antd";
+import React from "react";
 import styled from "styled-components";
 import { Form, FORM_FIELD_TYPES } from "ui/common";
-import { IPerson } from "ui/components/Person";
 import {
   IBank,
   ICheque,
-  IPaymentCatDiff,
   IPaymentCategory,
   IPaymentForm,
   ITx,

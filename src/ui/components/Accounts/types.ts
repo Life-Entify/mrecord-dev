@@ -2,6 +2,12 @@ import React from "react";
 import { IPerson } from "../Person";
 import { IEmployee } from "../Employees/Employee";
 import { BOOLEAN_STRING } from "../types";
+
+export interface IDepositBalance {
+  used: number;
+  withdrawn: number;
+  deposit: number;
+}
 export interface IPaymentCatDiff {
   income: IPaymentCategory[];
   expenditure: IPaymentCategory[];
