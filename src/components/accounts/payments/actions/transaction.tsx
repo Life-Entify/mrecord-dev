@@ -17,12 +17,17 @@ export function useTransactionAction() {
   const [txIds, setTxIds] = useState<string[]>();
   const [transaction, setTransaction] = useState<ITx>();
   const [transactions, setTransactions] = useState<ITx[]>();
-  const getTxs = async (noise?: boolean, options?: { notify: INotify }) => {
+  const [allTxs, setAllTxs] = useState<ITx[]>();
+  const getTxs = async (filter: Partial<ITx>, options?: { notify: INotify, noise?: boolean }) => {
     try {
-      const { data } = await getTransactions();
+      const { data } = await getTransactions({
+        variables: {
+          keyword: filter
+        }
+      });
       const { transactions } = data || {};
-      setTransactions(transactions as ITx[]);
-      noise &&
+      setAllTxs(transactions as ITx[]);
+      options?.noise &&
         options?.notify?.("success", {
           key: "get-tx-success",
           message: "Success",
@@ -123,7 +128,7 @@ export function useTransactionAction() {
         await createTransaction({
           variables: { transaction },
         });
-        await getTxs(false, { notify: options.notify });
+        await getTxs({}, { notify: options.notify });
         return options?.notify?.("success", {
           key: "create-tx-success",
           message: "Success",

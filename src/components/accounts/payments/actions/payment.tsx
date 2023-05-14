@@ -5,14 +5,19 @@ import { QKeywordPerson } from "app/graph.queries/persons/types";
 import { selectUser } from "app/redux/user.core";
 import React, { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { IPayment, INotify, ITx } from "ui";
+import { IPayment, INotify, ITx, IDateFilter, IPaymentSummaryEmp } from "ui";
 import { IPerson } from "ui/components/Person";
 export interface IActionOptions {
   notify: INotify;
 }
 export function usePaymentAction() {
-  const { getPayments, createPayment, updatePayment, deletePayment } =
-    usePayment();
+  const {
+    getPayments,
+    createPayment,
+    updatePayment,
+    deletePayment,
+    getPaymentSummaryByEmp,
+  } = usePayment();
   const { getPersons, getPersonsByPersonID } = usePerson({
     person: ["_id", "person_id", "profile"],
     profile: ["last_name", "first_name"],
@@ -24,6 +29,8 @@ export function usePaymentAction() {
   });
   const user = useSelector(selectUser);
   const [payments, setPayments] = useState<IPayment[]>();
+  const [paymentSummaryEmp, setPaymentSummaryEmp] =
+    useState<IPaymentSummaryEmp[]>();
   const [paymentQuery, setPaymentQuery] = useState<{
     keyword?: Partial<IPayment>;
     limit?: number;
@@ -31,7 +38,29 @@ export function usePaymentAction() {
   }>();
   const [payment, setPayment] = useState<IPayment>();
   const [persons, setPersons] = useState<IPerson[]>();
-
+  const getEmpSumByDate = async (
+    dateFilter: IDateFilter,
+    filter?: Partial<IPayment>,
+    options?: { notify: INotify; noise?: boolean }
+  ) => {
+    try {
+      const { data } = await getPaymentSummaryByEmp({
+        variables: {
+          filter,
+          date_filter: dateFilter,
+        },
+      });
+      const { paymentSummaryEmp: empData } = data || {};
+      setPaymentSummaryEmp(empData);
+    } catch (e) {
+      options?.noise &&
+        options?.notify?.("error", {
+          key: "get-emp-summary-error",
+          message: "Error",
+          description: (e as Error).message,
+        });
+    }
+  };
   const getPsons = async (
     keyword?: QKeywordPerson,
     limit?: number,
@@ -232,6 +261,8 @@ export function usePaymentAction() {
   }, []);
 
   return {
+    paymentSummaryEmp,
+    getEmpSumByDate,
     payments,
     payment,
     persons,

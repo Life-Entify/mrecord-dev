@@ -1,22 +1,25 @@
 import { useLazyQuery, useMutation } from "@apollo/client";
 import {
+  IPaymentReturnObjects,
   graphCreatePayment,
   graphDeletePayment,
+  graphGetPaymentSummaryByEmps,
   graphGetPayments,
   graphUpdatePayment,
 } from "app/graph.queries/payments";
 import React from "react";
-import { IPayment, ITx } from "ui";
-interface IReturnedData {
+import { IDateFilter, IPayment, IPaymentSummaryEmp, ITx } from "ui";
+interface IReturnedData extends IPaymentReturnObjects {
   payment: (keyof Omit<IPayment, "person" | "txs">)[];
-}
-export interface IQPaymentInput {
-  payment: Partial<IPayment>;
-}
-export interface IQPaymentRes {
-  payment: IPayment;
+  paymentSummary: (keyof IPaymentSummaryEmp)[];
 }
 const defaultValue: IReturnedData = {
+  paymentSummary: ["employee", "action_types", "pay_types"],
+  employee: ["_id", "employee_id", "person"],
+  person: ["profile"],
+  profile: ["last_name", "first_name"],
+  action_types: ["action_type", "total_amount"],
+  pay_types: ["pay_type", "total_amount"],
   payment: [
     "_id",
     "bank_id",
@@ -36,9 +39,21 @@ const defaultValue: IReturnedData = {
 };
 export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
   const [createPayment] = useMutation<
-    IQPaymentRes,
+    { payment: IPayment },
     { payment: IPayment; transactions: ITx[] }
   >(graphCreatePayment(graphReturnedData.payment));
+  const [getPaymentSummaryByEmp] = useLazyQuery<
+    { paymentSummaryEmp: IPaymentSummaryEmp[] },
+    { filter?: Partial<IPayment>; date_filter: IDateFilter }
+  >(
+    graphGetPaymentSummaryByEmps(
+      graphReturnedData.paymentSummary,
+      graphReturnedData
+    ),
+    {
+      fetchPolicy: "network-only",
+    }
+  );
   const [getPayments] = useLazyQuery<
     { payments: IPayment[] },
     { keyword?: Partial<IPayment>; limit?: number; skip?: number }
@@ -46,7 +61,7 @@ export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
     fetchPolicy: "network-only",
   });
   const [updatePayment] = useMutation<
-    IQPaymentRes,
+    { payment: IPayment },
     {
       _id: string;
       payment: Partial<Omit<IPayment, "_id">>;
@@ -58,6 +73,7 @@ export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
   );
 
   return {
+    getPaymentSummaryByEmp,
     createPayment,
     getPayments,
     updatePayment,

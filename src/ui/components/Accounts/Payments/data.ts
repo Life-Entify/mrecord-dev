@@ -131,9 +131,17 @@ export const paymentForm = ({
           children: [
             { value: AccountAction.receive_pay, title: "Receive Payment" },
             { value: AccountAction.receive_deposit, title: "Receive Deposit" },
+            { value: AccountAction.redeem_credit, title: "Redeem Debt" },
+            // { value: AccountAction.loan_repayment, title: "Loan Repayment" },
+          ],
+        },
+        {
+          value: `internal ${TxType.income}`,
+          title: "Internal Income",
+          disabled: true,
+          children: [
             { value: AccountAction.use_deposit, title: "Use Deposit" },
             { value: AccountAction.register_credit, title: "As Credit" },
-            { value: AccountAction.redeem_credit, title: "Redeem Debt" },
             // { value: AccountAction.loan_repayment, title: "Loan Repayment" },
           ],
         },
@@ -313,7 +321,6 @@ export const paymentForm = ({
       return [
         AccountAction.receive_pay,
         AccountAction.register_credit,
-        AccountAction.pay,
       ].includes(value)
         ? fieldData &&
             fieldForm?.({

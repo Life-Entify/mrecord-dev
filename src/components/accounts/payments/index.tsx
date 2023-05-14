@@ -42,6 +42,8 @@ const dialogNewPayment: Partial<IPaymentState> = {
 };
 export default function PaymentComponent() {
   const {
+    paymentSummaryEmp,
+    getEmpSumByDate,
     createPayment,
     getPayments,
     payments,
@@ -258,7 +260,8 @@ export default function PaymentComponent() {
                 });
                 setPayment(record);
                 setTransactions(undefined);
-                getTransactionsById(record.tx_ids);
+                if (record.tx_ids && record.tx_ids?.length > 0)
+                  getTransactionsById(record.tx_ids);
               },
             },
           },

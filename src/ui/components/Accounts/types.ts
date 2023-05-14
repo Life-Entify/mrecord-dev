@@ -3,6 +3,23 @@ import { IPerson } from "../Person";
 import { IEmployee } from "../Employees/Employee";
 import { BOOLEAN_STRING } from "../types";
 
+export interface IDateFilter {
+  date_stamp_from: number;
+  date_stamp_to: number;
+}
+export interface IActionTypeAccount {
+  action_type: AccountAction;
+  total_amount: number;
+}
+export interface IPayTypeAccount {
+  pay_type: PaymentType;
+  total_amount: number;
+}
+export interface IPaymentSummaryEmp {
+  employee: Omit<IEmployee, "logins">;
+  action_types: IActionTypeAccount[];
+  pay_types: IPayTypeAccount[];
+}
 export interface IDepositBalance {
   used: number;
   withdrawn: number;
