@@ -21,7 +21,7 @@ export interface ILogin {
 export interface IEmployee {
   _id: string;
   employee_id: number;
-  person_id: string;
+  person_id: number;
   logins?: ILogin[];
   status?: EMPLOYEE_STATUS;
 

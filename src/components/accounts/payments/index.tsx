@@ -43,7 +43,7 @@ const dialogNewPayment: Partial<IPaymentState> = {
 export default function PaymentComponent() {
   const {
     paymentSummaryEmp,
-    getEmpSumByDate,
+    getPaymentSumByEmp,
     createPayment,
     getPayments,
     payments,
@@ -179,6 +179,7 @@ export default function PaymentComponent() {
     closeDialog();
   };
   //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
+  console.log(paymentSummaryEmp);
   return (
     <>
       {contextHolder}
@@ -217,6 +218,25 @@ export default function PaymentComponent() {
               dialogType: undefined,
             }),
           size: "large",
+        }}
+        tabsProps={{
+          onChange(activeKey) {
+            if (activeKey === "receiver") {
+              const date = new Date();
+              const today = new Date(
+                `${date.getFullYear}-${date.getMonth() + 1}-${String(
+                  date.getDate()
+                ).padStart(2, "0")}`
+              ).getTime();
+              getPaymentSumByEmp(
+                {
+                  date_stamp_from: String(1683849600000),
+                },
+                undefined,
+                { notify: openNotification }
+              );
+            }
+          },
         }}
         paymentCategoryProps={{
           incomeProps: {
@@ -267,7 +287,7 @@ export default function PaymentComponent() {
           },
         }}
         receiverProps={{
-          receivers: dummy.receivers,
+          paymentSummary: paymentSummaryEmp,
         }}
         paymentTxsProps={{
           payment: payment && { ...payment, txs: transactions },

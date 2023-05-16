@@ -4,8 +4,8 @@ import { IEmployee } from "../Employees/Employee";
 import { BOOLEAN_STRING } from "../types";
 
 export interface IDateFilter {
-  date_stamp_from: number;
-  date_stamp_to: number;
+  date_stamp_from?: string;
+  date_stamp_to?: string;
 }
 export interface IActionTypeAccount {
   action_type: AccountAction;
@@ -13,6 +13,7 @@ export interface IActionTypeAccount {
 }
 export interface IPayTypeAccount {
   pay_type: PaymentType;
+  tx_type: TxType;
   total_amount: number;
 }
 export interface IPaymentSummaryEmp {
@@ -103,6 +104,17 @@ export enum IIncomeActions {
   use_deposit = "use_deposit",
   loan_repayment = "loan_repayment",
 }
+export enum IncomeInternal {
+  use_deposit = "use_deposit",
+}
+export enum IncomeExternal {
+  register_credit = "register_credit",
+}
+export type IncomeFalse = keyof (typeof IncomeExternal & typeof IncomeInternal);
+export const paymentFalseIncome: Record<IncomeFalse, undefined> = {
+  register_credit: undefined,
+  use_deposit: undefined
+};
 export enum IExpenditureAction {
   deposit_withdrawal = "deposit_withdrawal",
   pay = "pay",

@@ -38,7 +38,7 @@ export function usePaymentAction() {
   }>();
   const [payment, setPayment] = useState<IPayment>();
   const [persons, setPersons] = useState<IPerson[]>();
-  const getEmpSumByDate = async (
+  const getPaymentSumByEmp = async (
     dateFilter: IDateFilter,
     filter?: Partial<IPayment>,
     options?: { notify: INotify; noise?: boolean }
@@ -50,7 +50,22 @@ export function usePaymentAction() {
           date_filter: dateFilter,
         },
       });
-      const { paymentSummaryEmp: empData } = data || {};
+      let { paymentSummaryEmp: empData } = data || {};
+      const personIds = empData?.map((i) => i.employee?.person_id);
+      if (personIds?.length) {
+        const { data: personData } = await getPersonsByPersonID({
+          variables: {
+            ids: personIds,
+          },
+        });
+        const { persons } = personData || {};
+        empData = empData?.map((emp) => {
+          const empPerson = persons?.find(
+            (person) => person.person_id === emp.employee.person_id
+          );
+          return { ...emp, employee: { ...emp.employee, person: empPerson } };
+        });
+      }
       setPaymentSummaryEmp(empData);
     } catch (e) {
       options?.noise &&
@@ -262,7 +277,7 @@ export function usePaymentAction() {
 
   return {
     paymentSummaryEmp,
-    getEmpSumByDate,
+    getPaymentSumByEmp,
     payments,
     payment,
     persons,

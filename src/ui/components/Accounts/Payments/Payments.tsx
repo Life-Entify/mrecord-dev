@@ -1,4 +1,12 @@
-import { Button, ButtonProps, Drawer, DrawerProps, Space, Tabs } from "antd";
+import {
+  Button,
+  ButtonProps,
+  Drawer,
+  DrawerProps,
+  Space,
+  Tabs,
+  TabsProps,
+} from "antd";
 import React, { useCallback } from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common/views";
@@ -12,7 +20,7 @@ import { INewPaymentProps, NewPayment } from "./NewPayment";
 import { INewPaymentCatProps, NewPaymentCat } from "./NewPaymentCat";
 import { IPaymentReceiptProps, PaymentReceipt } from "./PaymentReceipt";
 import { IPaymentTxProps, PaymentTxs } from "./PaymentTxs";
-import { IReceiverProps, Receivers } from "./Receivers";
+import { IReceiverProps, Receivers } from "./Receivers/Receivers";
 
 const Root = styled.div``;
 const Container = styled.div`
@@ -48,6 +56,7 @@ export interface IPaymentsProps {
   personProps?: IPersonProps & {
     onBack?: React.MouseEventHandler;
   };
+  tabsProps?: TabsProps;
 }
 
 export function Payments({
@@ -61,6 +70,7 @@ export function Payments({
   paymentReceiptProps,
   receiverProps,
   personProps,
+  tabsProps,
 }: IPaymentsProps) {
   const { drawerType, ...deepDrawerProps } = drawerProps || {};
   const { extra, ...deepToolbarProps } = toolbarProps || {};
@@ -97,15 +107,23 @@ export function Payments({
         />
       )}
       <Container>
-        <Tabs>
-          <Tabs.TabPane key={1} tab="Payments">
-            <PaymentTable {...paymentTableProps} />
-          </Tabs.TabPane>
-          <Tabs.TabPane key={2} tab="Receivers">
-            <Receivers {...receiverProps} />
-          </Tabs.TabPane>
-        </Tabs>
-        {/* <Table<IPatient> {...tableProps} /> */}
+        <Tabs
+          {...tabsProps}
+          items={[
+            {
+              label: "Payments",
+              tabKey: "payment",
+              key: "payment",
+              children: <PaymentTable {...paymentTableProps} />,
+            },
+            {
+              label: "Receivers",
+              tabKey: "receiver",
+              key: "receiver",
+              children: <Receivers {...receiverProps} />,
+            },
+          ]}
+        />
         <Drawer
           {...deepDrawerProps}
           extra={getExtra(drawerType as PAYMENT_DIALOG_TYPE)}
@@ -120,7 +138,7 @@ export function Payments({
             <NewPaymentCat {...deepAddPaymentCatProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.PAYMENT_TXS && (
-            <PaymentTxs {...paymentTxsProps}/>
+            <PaymentTxs {...paymentTxsProps} />
           )}
           {drawerType === PAYMENT_DIALOG_TYPE.SHOW_RECEIPT && (
             <PaymentReceipt {...deepPaymentReceiptProps} />

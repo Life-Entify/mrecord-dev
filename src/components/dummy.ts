@@ -145,7 +145,7 @@ const staff: IEmployee = {
   employee_id: 1,
   person: structuredClone(person) as IPerson,
   _id: "1",
-  person_id: "1",
+  person_id: 1,
   department_ids: ["1"],
   // departments: [],
   logins: [login],

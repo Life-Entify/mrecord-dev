@@ -15,11 +15,11 @@ interface IReturnedData extends IPaymentReturnObjects {
 }
 const defaultValue: IReturnedData = {
   paymentSummary: ["employee", "action_types", "pay_types"],
-  employee: ["_id", "employee_id", "person"],
+  employee: ["_id", "employee_id", "person", "person_id"],
   person: ["profile"],
   profile: ["last_name", "first_name"],
   action_types: ["action_type", "total_amount"],
-  pay_types: ["pay_type", "total_amount"],
+  pay_types: ["pay_type", "tx_type", "total_amount"],
   payment: [
     "_id",
     "bank_id",
