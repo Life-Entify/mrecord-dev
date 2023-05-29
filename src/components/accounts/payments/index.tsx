@@ -186,6 +186,14 @@ export default function PaymentComponent() {
       {contextHolder}
       <Payments
         toolbarProps={{
+          dateRangePickerProps: {
+            onChange(values, formatString) {
+              console.log(values, formatString);
+            },
+            onOk(dates) {
+              console.log(dates);
+            },
+          },
           newBtnProps: {
             style: { marginLeft: 10 },
             onClick: () => {
