@@ -96,30 +96,6 @@ export enum PaymentType {
   transfer = "transfer",
   cheque = "cheque",
 }
-export enum IIncomeActions {
-  receive_pay = "receive_pay",
-  receive_deposit = "receive_deposit",
-  register_credit = "register_credit",
-  redeem_credit = "redeem_credit",
-  use_deposit = "use_deposit",
-  loan_repayment = "loan_repayment",
-}
-export enum IncomeInternal {
-  use_deposit = "use_deposit",
-}
-export enum IncomeExternal {
-  register_credit = "register_credit",
-}
-export type IncomeFalse = keyof (typeof IncomeExternal & typeof IncomeInternal);
-export const paymentFalseIncome: Record<IncomeFalse, undefined> = {
-  register_credit: undefined,
-  use_deposit: undefined
-};
-export enum IExpenditureAction {
-  deposit_withdrawal = "deposit_withdrawal",
-  pay = "pay",
-  loan = "loan",
-}
 export enum AccountAction {
   receive_pay = "receive_pay",
   pay = "pay",
@@ -131,6 +107,32 @@ export enum AccountAction {
   loan = "loan",
   loan_repayment = "loan_repayment",
 }
+export enum IExpenditureAction {
+  deposit_withdrawal = "deposit_withdrawal",
+  pay = "pay",
+  loan = "loan",
+}
+export enum IIncomeActions {
+  receive_pay = "receive_pay",
+  receive_deposit = "receive_deposit",
+  register_credit = "register_credit",
+  redeem_credit = "redeem_credit",
+  use_deposit = "use_deposit",
+  loan_repayment = "loan_repayment",
+}
+export enum IncomeInternal {
+  use_deposit = "use_deposit",
+}
+export enum IncomeDeposit {
+  receive_deposit = "receive_deposit",
+}
+export enum IncomeExternal {
+  register_credit = "register_credit",
+}
+export type IncomeFalse = keyof (typeof IncomeExternal &
+  typeof IncomeInternal &
+  typeof IncomeDeposit);
+
 export interface IPayment {
   _id: string;
   pay_type: keyof typeof PaymentType;

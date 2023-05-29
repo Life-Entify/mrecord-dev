@@ -44,7 +44,7 @@ export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
   >(graphCreatePayment(graphReturnedData.payment));
   const [getPaymentSummaryByEmp] = useLazyQuery<
     { paymentSummaryEmp: IPaymentSummaryEmp[] },
-    { filter?: Partial<IPayment>; date_filter: IDateFilter }
+    { filter?: Partial<IPayment>; date_filter?: IDateFilter }
   >(
     graphGetPaymentSummaryByEmps(
       graphReturnedData.paymentSummary,

@@ -47,7 +47,7 @@ export function usePaymentAction() {
       const { data } = await getPaymentSummaryByEmp({
         variables: {
           filter,
-          date_filter: dateFilter,
+          // date_filter: dateFilter,
         },
       });
       let { paymentSummaryEmp: empData } = data || {};

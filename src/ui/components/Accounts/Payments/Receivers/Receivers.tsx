@@ -1,14 +1,14 @@
-import { Card, Divider, List, Space, Tag } from "antd";
+import { Card, Divider, Space, Tag } from "antd";
 import React from "react";
 import styled from "styled-components";
 import {
   AccountAction,
-  IIncomeActions,
   IPaymentSummaryEmp,
+  IncomeFalse,
   PaymentType,
   TxType,
-  paymentFalseIncome,
 } from "../../types";
+import { paymentFalseIncome } from "ui/common/constants";
 
 const Root = styled.div`
   margin-top: 20px;
@@ -44,7 +44,7 @@ function ReceiverFn({ paymentSummary }: IReceiverProps) {
       }
       for (let i = 0; i < action_types.length; i++) {
         const { action_type, total_amount } = action_types[i];
-        if (Object.keys(paymentFalseIncome).indexOf(action_type) !== -1) {
+        if (paymentFalseIncome.indexOf(action_type as IncomeFalse) !== -1) {
           falseIncome += total_amount;
         }
         if (actionTypes[action_type]) {
@@ -81,7 +81,7 @@ function ReceiverFn({ paymentSummary }: IReceiverProps) {
             falseIncome: 0,
           };
           action_types.forEach(({ action_type, total_amount }) => {
-            if (Object.keys(paymentFalseIncome).indexOf(action_type) !== -1) {
+            if (paymentFalseIncome.indexOf(action_type as IncomeFalse) !== -1) {
               totalValues.falseIncome += total_amount;
             }
           });
