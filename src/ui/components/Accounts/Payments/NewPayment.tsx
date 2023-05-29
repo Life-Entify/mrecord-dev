@@ -57,7 +57,7 @@ export function NewPayment({
                   <strong>
                     {Number(
                       transactions
-                        ?.map((i) => Number(i.amount))
+                        ?.map((i) => Number(i.amount || 0))
                         .reduce((a, b) => a + b)
                     ).toLocaleString()}
                   </strong>,

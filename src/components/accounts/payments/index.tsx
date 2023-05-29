@@ -31,6 +31,7 @@ import { usePaymentAction } from "./actions/payment";
 import { usePaymentCategoryAction } from "./actions/payment_category";
 import { useTransactionAction } from "./actions/transaction";
 import { useDepositAction } from "../deposits/actions";
+import { dayToTimeStamp } from "app/utils";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -222,15 +223,10 @@ export default function PaymentComponent() {
         tabsProps={{
           onChange(activeKey) {
             if (activeKey === "receiver") {
-              const date = new Date();
-              const today = new Date(
-                `${date.getFullYear}-${date.getMonth() + 1}-${String(
-                  date.getDate()
-                ).padStart(2, "0")}`
-              ).getTime();
+              const today = dayToTimeStamp(new Date());
               getPaymentSumByEmp(
                 {
-                  date_stamp_from: String(1683849600000),
+                  date_stamp_from: today.toString(), //String(1683849600000),
                 },
                 undefined,
                 { notify: openNotification }
@@ -430,17 +426,25 @@ export default function PaymentComponent() {
                   resetPaymentForm();
                 });
               } else {
+                if (!values.total_amount) {
+                  return openNotification("error", {
+                    key: "payment-amount-error",
+                    message: "Error",
+                    description: "No amount found in this payment",
+                  });
+                }
+                //TODO:// Maintain the reciever query state, and update it to fetch new data on every new payment
                 if (values.use_client) {
                   values.person_id = client?.person_id;
                   delete values.client;
                 }
                 delete values.use_client;
                 delete values.category_id;
-                values.created_at = new Date(
-                  moment(values.created_at || new Date()).format("YYYY-MM-DD")
-                )
-                  .getTime()
-                  .toString();
+                values.created_at = dayToTimeStamp(
+                  new Date(
+                    moment(values.created_at || new Date()).format("YYYY-MM-DD")
+                  )
+                );
                 const tx_type =
                   expenditures.indexOf(values.action_type) === -1
                     ? TxType.income

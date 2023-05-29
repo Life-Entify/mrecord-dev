@@ -15,3 +15,12 @@ export function queryStringBuilder<Q, T>(
     }
   return queryString;
 }
+export function dayToTimeStamp(date: Date) {
+  return new Date(
+    `${date.getFullYear()}-${date.getMonth() + 1}-${String(
+      date.getDate()
+    ).padStart(2, "0")}`
+  )
+    .getTime()
+    .toFixed(0);
+}
