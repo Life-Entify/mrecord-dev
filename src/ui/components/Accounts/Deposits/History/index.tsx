@@ -8,20 +8,13 @@ const Root = styled.div``;
 
 export interface DepositHistoryProps {
   tableProps?: TableProps<IPayment>;
-  deposits?: IPayment[];
 }
 export const DepositHistory: React.FC<DepositHistoryProps> = ({
   tableProps,
-  deposits,
 }) => {
   return (
     <Root>
-      <Table
-        {...tableProps}
-        dataSource={deposits}
-        columns={getPaymentTableColumns()}
-        size="small"
-      />
+      <Table {...tableProps} columns={getPaymentTableColumns()} size="small" />
     </Root>
   );
 };

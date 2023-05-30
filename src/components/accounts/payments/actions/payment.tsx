@@ -11,6 +11,12 @@ import { IPerson } from "ui/components/Person";
 export interface IActionOptions {
   notify: INotify;
 }
+interface IPaymentQuery {
+  keyword?: Partial<IPayment>;
+  dateFilter?: IDateFilter;
+  limit?: number;
+  skip?: number;
+}
 export function usePaymentAction() {
   const {
     getPayments,
@@ -32,12 +38,9 @@ export function usePaymentAction() {
   const [payments, setPayments] = useState<IPayment[]>();
   const [paymentSummaryEmp, setPaymentSummaryEmp] =
     useState<IPaymentSummaryEmp[]>();
-  const [paymentQuery, setPaymentQuery] = useState<{
-    keyword?: Partial<IPayment>;
-    dateFilter?: IDateFilter;
-    limit?: number;
-    skip?: number;
-  }>();
+  const [paymentQuery, _setPaymentQuery] = useState<IPaymentQuery>();
+  const setPaymentQuery = (_query: Partial<IPaymentQuery>) =>
+    _setPaymentQuery((query) => ({ ...query, ..._query }));
   const [payment, setPayment] = useState<IPayment>();
   const [persons, setPersons] = useState<IPerson[]>();
   const getPaymentSumByEmp = useCallback(
@@ -184,7 +187,7 @@ export function usePaymentAction() {
     getPaymts();
     getPaymentSumByEmp();
   }, [JSON.stringify(paymentQuery)]);
-  
+
   const deletePaymt = useCallback(
     async (paymentId?: string, options?: IActionOptions) => {
       if (!paymentId) {

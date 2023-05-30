@@ -10,10 +10,14 @@ const Container = styled.div``;
 export interface IDepositProps {
   tabsProps?: TabsProps;
   toolbarProps?: IToolbarProps;
-  depositHxProps?: DepositHistoryProps
+  depositHxProps?: DepositHistoryProps;
 }
 
-export function Deposits({ tabsProps, toolbarProps }: IDepositProps) {
+export function Deposits({
+  tabsProps,
+  toolbarProps,
+  depositHxProps,
+}: IDepositProps) {
   return (
     <Root>
       {toolbarProps && <Toolbar {...toolbarProps} />}
@@ -25,7 +29,7 @@ export function Deposits({ tabsProps, toolbarProps }: IDepositProps) {
               label: "Deposits",
               tabKey: "deposits",
               key: "deposits",
-              children: <DepositHistory />,
+              children: <DepositHistory {...depositHxProps} />,
             },
             {
               label: "Depositors",
@@ -34,7 +38,6 @@ export function Deposits({ tabsProps, toolbarProps }: IDepositProps) {
               children: <></>,
             },
           ]}
-          
         />
       </Container>
     </Root>
