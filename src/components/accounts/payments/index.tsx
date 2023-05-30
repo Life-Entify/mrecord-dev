@@ -110,6 +110,14 @@ export default function PaymentComponent() {
       getPersons(keyword, limit, skip, { notify: openNotification });
     })();
   }, [JSON.stringify(personQuery)]);
+  useEffect(() => {
+    setPaymentQuery({
+      dateFilter: {
+        date_stamp_from: dayToTimeStamp(new Date()),
+        date_stamp_to: dayToTimeStamp(new Date()),
+      },
+    });
+  }, []);
   const valueFields = (allFields: any) => {
     const newValues: any = {};
     for (const key in allFields) {

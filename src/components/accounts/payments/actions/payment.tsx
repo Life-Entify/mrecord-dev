@@ -184,14 +184,7 @@ export function usePaymentAction() {
     getPaymts();
     getPaymentSumByEmp();
   }, [JSON.stringify(paymentQuery)]);
-  useEffect(() => {
-    setPaymentQuery({
-      dateFilter: {
-        date_stamp_from: dayToTimeStamp(new Date()),
-        date_stamp_to: dayToTimeStamp(new Date()),
-      },
-    });
-  }, []);
+  
   const deletePaymt = useCallback(
     async (paymentId?: string, options?: IActionOptions) => {
       if (!paymentId) {

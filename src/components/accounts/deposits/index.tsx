@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Debts, Deposits } from "ui";
+import dayjs from "dayjs";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -13,5 +14,17 @@ export default function DepositComponent() {
   const setState = (state: Partial<IPaymentState>) =>
     _setState((_state) => ({ ..._state, ...state }));
 
-  return <Deposits />;
+  return (
+    <Deposits
+      toolbarProps={{
+        dateRangePickerProps: {
+          defaultValue: [
+            dayjs(new Date().toLocaleDateString(), "DD/MM/YYYY"),
+            dayjs(new Date().toLocaleDateString(), "DD/MM/YYYY"),
+          ],
+          onChange(_, formatString) {},
+        },
+      }}
+    />
+  );
 }
