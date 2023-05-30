@@ -5,7 +5,9 @@ import { IToolbarProps, Toolbar } from "ui/common";
 import { DepositHistory, DepositHistoryProps } from "./History";
 
 const Root = styled.div``;
-const Container = styled.div``;
+const Container = styled.div`
+  margin-top: 50px;
+`;
 
 export interface IDepositProps {
   tabsProps?: TabsProps;
