@@ -23,8 +23,10 @@ export const externalIncome: (keyof typeof IIncomeActions)[] = [
   "loan_repayment",
   "redeem_credit",
 ];
-export const internalIncome: (keyof typeof IIncomeActions)[] = ["use_deposit"];
-const falseIncome: (keyof typeof IIncomeActions)[] = ["register_credit"];
+export const internalPayment: (keyof typeof AccountAction)[] = [
+  "use_deposit",
+  "register_credit",
+];
 
 export const paymentLabelMap: Record<keyof IPayment, React.ReactNode> = {
   _id: "ID",
@@ -161,8 +163,7 @@ export const paymentForm = ({
     },
     itemFunc(formInstance, fieldForm, fieldData) {
       const actionType = formInstance?.getFieldValue?.("action_type");
-      return !internalIncome.includes(actionType) &&
-        actionType !== IIncomeActions.register_credit
+      return !internalPayment.includes(actionType)
         ? fieldData && fieldForm?.(fieldData)
         : null;
     },
@@ -246,13 +247,28 @@ export const paymentForm = ({
     },
   },
   {
-    fieldType: FORM_FIELD_TYPES.SWITCH,
+    fieldType: FORM_FIELD_TYPES.HIDDEN,
     itemProps: {
-      name: "use_client",
-      label: "Use Saved Client",
+      noStyle: true,
+      shouldUpdate: (prevValues, currentValues) => {
+        return prevValues.action_type !== currentValues.action_type;
+      },
+    },
+    itemFunc(formInstance, fieldForm, fieldData) {
+      return formInstance?.getFieldValue?.("action_type") !==
+        AccountAction.deposit_withdrawal
+        ? fieldData && fieldForm?.(fieldData)
+        : null;
     },
     fieldProps: {
-      disabled: isEdit,
+      fieldType: FORM_FIELD_TYPES.SWITCH,
+      itemProps: {
+        name: "use_client",
+        label: "Use Saved Client",
+      },
+      fieldProps: {
+        disabled: isEdit,
+      },
     },
   },
   {
@@ -264,7 +280,9 @@ export const paymentForm = ({
       },
     },
     itemFunc(formInstance, fieldForm, fieldData) {
-      return !formInstance?.getFieldValue?.("use_client")
+      return formInstance?.getFieldValue?.("action_type") !==
+        AccountAction.deposit_withdrawal &&
+        !formInstance?.getFieldValue?.("use_client")
         ? fieldData && fieldForm?.(fieldData)
         : null;
     },
@@ -281,11 +299,16 @@ export const paymentForm = ({
     itemProps: {
       noStyle: true,
       shouldUpdate: (prevValues, currentValues) => {
-        return prevValues.use_client !== currentValues.use_client;
+        return (
+          prevValues.action_type !== currentValues.action_type ||
+          prevValues.use_client !== currentValues.use_client
+        );
       },
     },
     itemFunc(formInstance, fieldForm, fieldData) {
-      return formInstance?.getFieldValue?.("use_client")
+      return formInstance?.getFieldValue?.("action_type") ===
+        AccountAction.deposit_withdrawal ||
+        formInstance?.getFieldValue?.("use_client")
         ? fieldData && fieldForm?.(fieldData)
         : null;
     },
