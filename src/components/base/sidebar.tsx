@@ -25,7 +25,7 @@ export const items = [
     getItem("Payments", routeNames.payments),
     getItem("Payrolls", routeNames.payrolls),
   ]),
-  getItem("Human Resource", routeNames.appointments, <UserOutlined />, [
+  getItem("Human Resource", "", <UserOutlined />, [
     getItem("Staff", routeNames.staff),
     getItem("Departments", routeNames.departments),
   ]),
