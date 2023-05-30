@@ -21,7 +21,7 @@ export function usePaymentAction() {
   } = usePayment();
   const { getPersons, getPersonsByPersonID } = usePerson({
     person: ["_id", "person_id", "profile"],
-    profile: ["last_name", "first_name"],
+    profile: ["last_name", "first_name", "gender", "dob", "phone_number"],
   });
   const { getEmployeesByEmployeeId } = useEmployee({
     employee: ["_id", "employee_id", "person"],
