@@ -1,3 +1,4 @@
+import { dayToTimeStamp } from "app/utils";
 import { useEmployee } from "app/graph.hooks/employee";
 import { usePayment } from "app/graph.hooks/payment";
 import { usePerson } from "app/graph.hooks/person";
@@ -33,49 +34,50 @@ export function usePaymentAction() {
     useState<IPaymentSummaryEmp[]>();
   const [paymentQuery, setPaymentQuery] = useState<{
     keyword?: Partial<IPayment>;
+    dateFilter?: IDateFilter;
     limit?: number;
     skip?: number;
   }>();
   const [payment, setPayment] = useState<IPayment>();
   const [persons, setPersons] = useState<IPerson[]>();
-  const getPaymentSumByEmp = async (
-    dateFilter: IDateFilter,
-    filter?: Partial<IPayment>,
-    options?: { notify: INotify; noise?: boolean }
-  ) => {
-    try {
-      const { data } = await getPaymentSummaryByEmp({
-        variables: {
-          filter,
-          date_filter: dateFilter,
-        },
-      });
-      let { paymentSummaryEmp: empData } = data || {};
-      const personIds = empData?.map((i) => i.employee?.person_id);
-      if (personIds?.length) {
-        const { data: personData } = await getPersonsByPersonID({
+  const getPaymentSumByEmp = useCallback(
+    async (options?: { notify: INotify; noise?: boolean }) => {
+      try {
+        const { dateFilter, keyword } = paymentQuery || {};
+        const { data } = await getPaymentSummaryByEmp({
           variables: {
-            ids: personIds,
+            filter: keyword,
+            date_filter: dateFilter,
           },
         });
-        const { persons } = personData || {};
-        empData = empData?.map((emp) => {
-          const empPerson = persons?.find(
-            (person) => person.person_id === emp.employee.person_id
-          );
-          return { ...emp, employee: { ...emp.employee, person: empPerson } };
-        });
+        let { paymentSummaryEmp: empData } = data || {};
+        const personIds = empData?.map((i) => i.employee?.person_id);
+        if (personIds?.length) {
+          const { data: personData } = await getPersonsByPersonID({
+            variables: {
+              ids: personIds,
+            },
+          });
+          const { persons } = personData || {};
+          empData = empData?.map((emp) => {
+            const empPerson = persons?.find(
+              (person) => person.person_id === emp.employee.person_id
+            );
+            return { ...emp, employee: { ...emp.employee, person: empPerson } };
+          });
+        }
+        setPaymentSummaryEmp(empData);
+      } catch (e) {
+        options?.noise &&
+          options?.notify?.("error", {
+            key: "get-emp-summary-error",
+            message: "Error",
+            description: (e as Error).message,
+          });
       }
-      setPaymentSummaryEmp(empData);
-    } catch (e) {
-      options?.noise &&
-        options?.notify?.("error", {
-          key: "get-emp-summary-error",
-          message: "Error",
-          description: (e as Error).message,
-        });
-    }
-  };
+    },
+    [JSON.stringify(paymentQuery)]
+  );
   const getPsons = async (
     keyword?: QKeywordPerson,
     limit?: number,
@@ -109,11 +111,17 @@ export function usePaymentAction() {
   };
   const getPaymts = useCallback(
     async (options?: { notify?: INotify; noise?: boolean }) => {
-      const { keyword, limit, skip } = paymentQuery || {};
+      const {
+        keyword,
+        limit,
+        skip,
+        dateFilter: date_filter,
+      } = paymentQuery || {};
       try {
         const { data } = await getPayments({
           variables: {
             keyword,
+            date_filter,
             limit,
             skip,
           },
@@ -174,7 +182,16 @@ export function usePaymentAction() {
   );
   useEffect(() => {
     getPaymts();
+    getPaymentSumByEmp();
   }, [JSON.stringify(paymentQuery)]);
+  useEffect(() => {
+    setPaymentQuery({
+      dateFilter: {
+        date_stamp_from: dayToTimeStamp(new Date()),
+        date_stamp_to: dayToTimeStamp(new Date()),
+      },
+    });
+  }, []);
   const deletePaymt = useCallback(
     async (paymentId?: string, options?: IActionOptions) => {
       if (!paymentId) {
@@ -271,9 +288,6 @@ export function usePaymentAction() {
     },
     [!!createPayment, JSON.stringify(user)]
   );
-  useEffect(() => {
-    getPaymts();
-  }, []);
 
   return {
     paymentSummaryEmp,
@@ -282,6 +296,7 @@ export function usePaymentAction() {
     payment,
     persons,
     setPayment,
+    setPaymentQuery,
     getPayments: getPaymts,
     createPayment: createPaymt,
     updatePayment: updatePaymt,

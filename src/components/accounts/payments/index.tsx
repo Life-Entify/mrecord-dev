@@ -2,6 +2,7 @@ import { checkDEV } from "@apollo/client/utilities/globals";
 import { QKeywordPerson } from "app/graph.queries/persons/types";
 import moment from "moment";
 import React, { useCallback, useEffect, useState } from "react";
+import dayjs from "dayjs";
 import {
   INotify,
   IPayment,
@@ -51,6 +52,8 @@ export default function PaymentComponent() {
     payment,
     persons,
     setPayment,
+    setPaymentQuery,
+
     deletePayment,
     getPersons,
     updatePayment,
@@ -180,18 +183,23 @@ export default function PaymentComponent() {
     closeDialog();
   };
   //TODO: DISPLAY CATEGORIES ON THE NEW PAYMENT PAGE
-  console.log(paymentSummaryEmp);
   return (
     <>
       {contextHolder}
       <Payments
         toolbarProps={{
           dateRangePickerProps: {
+            defaultValue: [
+              dayjs(new Date().toLocaleDateString(), "DD/MM/YYYY"),
+              dayjs(new Date().toLocaleDateString(), "DD/MM/YYYY"),
+            ],
             onChange(values, formatString) {
-              console.log(values, formatString);
-            },
-            onOk(dates) {
-              console.log(dates);
+              setPaymentQuery({
+                dateFilter: {
+                  date_stamp_from: dayToTimeStamp(new Date(formatString[0])),
+                  date_stamp_to: dayToTimeStamp(new Date(formatString[1])),
+                },
+              });
             },
           },
           newBtnProps: {
@@ -231,14 +239,7 @@ export default function PaymentComponent() {
         tabsProps={{
           onChange(activeKey) {
             if (activeKey === "receiver") {
-              const today = dayToTimeStamp(new Date());
-              getPaymentSumByEmp(
-                {
-                  date_stamp_from: today.toString(), //String(1683849600000),
-                },
-                undefined,
-                { notify: openNotification }
-              );
+              getPaymentSumByEmp({ notify: openNotification });
             }
           },
         }}

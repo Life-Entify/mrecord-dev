@@ -56,7 +56,12 @@ export function usePayment(graphReturnedData: IReturnedData = defaultValue) {
   );
   const [getPayments] = useLazyQuery<
     { payments: IPayment[] },
-    { keyword?: Partial<IPayment>; limit?: number; skip?: number }
+    {
+      keyword?: Partial<IPayment>;
+      date_filter?: IDateFilter;
+      limit?: number;
+      skip?: number;
+    }
   >(graphGetPayments(graphReturnedData.payment), {
     fetchPolicy: "network-only",
   });

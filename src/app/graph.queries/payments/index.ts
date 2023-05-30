@@ -73,8 +73,8 @@ export const graphUpdatePayment = (payment?: (keyof IPayment)[]) => {
 export const graphGetPayments = (payment?: (keyof IPayment)[]) => {
   const query = payment ? payment.join(" ") : "_id";
   return gql`
-    query getPayments($keyword: PaymentInputType, $limit: Int, $skip: Int) {
-      payments: getPayments(keyword: $keyword, limit: $limit, skip: $skip) {
+    query getPayments($keyword: PaymentInputType, $date_filter: DateStampInputType, $limit: Int, $skip: Int) {
+      payments: getPayments(keyword: $keyword, date_filter: $date_filter, limit: $limit, skip: $skip) {
         ${query}
       }
     }
