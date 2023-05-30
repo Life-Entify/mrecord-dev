@@ -135,7 +135,10 @@ export function useEmployee(
       logins: employeeReturnData.logins,
     }),
     {
-      fetchPolicy: "network-only",
+      fetchPolicy: "no-cache",
+      nextFetchPolicy(currentFetchPolicy, context) {
+        return "network-only";
+      },
     }
   );
   const [getEmployees] = useLazyQuery<

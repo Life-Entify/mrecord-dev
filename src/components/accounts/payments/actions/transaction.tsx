@@ -18,12 +18,15 @@ export function useTransactionAction() {
   const [transaction, setTransaction] = useState<ITx>();
   const [transactions, setTransactions] = useState<ITx[]>();
   const [allTxs, setAllTxs] = useState<ITx[]>();
-  const getTxs = async (filter: Partial<ITx>, options?: { notify: INotify, noise?: boolean }) => {
+  const getTxs = async (
+    filter: Partial<ITx>,
+    options?: { notify: INotify; noise?: boolean }
+  ) => {
     try {
       const { data } = await getTransactions({
         variables: {
-          keyword: filter
-        }
+          keyword: filter,
+        },
       });
       const { transactions } = data || {};
       setAllTxs(transactions as ITx[]);

@@ -193,7 +193,7 @@ export default function PaymentComponent() {
               dayjs(new Date().toLocaleDateString(), "DD/MM/YYYY"),
               dayjs(new Date().toLocaleDateString(), "DD/MM/YYYY"),
             ],
-            onChange(values, formatString) {
+            onChange(_, formatString) {
               setPaymentQuery({
                 dateFilter: {
                   date_stamp_from: dayToTimeStamp(new Date(formatString[0])),
@@ -270,7 +270,7 @@ export default function PaymentComponent() {
           },
         }}
         paymentTableProps={{
-          payments: payments,
+          payments: payments?.map((i) => ({ ...i, key: i._id })),
           showTx: false,
           banks: banks as IOrgBank[],
           tableProps: {
@@ -285,8 +285,9 @@ export default function PaymentComponent() {
                 });
                 setPayment(record);
                 setTransactions(undefined);
-                if (record.tx_ids && record.tx_ids?.length > 0)
+                if (record.tx_ids && record.tx_ids?.length > 0) {
                   getTransactionsById(record.tx_ids);
+                }
               },
             },
           },

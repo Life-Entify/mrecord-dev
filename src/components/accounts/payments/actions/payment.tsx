@@ -24,7 +24,7 @@ export function usePaymentAction() {
     profile: ["last_name", "first_name", "gender", "dob", "phone_number"],
   });
   const { getEmployeesByEmployeeId } = useEmployee({
-    employee: ["_id", "employee_id", "person"],
+    employee: ["_id", "employee_id", "person_id", "person"],
     person: ["profile"],
     profile: ["last_name", "first_name"],
   });
@@ -133,21 +133,6 @@ export function usePaymentAction() {
         const employee_ids = payments
           ?.map((i) => i.employee_id)
           .filter((value, index, record) => record.indexOf(value) === index);
-        if (personIds && personIds.length > 0) {
-          const { data: personData } = await getPersonsByPersonID({
-            variables: {
-              ids: personIds as number[],
-            },
-          });
-          const { persons } = personData || {};
-          payments = payments?.map((payment) => {
-            const person = persons?.find(
-              (person) => person.person_id === payment.person_id
-            );
-            payment.person = person;
-            return payment;
-          });
-        }
         if (employee_ids && employee_ids.length > 0) {
           const { data: empData } = await getEmployeesByEmployeeId({
             variables: {
@@ -161,6 +146,21 @@ export function usePaymentAction() {
             );
             if (employee) i.employee = employee;
             return i;
+          });
+        }
+        if (personIds && personIds.length > 0) {
+          const { data: personData } = await getPersonsByPersonID({
+            variables: {
+              ids: personIds as number[],
+            },
+          });
+          const { persons } = personData || {};
+          payments = payments?.map((payment) => {
+            const person = persons?.find(
+              (person) => person.person_id === payment.person_id
+            );
+            payment.person = person;
+            return payment;
           });
         }
         setPayments(payments);
