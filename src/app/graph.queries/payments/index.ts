@@ -60,16 +60,6 @@ export const graphUpdatePayment = (payment?: (keyof IPayment)[]) => {
         }
     }`;
 };
-// export const QueryGetPaymentSummaryByEmps = (payment?: (keyof IPayment)[]) => {
-//   const query = payment ? payment.join(" ") : "_id";
-//   return gql`
-//     query getPaymentSummaryByEmps($keyword: PaymentInputType, $limit: Int, $skip: Int) {
-//       paymentSummaryEmp: getPaymentSummaryByEmps(keyword: $keyword, limit: $limit, skip: $skip) {
-//         ${query}
-//       }
-//     }
-//   `;
-// };
 export const graphGetPayments = (payment?: (keyof IPayment)[]) => {
   const query = payment ? payment.join(" ") : "_id";
   return gql`
