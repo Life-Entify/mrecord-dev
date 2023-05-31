@@ -1,24 +1,44 @@
 import { gql } from "@apollo/client";
 import { queryStringBuilder } from "app/utils";
-import { IDepositBalance, IEmployee, IPerson, IProfile } from "ui";
+import {
+  IDepositBalance,
+  IEmployee,
+  IPaymentSummaryEmp,
+  IPerson,
+  IProfile,
+} from "ui";
 
-interface IDepositSummary {
-  employee: (keyof IEmployee)[];
-  deposit_info: ["_id", "total_amount"];
+interface IDepositSummaryID {
+  action_type: string;
+  person_id: number;
 }
-interface IDepositSummaryNested extends IDepositSummary {
-  _id: ["action_type", "person_id"];
-  person: (keyof IPerson)[];
+interface IDepositSummary {
+  deposit_info: {
+    _id: IDepositSummaryID;
+    total_amount: number;
+  };
+  persons: IPerson[];
+}
+interface IDepositSummaryNested {
+  _id: (keyof IDepositSummaryID)[];
+  deposit_info: (keyof {
+    _id: IDepositSummaryID;
+    total_amount: number;
+  })[];
+  persons: (keyof IPerson)[];
   profile: (keyof IProfile)[];
 }
 export const graphGetDepositSummary = <
   Q = IDepositSummary,
   N = IDepositSummaryNested
 >(
-  payment?: (keyof Q)[] | (keyof N)[],
+  result?: (keyof Q)[],
   nestedValues?: N
 ) => {
-  const query = queryStringBuilder<Q, N>(payment, nestedValues);
+  const query = queryStringBuilder<Q, N>(
+    result as (keyof Q)[] | (keyof N)[],
+    nestedValues
+  );
   return gql`
     query getDepositSummaryByPersons($skip: Int, $limit: Int) {
       depositors: getDepositSummaryByPersons(skip: $skip, limit: $limit) {

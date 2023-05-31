@@ -24,9 +24,17 @@ export function useDeposit(graphReturnedData: IReturnedData = defaultValue) {
       depositors: IDepositSummary;
     },
     { limit?: number; skip?: number }
-  >(graphGetDepositSummary(graphReturnedData.depositBalance), {
-    fetchPolicy: "network-only",
-  });
+  >(
+    graphGetDepositSummary(["persons", "deposit_info"], {
+      deposit_info: ["_id", "total_amount"],
+      _id: ["action_type", "person_id"],
+      persons: ["profile"],
+      profile: ["last_name", "first_name"],
+    }),
+    {
+      fetchPolicy: "network-only",
+    }
+  );
   const [getPersonDepositBalance] = useLazyQuery<
     { depositBalance: IDepositBalance },
     { person_id?: number }

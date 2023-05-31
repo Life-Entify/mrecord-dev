@@ -3,6 +3,7 @@ import { Debts, Deposits } from "ui";
 import dayjs from "dayjs";
 import { usePaymentAction } from "../payments/actions/payment";
 import { dayToTimeStamp } from "app/utils";
+import { useDepositAction } from "./actions";
 interface IPaymentState {
   openDrawer: boolean;
   drawerTitle: string;
@@ -11,6 +12,7 @@ interface IPaymentState {
 
 export default function DepositComponent() {
   const { setPaymentQuery, payments } = usePaymentAction();
+  const { depositSummary, getDepositSummary } = useDepositAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -27,6 +29,7 @@ export default function DepositComponent() {
       },
     });
   }, []);
+  console.log(depositSummary);
   return (
     <Deposits
       toolbarProps={{
@@ -43,6 +46,13 @@ export default function DepositComponent() {
               },
             });
           },
+        },
+      }}
+      tabsProps={{
+        onChange(activeKey) {
+          if (activeKey === "depositors") {
+            getDepositSummary();
+          }
         },
       }}
       depositHxProps={{
