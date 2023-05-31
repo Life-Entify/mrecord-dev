@@ -5,6 +5,13 @@ import {
 } from "app/graph.queries/deposit";
 import React from "react";
 import { IDepositBalance, IPerson } from "ui";
+export interface IDepositSummary {
+  persons: IPerson[];
+  deposit_info: {
+    _id: { person_id: number; action_type: string };
+    total_amount: number;
+  };
+}
 interface IReturnedData {
   depositBalance: (keyof IDepositBalance)[];
 }
@@ -14,13 +21,7 @@ const defaultValue: IReturnedData = {
 export function useDeposit(graphReturnedData: IReturnedData = defaultValue) {
   const [getDepositorDepositSummary] = useLazyQuery<
     {
-      depositBalance: {
-        persons: IPerson[];
-        deposit_info: {
-          _id: { person_id: number; action_type: string };
-          total_amount: number;
-        };
-      };
+      depositors: IDepositSummary;
     },
     { limit?: number; skip?: number }
   >(graphGetDepositSummary(graphReturnedData.depositBalance), {

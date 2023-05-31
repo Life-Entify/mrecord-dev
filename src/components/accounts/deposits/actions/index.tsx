@@ -1,11 +1,34 @@
-import { useDeposit } from "app/graph.hooks/deposit";
-import React, { useState } from "react";
+import { IDepositSummary, useDeposit } from "app/graph.hooks/deposit";
+import React, { useCallback, useState } from "react";
 import { IDepositBalance, INotify } from "ui";
 
+interface IQueryOptions {
+  limit: number;
+  skip: number;
+}
 export function useDepositAction() {
-  const { getPersonDepositBalance } = useDeposit();
+  const { getPersonDepositBalance, getDepositorDepositSummary } = useDeposit();
   const [personDepositBalance, setPersonDepositBalance] =
     useState<IDepositBalance>();
+  const [queryOptions, _setQueryOptions] = useState<Partial<IQueryOptions>>();
+  const setQueryOptions = (_state: Partial<IQueryOptions>) =>
+    _setQueryOptions((state) => ({
+      ...state,
+      ..._state,
+    }));
+  const [depositSummary, setDepositSummary] = useState<IDepositSummary>();
+  const getDepositSummary = useCallback(async () => {
+    try {
+      const { data } = await getDepositorDepositSummary({
+        variables: {
+          limit: queryOptions?.limit,
+          skip: queryOptions?.skip,
+        },
+      });
+      const { depositors } = data || {};
+      setDepositSummary(depositors);
+    } catch (e) {}
+  }, [JSON.stringify(queryOptions)]);
   const getPersonDepoBal = async (
     personId: number,
     options?: { notify?: INotify; noise?: boolean }
@@ -37,5 +60,7 @@ export function useDepositAction() {
   return {
     personDepositBalance,
     getPersonDepositBalance: getPersonDepoBal,
+    getDepositSummary,
+    depositSummary,
   };
 }
