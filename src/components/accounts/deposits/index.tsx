@@ -31,8 +31,6 @@ export default function DepositComponent() {
       },
     });
   }, []);
-  console.log("payment query == ", paymentQuery);
-  console.log(depositSummary);
   return (
     <Deposits
       toolbarProps={{
