@@ -1,6 +1,13 @@
-import { IDepositSummary, useDeposit } from "app/graph.hooks/deposit";
+import { useDeposit } from "app/graph.hooks/deposit";
 import React, { useCallback, useState } from "react";
-import { IDepositBalance, INotify } from "ui";
+import {
+  AccountAction,
+  IAccountDeposits,
+  IDepositBalance,
+  IDepositorSummary,
+  INotify,
+  IPerson,
+} from "ui";
 
 interface IQueryOptions {
   limit: number;
@@ -16,7 +23,7 @@ export function useDepositAction() {
       ...state,
       ..._state,
     }));
-  const [depositSummary, setDepositSummary] = useState<IDepositSummary>();
+  const [depositSummary, setDepositSummary] = useState<IDepositorSummary[]>();
   const getDepositSummary = useCallback(async () => {
     try {
       const { data } = await getDepositorDepositSummary({
@@ -26,7 +33,33 @@ export function useDepositAction() {
         },
       });
       const { depositors } = data || {};
-      setDepositSummary(depositors);
+      const { deposit_info, persons } = depositors || {};
+      const depositorSumm: IDepositorSummary[] = [];
+      if (deposit_info)
+        for (let i = 0; i < deposit_info.length; i++) {
+          const dSummary = deposit_info[i];
+          const personIndex = depositorSumm.findIndex(
+            (item) => item.person_id === dSummary._id.person_id
+          );
+          if (personIndex !== -1) {
+            const actionType = dSummary._id.action_type as IAccountDeposits;
+            depositorSumm[personIndex][actionType] = dSummary.total_amount;
+          } else {
+            const person = persons?.find(
+              (p) => p.person_id === dSummary._id.person_id
+            );
+            if (person) {
+              const actionType = dSummary._id.action_type as IAccountDeposits;
+              const { last_name, first_name } = person.profile || {};
+              const value: Partial<IDepositorSummary> = {};
+              value.name = `${last_name || ""} ${first_name || ""}`;
+              value[actionType] = dSummary.total_amount;
+              value.person_id = dSummary._id.person_id;
+              depositorSumm.push(value as IDepositorSummary);
+            }
+          }
+        }
+      setDepositSummary(depositorSumm);
     } catch (e) {}
   }, [JSON.stringify(queryOptions)]);
   const getPersonDepoBal = async (

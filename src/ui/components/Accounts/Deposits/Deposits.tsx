@@ -3,6 +3,7 @@ import React from "react";
 import styled from "styled-components";
 import { IToolbarProps, Toolbar } from "ui/common";
 import { DepositHistory, DepositHistoryProps } from "./History";
+import { DepositorProps, Depositors } from "./Depositors";
 
 const Root = styled.div``;
 const Container = styled.div`
@@ -13,12 +14,14 @@ export interface IDepositProps {
   tabsProps?: TabsProps;
   toolbarProps?: IToolbarProps;
   depositHxProps?: DepositHistoryProps;
+  depositorProps?: DepositorProps;
 }
 
 export function Deposits({
   tabsProps,
   toolbarProps,
   depositHxProps,
+  depositorProps,
 }: IDepositProps) {
   return (
     <Root>
@@ -37,7 +40,7 @@ export function Deposits({
               label: "Depositors",
               tabKey: "depositors",
               key: "depositors",
-              children: <></>,
+              children: <Depositors {...depositorProps} />,
             },
           ]}
         />

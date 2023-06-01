@@ -16,6 +16,15 @@ export interface IPayTypeAccount {
   tx_type: TxType;
   total_amount: number;
 }
+export type IAccountDeposits =
+  | AccountAction.deposit_withdrawal
+  | AccountAction.receive_deposit
+  | AccountAction.use_deposit;
+export type IDepositorSummary = Record<IAccountDeposits, number> & {
+  person_id: number;
+  name: string;
+  balance?: number;
+};
 export interface IPaymentSummaryEmp {
   employee: Omit<IEmployee, "logins">;
   action_types: IActionTypeAccount[];

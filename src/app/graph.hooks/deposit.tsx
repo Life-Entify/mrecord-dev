@@ -10,7 +10,7 @@ export interface IDepositSummary {
   deposit_info: {
     _id: { person_id: number; action_type: string };
     total_amount: number;
-  };
+  }[];
 }
 interface IReturnedData {
   depositBalance: (keyof IDepositBalance)[];
@@ -28,7 +28,7 @@ export function useDeposit(graphReturnedData: IReturnedData = defaultValue) {
     graphGetDepositSummary(["persons", "deposit_info"], {
       deposit_info: ["_id", "total_amount"],
       _id: ["action_type", "person_id"],
-      persons: ["profile"],
+      persons: ["profile", "person_id"],
       profile: ["last_name", "first_name"],
     }),
     {
