@@ -59,7 +59,15 @@ export function useDepositAction() {
             }
           }
         }
-      setDepositSummary(depositorSumm);
+      setDepositSummary(
+        depositorSumm?.map((i) => ({
+          ...i,
+          balance:
+            (i.receive_deposit || 0) -
+            (i.use_deposit || 0) -
+            (i.deposit_withdrawal || 0),
+        }))
+      );
     } catch (e) {}
   }, [JSON.stringify(queryOptions)]);
   const getPersonDepoBal = async (
@@ -91,6 +99,7 @@ export function useDepositAction() {
   };
 
   return {
+    setQueryOptions,
     personDepositBalance,
     getPersonDepositBalance: getPersonDepoBal,
     getDepositSummary,

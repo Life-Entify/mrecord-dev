@@ -11,8 +11,10 @@ interface IPaymentState {
 }
 
 export default function DepositComponent() {
-  const { setPaymentQuery, payments } = usePaymentAction();
-  const { depositSummary, getDepositSummary } = useDepositAction();
+  const { setPaymentQuery, payments, getPayments, paymentQuery } =
+    usePaymentAction();
+  const { depositSummary, getDepositSummary, setQueryOptions } =
+    useDepositAction();
   const [state, _setState] = useState<Partial<IPaymentState>>({
     openDrawer: false,
   });
@@ -29,6 +31,7 @@ export default function DepositComponent() {
       },
     });
   }, []);
+  console.log("payment query == ", paymentQuery);
   console.log(depositSummary);
   return (
     <Deposits
@@ -52,12 +55,19 @@ export default function DepositComponent() {
         onChange(activeKey) {
           if (activeKey === "depositors") {
             getDepositSummary();
+          } else {
+            getPayments();
           }
         },
       }}
       depositHxProps={{
         tableProps: {
           dataSource: payments,
+        },
+      }}
+      depositorProps={{
+        tableProps: {
+          dataSource: depositSummary,
         },
       }}
     />

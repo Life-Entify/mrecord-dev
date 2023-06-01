@@ -292,6 +292,7 @@ export function usePaymentAction() {
     payment,
     persons,
     setPayment,
+    paymentQuery,
     setPaymentQuery,
     getPayments: getPaymts,
     createPayment: createPaymt,
